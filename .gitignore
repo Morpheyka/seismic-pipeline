@@ -1,0 +1,23 @@
+# Track only seismic_pipeline_standalone examples and package (for seismic-pipeline repo)
+*
+!.gitignore
+!seismic_pipeline_standalone/
+seismic_pipeline_standalone/*
+!seismic_pipeline_standalone/full_seismic_pipeline_example_window3.py
+!seismic_pipeline_standalone/full_seismic_pipeline_example.py
+!seismic_pipeline_standalone/seismic_pipeline/
+!seismic_pipeline_standalone/seismic_pipeline/**
+seismic_pipeline_standalone/seismic_pipeline/**/__pycache__/
+seismic_pipeline_standalone/seismic_pipeline/**/*.pyc
+
+# Standard excludes under tracked paths
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+*.log
+*.pkl
+.DS_Store
