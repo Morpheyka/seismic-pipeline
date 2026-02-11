@@ -16,7 +16,19 @@ THREADS_PER_JOB = 1  # Each job uses 1 thread
 
 # Add the seismic_pipeline package to the path
 _script_dir = os.path.dirname(os.path.abspath(__file__))
+_workspace_root = os.path.dirname(_script_dir)
 sys.path.insert(0, _script_dir)
+DEFAULT_QUALITY_MODEL_PATH = os.path.join(
+    _workspace_root,
+    "Анализ моделей оценки качества сигналов и метод оценки из литературы",
+    "Сохраненный модели pickle",
+    "mlp_class_new.pickle",
+)
+DEFAULT_QUALITY_MODEL_MODULE_DIR = os.path.join(
+    _workspace_root,
+    "Анализ моделей оценки качества сигналов и метод оценки из литературы",
+    "скрипты",
+)
 
 # Configure threading BEFORE importing numpy (load threading_config directly to avoid loading full package)
 import importlib.util
@@ -64,6 +76,7 @@ from seismic_pipeline import (
     REMDailyMultiStatExtractorYt,
     MetadataAdderYt,
     HypnogramCacheManagerYt,
+    HypnoCalculatorYt,
     save_step_data
 )
 from seismic_pipeline.mod.scoreryt import yt_accuracy_scorer
@@ -115,7 +128,24 @@ def main():
                        help='Compile markdown report to PDF (requires pandoc)')
     parser.add_argument('--skip-missing-prompt', action='store_true', default=False,
                        help='Automatically continue even if some hypnograms are missing (non-interactive mode)')
+    parser.add_argument('--auto-hypnogram', action='store_true', default=False,
+                       help='Compute missing hypnograms from raw EEG (with DAT pre-cache); if quality is insufficient, fallback to existing local/S3 hypnograms')
+    parser.add_argument('--quality-model-path', default=DEFAULT_QUALITY_MODEL_PATH,
+                       help='Path to channel-quality model pickle/joblib used by auto hypnogram')
+    parser.add_argument('--quality-model-module-path', action='append', default=[],
+                       help='Extra module directory for unpickling quality model (can be passed multiple times)')
+    parser.add_argument('--quality-good-classes', default='4,5',
+                       help='Comma-separated quality classes considered high quality (default: 4,5)')
+    parser.add_argument('--quality-fallback-all-channels', action='store_true', default=False,
+                       help='If quality prediction fails, use all channels for compute instead of immediate fallback to existing local/S3 hypnograms')
     args = parser.parse_args()
+
+    quality_model_module_paths = args.quality_model_module_path[:] if args.quality_model_module_path else []
+    if DEFAULT_QUALITY_MODEL_MODULE_DIR not in quality_model_module_paths:
+        quality_model_module_paths.append(DEFAULT_QUALITY_MODEL_MODULE_DIR)
+    quality_good_classes = tuple(
+        int(v.strip()) for v in args.quality_good_classes.split(',') if v.strip()
+    )
     
     # Configure logging based on arguments
     if args.quiet:
@@ -206,9 +236,10 @@ def main():
     #     print()
     
     # 2. Create cache manager with S3 fallback
+    local_data_root = '/home/ponomattik/mnt/wd/rat'
     cache_manager = HypnogramCacheManagerYt(
         local_cache_dir='./hypnogram_cache',
-        local_data_root='/home/ponomattik/mnt/wd/rat',
+        local_data_root=local_data_root,
         s3_config={
             'service_name': 's3',
             'endpoint_url': 'http://10.132.230.2:7770',
@@ -217,6 +248,22 @@ def main():
         },
         s3_rat_bucket='rat',
         s3_temp_bucket='temp'
+    )
+
+    auto_hypnogram_step = (
+        'hypno_calculator',
+        HypnoCalculatorYt(
+            cache_manager=cache_manager,
+            use_s3_dat=False,
+            local_data_root=local_data_root,
+            s3_config=cache_manager.s3_config,
+            epoch_length_sec=5,
+            threshold='GMM',
+            quality_model_path=args.quality_model_path,
+            quality_model_module_paths=quality_model_module_paths,
+            quality_good_classes=quality_good_classes,
+            quality_fallback_to_all_channels=args.quality_fallback_all_channels,
+        ),
     )
     
     # 3. Create report generator and prepare output directories
@@ -245,6 +292,10 @@ def main():
             use_fixed_control_window=True,
             fixed_control_start_days=9  # Creates 6-day control window: days 9, 8, 7, 6, 5, 4
         )),
+    ]
+    if args.auto_hypnogram:
+        template_steps.append(auto_hypnogram_step)
+    template_steps.extend([
         ('rem_calculator', REMProfileCalculatorYt(
             cache_manager=cache_manager,
             window_size_hours=6,
@@ -262,7 +313,7 @@ def main():
         ('scaler', StandardScalerYt(regression=False)),
 
         ('classifier', LogisticRegression(max_iter=1000, penalty='l1'))
-    ]
+    ])
     template_pipe = PipelineYt(template_steps)
     
     # Define parameter grid for linear classifiers
@@ -420,6 +471,10 @@ def main():
                 fixed_control_start_days=9,  # Creates 6-day window: days 9, 8, 7, 6, 5, 4 (fixed_control_window_days = window_days = 6)
                 original_position=window_pos  # Pass original position to distinguish positive from negative
             )),
+        ]
+        if args.auto_hypnogram:
+            steps.append(auto_hypnogram_step)
+        steps.extend([
             ('rem_calculator', REMProfileCalculatorYt(
                 cache_manager=cache_manager,
                 window_size_hours=6,
@@ -437,7 +492,7 @@ def main():
             ('scaler', StandardScalerYt(regression=False)),
   
             ('classifier', LogisticRegression())  # Placeholder, will be replaced by grid search
-        ]
+        ])
         
         # Create pipeline
         pipe = PipelineYt(steps)
