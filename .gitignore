@@ -1,6 +1,7 @@
 # Track only seismic_pipeline_standalone examples and package (for seismic-pipeline repo)
 *
 !.gitignore
+!README.md
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/full_seismic_pipeline_example_window3.py
