@@ -4,6 +4,7 @@
 !README.md
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
+!seismic_pipeline_standalone/requirements.txt
 !seismic_pipeline_standalone/full_seismic_pipeline_example_window3.py
 !seismic_pipeline_standalone/full_seismic_pipeline_example.py
 !seismic_pipeline_standalone/seismic_pipeline/

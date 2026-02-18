@@ -51,7 +51,15 @@ When hypnograms are missing for some rat/date windows, the pipeline can **comput
 
 ## How to run
 
+Use the project’s virtual environment (venv at repo root):
+
 ```bash
+# From repository root
+cd "/path/to/Main project"   # or your repo root
+python3 -m venv .venv        # only if .venv doesn't exist
+source .venv/bin/activate    # Linux/macOS; on Windows: .venv\Scripts\activate
+pip install -r seismic_pipeline_standalone/requirements.txt
+
 cd seismic_pipeline_standalone
 # With auto-hypnogram (compute missing from .dat, mnt then S3):
 python full_seismic_pipeline_example_window3.py --auto-hypnogram --output-dir ./run_output
@@ -65,7 +73,7 @@ Configure threading (e.g. `MAX_CORES`, `THREADS_PER_JOB`) at the top of the scri
 
 ## Repository layout (main parts)
 
-- `seismic_pipeline_standalone/` – Pipeline package and example runner (`full_seismic_pipeline_example_window3.py`).
+- `seismic_pipeline_standalone/` – Pipeline package, `requirements.txt`, and example runner (`full_seismic_pipeline_example_window3.py`).
 - `seismic_pipeline_standalone/seismic_pipeline/seismo/` – Hypnogram calculator, cache managers (hypnogram + `.dat`), REM profile calculator, etc.
 - `hypnogram_cache/`, `dat_file_cache/` – Local caches (often created at repo root when running from there).
 - `copy_plan.md` – Plan and data flow for the auto-hypnogram feature.
@@ -127,7 +135,15 @@ Configure threading (e.g. `MAX_CORES`, `THREADS_PER_JOB`) at the top of the scri
 
 ## Запуск
 
+Используйте виртуальное окружение проекта (venv в корне репозитория):
+
 ```bash
+# Из корня репозитория
+cd "/path/to/Main project"   # или ваш корень репо
+python3 -m venv .venv        # только если .venv ещё нет
+source .venv/bin/activate    # Linux/macOS; в Windows: .venv\Scripts\activate
+pip install -r seismic_pipeline_standalone/requirements.txt
+
 cd seismic_pipeline_standalone
 # С авто-гипнограммой (вычисление недостающих из .dat, mnt затем S3):
 python full_seismic_pipeline_example_window3.py --auto-hypnogram --output-dir ./run_output
@@ -141,7 +157,7 @@ python full_seismic_pipeline_example_window3.py --output-dir ./run_output
 
 ## Структура репозитория (основное)
 
-- `seismic_pipeline_standalone/` — пакет пайплайна и пример запуска (`full_seismic_pipeline_example_window3.py`).
+- `seismic_pipeline_standalone/` — пакет пайплайна, `requirements.txt` и пример запуска (`full_seismic_pipeline_example_window3.py`).
 - `seismic_pipeline_standalone/seismic_pipeline/seismo/` — калькулятор гипнограмм, менеджеры кэшей (гипнограммы и `.dat`), калькулятор REM-профиля и др.
 - `hypnogram_cache/`, `dat_file_cache/` — локальные кэши (часто создаются в корне репозитория при запуске оттуда).
 - `copy_plan.md` — план и поток данных для функции авто-гипнограммы.
