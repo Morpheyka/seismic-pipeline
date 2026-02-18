@@ -25,6 +25,7 @@ from .rem_maxmin_extractor import (
 from .metadata_adder import MetadataAdderYt
 from .hypnogram_cache_manager import HypnogramCacheManagerYt
 from .hypnogram_calculator import HypnoCalculatorYt
+from .dat_file_cache_manager import DatFileCacheManagerYt
 from .logging_config import ModLoggerYt, get_mod_logger
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     'MetadataAdderYt',
     'HypnogramCacheManagerYt',
     'HypnoCalculatorYt',
+    'DatFileCacheManagerYt',
     'ModLoggerYt',
     'get_mod_logger'
 ]

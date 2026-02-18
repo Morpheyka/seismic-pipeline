@@ -828,7 +828,89 @@ class HypnogramCacheManagerYt:
         except Exception as e:
             self.logger.error(f"Failed to cache hypnogram: {e}")
             return False
-            
+
+    def cache_hypnogram_from_data(self, rat_id: str, date: str, hypnogram: Union[np.ndarray, list]) -> bool:
+        """
+        Cache a hypnogram that was computed in-memory (e.g. from .dat files).
+        Saves directly to local cache without loading from file.
+
+        Parameters
+        ----------
+        rat_id : str
+            Rat identifier (e.g., 'R1', 'R2', etc.)
+        date : str
+            Date in YYYY_MM_DD format
+        hypnogram : np.ndarray or list
+            Hypnogram data to cache (computed in-memory)
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+        try:
+            cache_key = self._generate_cache_key(rat_id, date)
+
+            # Check if already cached
+            if cache_key in self.cache_index:
+                cache_info = self.cache_index[cache_key]
+                cache_file = Path(cache_info['cache_file'])
+                if cache_file.exists():
+                    try:
+                        with open(cache_file, 'rb') as f:
+                            test_hypno = pickle.load(f)
+                        if test_hypno is not None:
+                            return True
+                    except Exception:
+                        pass
+
+            # Validate hypnogram
+            if hypnogram is None:
+                self.logger.warning(f"Hypnogram is None for {rat_id} on {date}")
+                return False
+            if isinstance(hypnogram, list) and len(hypnogram) == 0:
+                self.logger.warning(f"Hypnogram is empty list for {rat_id} on {date}")
+                return False
+            if isinstance(hypnogram, np.ndarray) and hypnogram.size == 0:
+                self.logger.warning(f"Hypnogram array is empty for {rat_id} on {date}")
+                return False
+
+            self.local_cache_dir.mkdir(parents=True, exist_ok=True)
+            import os as os_module
+            temp_suffix = f'.pkl.tmp.{os_module.getpid()}'
+            cache_file = self.local_cache_dir.resolve() / f"{cache_key}_hypno.pkl"
+            temp_file = cache_file.parent / f"{cache_key}_hypno{temp_suffix}"
+
+            try:
+                with open(temp_file, 'wb') as f:
+                    pickle.dump(hypnogram, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.flush()
+                    os.fsync(f.fileno())
+                if not temp_file.exists() or temp_file.stat().st_size == 0:
+                    raise ValueError("Temp file write failed")
+                os.replace(str(temp_file.resolve()), str(cache_file.resolve()))
+                self.cache_index[cache_key] = {
+                    'rat_id': rat_id,
+                    'date': date,
+                    'source': 'computed',
+                    'cache_file': str(cache_file),
+                    'cached_at': datetime.now().isoformat(),
+                    'hypnogram_shape': hypnogram.shape if hasattr(hypnogram, 'shape') else len(hypnogram)
+                }
+                self._save_cache_index()
+                return True
+            except Exception as e:
+                self.logger.error(f"Failed to cache computed hypnogram for {rat_id} on {date}: {e}")
+                try:
+                    if temp_file.exists():
+                        temp_file.unlink()
+                except Exception:
+                    pass
+                return False
+        except Exception as e:
+            self.logger.error(f"Failed to cache hypnogram from data: {e}")
+            return False
+
     def cache_multiple_hypnograms(self, rat_dates: List[Tuple[str, str]], source: str = 'local') -> Dict[str, bool]:
         """
         Cache multiple hypnogram files.

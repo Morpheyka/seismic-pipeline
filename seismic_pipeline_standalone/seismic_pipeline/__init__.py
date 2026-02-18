@@ -41,6 +41,7 @@ from .seismo import (
     MetadataAdderYt,
     HypnogramCacheManagerYt,
     HypnoCalculatorYt,
+    DatFileCacheManagerYt,
 )
 
 # Import visualization tools (optional - can be imported directly)
@@ -80,6 +81,7 @@ __all__ = [
     'MetadataAdderYt',
     'HypnogramCacheManagerYt',
     'HypnoCalculatorYt',
+    'DatFileCacheManagerYt',
     
     # Visualization tools (if available)
     'visualize_hyperparameter_grid_slices',

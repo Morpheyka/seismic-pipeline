@@ -568,26 +568,22 @@ class HypnoCalculatorYt(TransformerMixinYt):
                 eeg_data, rat_id, selected_channels, art_thrs_df, delta_thrs_df, ratio_thrs_df, channel_quality
             )
         
-        # Cache hypnogram
+        # Cache hypnogram directly to hypnogram cache (works even when local_data_root is read-only)
         if self.cache_manager:
-            # Save hypnogram to expected local location first
-            # (where _load_hypnogram_from_local expects it)
-            date_parsed = self._parse_date(date)
-            expected_path = Path(self.local_data_root) / date_parsed / f"{rat_id}_hypno.pickle"
-            
-            # Create directory if needed
-            expected_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Save hypnogram
-            import pickle
-            with open(expected_path, 'wb') as f:
-                pickle.dump(hypnogram, f)
-            
-            # Now cache it (cache_manager will load from the file we just saved)
-            success = self.cache_manager.cache_hypnogram(rat_id, date, source='local')
+            success = self.cache_manager.cache_hypnogram_from_data(rat_id, date, hypnogram)
             if not success:
                 self.logger.warning(f"Failed to cache hypnogram for {rat_id} on {date}")
                 return False
+            # Optionally write to local_data_root for persistence (best effort)
+            try:
+                date_parsed = self._parse_date(date)
+                expected_path = Path(self.local_data_root) / date_parsed / f"{rat_id}_hypno.pickle"
+                expected_path.parent.mkdir(parents=True, exist_ok=True)
+                import pickle
+                with open(expected_path, 'wb') as f:
+                    pickle.dump(hypnogram, f)
+            except (OSError, PermissionError) as e:
+                self.logger.debug(f"Could not write hypnogram to {expected_path}: {e} (cache is populated)")
         
         self.logger.info(f"Calculated and cached hypnogram for {rat_id} on {date}")
         return True

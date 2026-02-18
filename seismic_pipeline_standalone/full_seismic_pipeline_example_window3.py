@@ -77,6 +77,7 @@ from seismic_pipeline import (
     MetadataAdderYt,
     HypnogramCacheManagerYt,
     HypnoCalculatorYt,
+    DatFileCacheManagerYt,
     save_step_data
 )
 from seismic_pipeline.mod.scoreryt import yt_accuracy_scorer
@@ -132,7 +133,7 @@ def main():
     parser.add_argument('--skip-missing-prompt', action='store_true', default=False,
                        help='Automatically continue even if some hypnograms are missing (non-interactive mode)')
     parser.add_argument('--auto-hypnogram', action='store_true', default=False,
-                       help='Compute missing hypnograms from raw EEG (with DAT pre-cache); if quality is insufficient, fallback to existing local/S3 hypnograms')
+                       help='Compute missing hypnograms from .dat files (local /mnt/wd/rat or S3 bucket "rat"); fallback to existing local/S3 hypnograms if quality insufficient')
     parser.add_argument('--quality-model-path', default=DEFAULT_QUALITY_MODEL_PATH,
                        help='Path to channel-quality model pickle/joblib used by auto hypnogram')
     parser.add_argument('--quality-model-module-path', action='append', default=[],
@@ -141,6 +142,10 @@ def main():
                        help='Comma-separated quality classes considered high quality (default: 4,5)')
     parser.add_argument('--quality-fallback-all-channels', action='store_true', default=False,
                        help='If quality prediction fails, use all channels for compute instead of immediate fallback to existing local/S3 hypnograms')
+    parser.add_argument('--local-data-root', default='/mnt/wd/rat',
+                       help='Local path for .dat files and hypnograms (default: /mnt/wd/rat)')
+    parser.add_argument('--use-s3-dat', action='store_true', default=False,
+                       help='Prefer S3 bucket "rat" for .dat files; otherwise try local first, then S3 fallback')
     args = parser.parse_args()
 
     quality_model_module_paths = args.quality_model_module_path[:] if args.quality_model_module_path else []
@@ -239,27 +244,37 @@ def main():
     #     print()
     
     # 2. Create cache manager with S3 fallback
-    local_data_root = '/home/ponomattik/mnt/wd/rat'
+    local_data_root = args.local_data_root
+    s3_config = {
+        'service_name': 's3',
+        'endpoint_url': 'http://10.132.230.2:7770',
+        'aws_access_key_id': 'quantum',
+        'aws_secret_access_key': 's3password',
+    }
     cache_manager = HypnogramCacheManagerYt(
         local_cache_dir='./hypnogram_cache',
         local_data_root=local_data_root,
-        s3_config={
-            'service_name': 's3',
-            'endpoint_url': 'http://10.132.230.2:7770',
-            'aws_access_key_id': 'quantum',
-            'aws_secret_access_key': 's3password',
-        },
+        s3_config=s3_config,
         s3_rat_bucket='rat',
         s3_temp_bucket='temp'
+    )
+
+    # .dat files: try local (mnt) first, then S3 bucket "rat" if not found (see use_s3_dat=False)
+    dat_cache_manager = DatFileCacheManagerYt(
+        local_cache_dir='./dat_file_cache',
+        local_data_root=local_data_root,
+        s3_config=s3_config,
+        s3_rat_bucket='rat'
     )
 
     auto_hypnogram_step = (
         'hypno_calculator',
         HypnoCalculatorYt(
             cache_manager=cache_manager,
-            use_s3_dat=False,
+            dat_cache_manager=dat_cache_manager,
+            use_s3_dat=args.use_s3_dat,
             local_data_root=local_data_root,
-            s3_config=cache_manager.s3_config,
+            s3_config=s3_config,
             epoch_length_sec=5,
             threshold='GMM',
             quality_model_path=args.quality_model_path,
@@ -397,16 +412,46 @@ def main():
     )
     
     if cache_results['missing'] > 0:
-        print("WARNING: Some hypnograms are missing. Experiments may fail for those dates.")
-        print(f"  Negative cache populated with {cache_results['missing']} known-missing entries.")
-        print(f"  Grid search will skip these instantly (no S3 timeouts).")
-        if args.skip_missing_prompt:
-            print("Auto-continuing (--skip-missing-prompt flag set)...")
-        else:
-            response = input("Continue with experiments anyway? (y/n): ")
-            if response.lower() != 'y':
-                print("Exiting...")
-                return
+        if args.auto_hypnogram:
+            # Compute missing hypnograms from .dat files (local /mnt/wd/rat or S3 bucket "rat")
+            print("Computing missing hypnograms from .dat files (local + S3 fallback)...")
+            missing_list = cache_results.get('missing_list', [])
+            X_precompute = [{'rat_id': r, 'window_dates': [d]} for r, d in missing_list]
+            hypno_calc = HypnoCalculatorYt(
+                cache_manager=cache_manager,
+                dat_cache_manager=dat_cache_manager,
+                use_s3_dat=args.use_s3_dat,
+                local_data_root=local_data_root,
+                s3_config=s3_config,
+                epoch_length_sec=5,
+                threshold='GMM',
+                quality_model_path=args.quality_model_path,
+                quality_model_module_paths=quality_model_module_paths,
+                quality_good_classes=quality_good_classes,
+                quality_fallback_to_all_channels=args.quality_fallback_all_channels,
+            )
+            hypno_calc.transform(X_precompute, None)
+            # Re-run precache to update cache status (newly computed hypnograms are now in local_data_root)
+            cache_results = cache_manager.precache_for_experiment(
+                events,
+                window_positions,
+                window_days=3,
+                fixed_control_start_days=9,
+                progress_callback=(lambda m: print(m)) if not args.quiet else None
+            )
+            print(f"After auto-hypnogram: {cache_results['cached']}/{cache_results['total']} cached, "
+                  f"{cache_results['missing']} still missing.")
+        if cache_results['missing'] > 0:
+            print("WARNING: Some hypnograms are still missing. Experiments may fail for those dates.")
+            print(f"  Negative cache populated with {cache_results['missing']} known-missing entries.")
+            print(f"  Grid search will skip these instantly (no S3 timeouts).")
+            if args.skip_missing_prompt:
+                print("Auto-continuing (--skip-missing-prompt flag set)...")
+            else:
+                response = input("Continue with experiments anyway? (y/n): ")
+                if response.lower() != 'y':
+                    print("Exiting...")
+                    return
     
     # 6. Run experiments for each window position (4 to -8, skipping 5 to avoid day 10)
     # Count total param grid combinations for timing estimate
