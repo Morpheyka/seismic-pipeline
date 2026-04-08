@@ -2,6 +2,8 @@
 *
 !.gitignore
 !README.md
+!literature/
+!literature/**
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/requirements.txt
