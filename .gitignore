@@ -2,6 +2,7 @@
 *
 !.gitignore
 !README.md
+!otchet_V_0.2.ipynb
 !literature/
 !literature/**
 !seismic_pipeline_standalone/
