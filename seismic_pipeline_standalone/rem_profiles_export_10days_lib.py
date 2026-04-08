@@ -306,7 +306,9 @@ def export_rem_profiles_10days_cached_only(
         s3_config=s3_config or DEFAULT_S3_CONFIG,
         s3_rat_bucket=s3_rat_bucket,
         s3_temp_bucket=s3_temp_bucket,
-        allow_local_root_fallback=False,
+        # Keep fallback roots enabled so notebook configs with '/mnt/wd/rat'
+        # still resolve to '~/mnt/wd/rat' when mounted there.
+        allow_local_root_fallback=True,
     )
 
     rows = _build_10day_inputs(events)
