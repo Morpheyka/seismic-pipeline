@@ -14,6 +14,14 @@ seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/seismic_pipeline/**
 seismic_pipeline_standalone/seismic_pipeline/**/__pycache__/
 seismic_pipeline_standalone/seismic_pipeline/**/*.pyc
+!rem_profiles_export_10days_lib.py
+!rem_profiles_export_10days_lib/**
+!rem_profiles_export_v02_lib.py
+rem_profiles_export_10days_lib/**/*.pyc
+rem_profiles_export_10days_lib/**/__pycache__/
+rem_profiles_export_10days_lib/**/*.pyc
+rem_profiles_export_v02_lib/**/*.pyc
+rem_profiles_export_v02_lib/**/__pycache__/
 
 # Standard excludes under tracked paths
 __pycache__/
