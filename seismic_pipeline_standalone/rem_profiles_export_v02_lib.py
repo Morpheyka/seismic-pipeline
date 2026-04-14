@@ -1595,7 +1595,7 @@ def run_variant(
             export_result = export_rem_profiles_10days_cached_only(**export_cfg)
 
             prep_cfg = _RUNTIME_LAST_PREPARE_CFG or {}
-            prep_csv_path = prep_cfg.get("csv_path", export_result["paths"]["nanpad_output_csv"])
+            prep_csv_path = export_result["paths"]["nanpad_output_csv"]
             prep_bad_indices = prep_cfg.get("bad_sample_indices", None)
             prep = prepare_model_data(
                 csv_path=prep_csv_path,

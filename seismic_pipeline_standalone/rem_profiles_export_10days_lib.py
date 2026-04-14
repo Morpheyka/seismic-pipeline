@@ -1182,8 +1182,26 @@ def sample_model(
         if backend == "pymc":
             trace = pm.sample(**sample_kwargs)
         elif backend in {"numpyro", "blackjax"}:
+            # With a single GPU, JAX "parallel" chains via pmap may fail for chains>1.
+            # Prefer vectorized chains in that case.
             try:
-                trace = pm.sample(nuts_sampler=backend, **sample_kwargs)
+                import jax
+                device_count = int(jax.device_count())
+            except Exception:
+                device_count = 1
+
+            nuts_sampler_kwargs = {}
+            if chains > 1 and device_count < chains:
+                nuts_sampler_kwargs["chain_method"] = "vectorized"
+            # BlackJAX progress bar uses IO callbacks, which can fail under vectorized/vmap.
+            sample_kwargs["progressbar"] = False
+
+            try:
+                trace = pm.sample(
+                    nuts_sampler=backend,
+                    nuts_sampler_kwargs=nuts_sampler_kwargs,
+                    **sample_kwargs,
+                )
             except ValueError as exc:
                 msg = str(exc)
                 if "Model can not be sampled with NUTS alone" in msg:
@@ -1191,7 +1209,34 @@ def sample_model(
                         "JAX backend requires a fully continuous differentiable model. "
                         "Use tau_mode='marginalized' (or backend='pymc')."
                     ) from exc
+                if (
+                    "cannot select an axis to squeeze out" in msg
+                    and "shape=(4, 2)" in msg
+                    and "dimensions=(0,)" in msg
+                ):
+                    # Retry with explicit vectorized chain mode.
+                    trace = pm.sample(
+                        nuts_sampler=backend,
+                        nuts_sampler_kwargs={"chain_method": "vectorized"},
+                        **sample_kwargs,
+                    )
+                    return trace
                 raise
+            except RuntimeError as exc:
+                msg = str(exc)
+                if (
+                    "Unknown backend: 'gpu' requested" in msg
+                    and "Platforms present are: cpu" in msg
+                ):
+                    # If GPU is requested but unavailable, force CPU and retry once.
+                    os.environ["JAX_PLATFORM_NAME"] = "cpu"
+                    print(
+                        "Requested JAX backend 'gpu' is not available on this machine. "
+                        "Falling back to CPU for sampling."
+                    )
+                    trace = pm.sample(nuts_sampler=backend, **sample_kwargs)
+                else:
+                    raise
         else:
             raise ValueError(
                 "Unsupported nuts_backend. Use one of: 'pymc', 'numpyro', 'blackjax'."
@@ -1650,7 +1695,7 @@ def run_variant(
             export_result = export_rem_profiles_10days_cached_only(**export_cfg)
 
             prep_cfg = _RUNTIME_LAST_PREPARE_CFG or {}
-            prep_csv_path = prep_cfg.get("csv_path", export_result["paths"]["nanpad_output_csv"])
+            prep_csv_path = export_result["paths"]["nanpad_output_csv"]
             prep_bad_indices = prep_cfg.get("bad_sample_indices", None)
             prep = prepare_model_data(
                 csv_path=prep_csv_path,
