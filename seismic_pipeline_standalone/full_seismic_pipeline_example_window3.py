@@ -74,6 +74,7 @@ from seismic_pipeline import (
     REMProfileCleanerYt,
     REMProfileAdvancedCleanerYt,
     REMDailyExtractorYt,
+    REMDailyMultiStatExtractorYt,
     MetadataAdderYt,
     HypnogramCacheManagerYt,
     HypnoCalculatorYt,
@@ -166,13 +167,13 @@ def main():
     
     events = [
     {'rat_id': 'R2', 'date': '2022-11-07'},
-    {'rat_id': 'R2', 'date': '2022-11-18'},
+    #{'rat_id': 'R2', 'date': '2022-11-18'},
     {'rat_id': 'R2', 'date': '2023-04-03'},
-    {'rat_id': 'R2', 'date': '2023-04-11'},
+    #{'rat_id': 'R2', 'date': '2023-04-11'},
     {'rat_id': 'R2', 'date': '2023-04-18'},
     {'rat_id': 'R2', 'date': '2023-04-21'},
     {'rat_id': 'R2', 'date': '2023-05-03'},
-    {'rat_id': 'R2', 'date': '2023-05-09'},
+    #{'rat_id': 'R2', 'date': '2023-05-09'},
     {'rat_id': 'R2', 'date': '2024-09-30'},
     {'rat_id': 'R2', 'date': '2024-10-29'},
     {'rat_id': 'R3', 'date': '2025-01-23'},
@@ -323,12 +324,12 @@ def main():
             sampling_rate=250,
             fail_on_missing_data=False  # Set to False for testing with missing data
         )),
-        ('feature_extractor', REMDailyExtractorYt(
+        ('feature_extractor', REMDailyMultiStatExtractorYt(
             window_days=3,
             handle_empty_days='zero',
-            daily_statistic='max_min_diff'
+            daily_statistics=['mean', 'max_min_diff']
         )),
-        ('classifier', LogisticRegression(max_iter=1000, penalty='l2'))
+        ('classifier', LogisticRegression(max_iter=10_000, penalty='l2', solver='lbfgs'))
     ])
     template_pipe = PipelineYt(template_steps)
     
@@ -345,10 +346,10 @@ def main():
 
     # Define parameter grid for linear classifiers
     base_params = {
-        'rem_calculator__window_size_hours': [1, 2, 3,],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        'rem_calculator__step_size_hours': [1, 2, 3,],# 4, 5, 6, 7, 8],
-        'feature_extractor__window_days': [3,  6, ],  # Match label_generator window_days
-        'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
+        #'rem_calculator__window_size_hours': [ 3, ],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        #'rem_calculator__step_size_hours': [1,],# 4, 5, 6, 7, 8],
+        #'feature_extractor__window_days': [3, ],  # Match label_generator window_days
+        #'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
         #'feature_extractor__daily_statistic': ['max_min_diff', 'mean', 'max'],  # Different statistics to extract
         #'feature_extractor__handle_empty_days': ['zero', 'mean'],  # How to handle missing days
     }
@@ -357,9 +358,9 @@ def main():
     lr_params_l2 = base_params.copy()
     lr_params_l2.update({
         #'classifier': [LogisticRegression(max_iter=1000, penalty='l2')],
-        'classifier__C': [0.1, 1],
-        'classifier__solver': ['liblinear', 'lbfgs'],
-        'classifier__tol': [1e-4, 1e-5],
+        'classifier__C': [0.001, 0.01, 0.05, 0.1, 0.5, 1.0],
+        #'classifier__solver': ['liblinear', 'lbfgs'],
+        'classifier__tol': [1e-5, 1e-4, 1e-3],
         #'classifier__fit_intercept': [True, False],
         #'classifier__max_iter': [1000],
     })
@@ -402,7 +403,7 @@ def main():
     print("Head section added to report.")
     
     # 5. Pre-cache all hypnograms before experiments
-    window_positions = list(range(7, -9, -1))  # Window positions from 4 to -8
+    window_positions = list(range(6, -7, -1))  # Window positions from 6 to 3
     cache_results = cache_manager.precache_for_experiment(
         events,
         window_positions,
@@ -501,7 +502,7 @@ def main():
         window_end = window_pos  # End day (closest to event)
         
         # Control window: 3 days starting at fixed_control_start_days (days 9, 8, 7 before event)
-        control_window_start = 9
+        control_window_start = 9 # 9, 8, 7
         control_window_end = 7  # 3 days: 9, 8, 7
         
         # Format window range string (handle negative numbers)
@@ -524,7 +525,7 @@ def main():
                 window_step_days=window_step_days_for_gen,
                 date_format='%Y-%m-%d',
                 use_fixed_control_window=True,
-                fixed_control_start_days=9,  # Creates 3-day window: days 9, 8, 7 (fixed_control_window_days = window_days = 3)
+                fixed_control_start_days=9,  # Creates 3-day window: days 7, 6, 5 (fixed_control_window_days = window_days = 3)
                 original_position=window_pos  # Pass original position to distinguish positive from negative
             )),
         ]
@@ -533,20 +534,20 @@ def main():
         steps.extend([
             ('rem_calculator', REMProfileCalculatorYt(
                 cache_manager=cache_manager,
-                window_size_hours=6,
+                window_size_hours=2,
                 step_size_hours=1,
                 rem_stage=2,
                 epoch_length_sec=5,
                 sampling_rate=250,
                 fail_on_missing_data=False
             )),
-            ('feature_extractor', REMDailyExtractorYt(
+            ('feature_extractor', REMDailyMultiStatExtractorYt(
                 window_days=3,
                 handle_empty_days='zero',
-                daily_statistic='max_min_diff'
+                daily_statistics=['mean', 'max_min_diff']
             )),
             ('scaler', StandardScalerYt(regression=False)),  # Will be controlled by hyperparameter
-            ('classifier', LogisticRegression())  # Placeholder, will be replaced by grid search
+            ('classifier', LogisticRegression(max_iter=10_000, l1_ratio=0.0, solver='lbfgs', tol=1e-5))  # Placeholder, will be replaced by grid search
         ])
         
         # Create pipeline
@@ -558,7 +559,7 @@ def main():
         grid_search = GridSearchCVYt(
             estimator=pipe,
             param_grid=param_grid,
-            cv=4,
+            cv=17,
             scoring=yt_accuracy_scorer,
             n_jobs=MAX_CORES,  # 13 parallel jobs
             verbose=1,

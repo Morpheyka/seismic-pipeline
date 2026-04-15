@@ -179,28 +179,30 @@ class REMProfileCalculatorYt(TransformerMixinYt):
             _t_cache = _t.time() - _t0
             # #endregion
             
-            # If not cached, try to cache it from local source first
+            # If not cached, try to cache it from S3 source first
             if hypnogram is None:
                 # #region agent log
                 _t1 = _t.time()
                 # #endregion
-                success = self.cache_manager.cache_hypnogram(rat_id, date, 'local')
+                if self.cache_manager._check_s3_temp_bucket_exists(rat_id, date):
+                    success = self.cache_manager.cache_hypnogram(rat_id, date, 's3')
+                else:
+                    success = False
                 # #region agent log
-                _t_local = _t.time() - _t1
+                _t_s3 = _t.time() - _t1
                 # #endregion
                 if success:
                     hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
                 else:
-                    # If local fails, check if file exists in S3 temp bucket before attempting download
+                    # If S3 fails, fallback to local source
                     # #region agent log
                     _t2 = _t.time()
                     # #endregion
-                    if self.cache_manager._check_s3_temp_bucket_exists(rat_id, date):
-                        success = self.cache_manager.cache_hypnogram(rat_id, date, 's3')
-                        if success:
-                            hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
+                    success = self.cache_manager.cache_hypnogram(rat_id, date, 'local')
+                    if success:
+                        hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
                     # #region agent log
-                    _t_s3 = _t.time() - _t2
+                    _t_local = _t.time() - _t2
                     import json as _j, os as _os
                     if not hasattr(self, '_dbg_miss_count'): self._dbg_miss_count = 0
                     self._dbg_miss_count += 1
@@ -208,7 +210,7 @@ class REMProfileCalculatorYt(TransformerMixinYt):
                         _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
                         try:
                             with open(_logpath, 'a') as _f:
-                                _f.write(_j.dumps({"hypothesisId":"H1_H2","location":"rem_profile_calculator.py:160","message":"missing_hypnogram_lookup","data":{"rat_id":rat_id,"date":date,"local_time_s":round(_t_local,4),"s3_check_time_s":round(_t_s3,4),"total_miss_time_s":round(_t_local+_t_s3,4),"miss_count":self._dbg_miss_count},"timestamp":int(_t.time()*1000)}) + '\n')
+                                _f.write(_j.dumps({"hypothesisId":"H1_H2","location":"rem_profile_calculator.py:160","message":"missing_hypnogram_lookup","data":{"rat_id":rat_id,"date":date,"s3_check_time_s":round(_t_s3,4),"local_time_s":round(_t_local,4),"total_miss_time_s":round(_t_local+_t_s3,4),"miss_count":self._dbg_miss_count},"timestamp":int(_t.time()*1000)}) + '\n')
                         except Exception:
                             pass
                     # #endregion

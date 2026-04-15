@@ -5,6 +5,10 @@
 !otchet_V_0.2.ipynb
 !literature/
 !literature/**
+!reports/
+!reports/**
+!run report/
+!run report/**
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/requirements.txt

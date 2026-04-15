@@ -1059,16 +1059,7 @@ class HypnogramCacheManagerYt:
             # Try to automatically reload from source
             self.logger.info(f"Attempting to reload hypnogram for {rat_id}_{date} from source...")
             try:
-                # Try local first
-                success = self.cache_hypnogram(rat_id, date, source='local')
-                if success:
-                    # Verify it was actually cached correctly
-                    hypnogram = self.get_cached_hypnogram(rat_id, date)
-                    if hypnogram is not None:
-                        self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date}")
-                        return hypnogram
-                
-                # Try S3 fallback
+                # Try S3 first
                 if self._check_s3_temp_bucket_exists(rat_id, date):
                     success = self.cache_hypnogram(rat_id, date, source='s3')
                     if success:
@@ -1076,6 +1067,14 @@ class HypnogramCacheManagerYt:
                         if hypnogram is not None:
                             self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date} from S3")
                             return hypnogram
+                
+                # Fallback to local source
+                success = self.cache_hypnogram(rat_id, date, source='local')
+                if success:
+                    hypnogram = self.get_cached_hypnogram(rat_id, date)
+                    if hypnogram is not None:
+                        self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date}")
+                        return hypnogram
             except Exception as reload_error:
                 self.logger.warning(f"Failed to reload hypnogram for {rat_id}_{date}: {reload_error}")
             
@@ -1352,9 +1351,12 @@ class HypnogramCacheManagerYt:
                         del self.cache_index[cache_key]
                         self._save_cache_index()
 
-            success = self.cache_hypnogram(rat_id, date_str, source='local')
-            if not success and self._check_s3_temp_bucket_exists(rat_id, date_str):
+            if self._check_s3_temp_bucket_exists(rat_id, date_str):
                 success = self.cache_hypnogram(rat_id, date_str, source='s3')
+            else:
+                success = False
+            if not success:
+                success = self.cache_hypnogram(rat_id, date_str, source='local')
 
             if success:
                 hypnogram = self.get_cached_hypnogram(rat_id, date_str)

@@ -138,6 +138,8 @@ def main():
                        help='Comma-separated quality classes considered high quality (default: 4,5)')
     parser.add_argument('--quality-fallback-all-channels', action='store_true', default=False,
                        help='If quality prediction fails, use all channels for compute instead of immediate fallback to existing local/S3 hypnograms')
+    parser.add_argument('--local-data-root', default='/mnt/wd/rat',
+                       help='Local root directory for rat data/hypnograms (WD path)')
     args = parser.parse_args()
 
     quality_model_module_paths = args.quality_model_module_path[:] if args.quality_model_module_path else []
@@ -236,7 +238,7 @@ def main():
     #     print()
     
     # 2. Create cache manager with S3 fallback
-    local_data_root = '/home/ponomattik/mnt/wd/rat'
+    local_data_root = args.local_data_root
     cache_manager = HypnogramCacheManagerYt(
         local_cache_dir='./hypnogram_cache',
         local_data_root=local_data_root,
