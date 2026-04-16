@@ -656,10 +656,9 @@ def plot_score_dynamics(all_results: dict, output_path: str, invert_x: bool = Tr
 
     window_positions_array = np.array(all_results['window_positions'])
 
-    # Accuracy
+    # Accuracy (mean only)
     ax = axes[0, 0]
-    ax.errorbar(window_positions_array, all_results['accuracy_mean'],
-                yerr=all_results['accuracy_std'], marker='o', capsize=5, capthick=2)
+    ax.plot(window_positions_array, all_results['accuracy_mean'], marker='o')
     ax.set_xlabel('Window Position')
     ax.set_ylabel('Accuracy')
     ax.set_title('Accuracy vs Window Position')
@@ -667,10 +666,9 @@ def plot_score_dynamics(all_results: dict, output_path: str, invert_x: bool = Tr
     if invert_x:
         ax.invert_xaxis()
 
-    # Precision Class 0
+    # Precision Class 0 (mean only)
     ax = axes[0, 1]
-    ax.errorbar(window_positions_array, all_results['precision_class_0_mean'],
-                yerr=all_results['precision_class_0_std'], marker='o', capsize=5, capthick=2, color='green')
+    ax.plot(window_positions_array, all_results['precision_class_0_mean'], marker='o', color='green')
     ax.set_xlabel('Window Position')
     ax.set_ylabel('Precision')
     ax.set_title('Precision Class 0 vs Window Position')
@@ -678,10 +676,9 @@ def plot_score_dynamics(all_results: dict, output_path: str, invert_x: bool = Tr
     if invert_x:
         ax.invert_xaxis()
 
-    # Precision Class 1
+    # Precision Class 1 (mean only)
     ax = axes[0, 2]
-    ax.errorbar(window_positions_array, all_results['precision_class_1_mean'],
-                yerr=all_results['precision_class_1_std'], marker='o', capsize=5, capthick=2, color='orange')
+    ax.plot(window_positions_array, all_results['precision_class_1_mean'], marker='o', color='orange')
     ax.set_xlabel('Window Position')
     ax.set_ylabel('Precision')
     ax.set_title('Precision Class 1 vs Window Position')
@@ -689,10 +686,9 @@ def plot_score_dynamics(all_results: dict, output_path: str, invert_x: bool = Tr
     if invert_x:
         ax.invert_xaxis()
 
-    # Recall
+    # Recall (mean only)
     ax = axes[1, 0]
-    ax.errorbar(window_positions_array, all_results['recall_mean'],
-                yerr=all_results['recall_std'], marker='o', capsize=5, capthick=2, color='red')
+    ax.plot(window_positions_array, all_results['recall_mean'], marker='o', color='red')
     ax.set_xlabel('Window Position')
     ax.set_ylabel('Recall')
     ax.set_title('Recall vs Window Position')
@@ -700,10 +696,9 @@ def plot_score_dynamics(all_results: dict, output_path: str, invert_x: bool = Tr
     if invert_x:
         ax.invert_xaxis()
 
-    # ROC-AUC
+    # ROC-AUC (mean only)
     ax = axes[1, 1]
-    ax.errorbar(window_positions_array, all_results['roc_auc_mean'],
-                yerr=all_results['roc_auc_std'], marker='o', capsize=5, capthick=2, color='purple')
+    ax.plot(window_positions_array, all_results['roc_auc_mean'], marker='o', color='purple')
     ax.set_xlabel('Window Position')
     ax.set_ylabel('ROC-AUC')
     ax.set_title('ROC-AUC vs Window Position')

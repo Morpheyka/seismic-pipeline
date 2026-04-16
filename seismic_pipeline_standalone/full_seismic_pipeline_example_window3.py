@@ -11,6 +11,11 @@ with all 12 events including 2024 events that use S3 fallback.
 import os
 import sys
 
+WINDOW_DAYS = 3
+CONTROL_WINDOW_DAYS = 8
+STARTPOINT_DAYS = 4
+ENDPOINT_DAYS = -6
+
 MAX_CORES = 15  # Number of parallel jobs for GridSearchCV
 THREADS_PER_JOB = 1  # Each job uses 1 thread
 
@@ -49,7 +54,9 @@ from itertools import combinations
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, roc_auc_score, make_scorer, accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 import re
 import hashlib
 import gc
@@ -86,8 +93,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from seismic_pipeline.mod.grid_searchyt import GridSearchCVYt
 from seismic_pipeline.mod.sklearnbaseyt import TransformerMixinYt
-# Scaler and passthrough for param grid (with/without scaling)
-from seismic_pipeline.mod.scaleryt import StandardScalerYt, PassthroughYt
+# Scalers and passthrough for sample/profile scaling and param grids
+from seismic_pipeline.mod.scaleryt import (
+    StandardScalerYt,
+    MaxMinSampleScaler,
+    PassthroughYt,
+)
 
 from seismic_pipeline.mod.cross_validationyt import cross_val_predict_yt, StratifiedKFoldYt
 
@@ -167,13 +178,13 @@ def main():
     
     events = [
     {'rat_id': 'R2', 'date': '2022-11-07'},
-    #{'rat_id': 'R2', 'date': '2022-11-18'},
+    {'rat_id': 'R2', 'date': '2022-11-18'},
     {'rat_id': 'R2', 'date': '2023-04-03'},
-    #{'rat_id': 'R2', 'date': '2023-04-11'},
+    {'rat_id': 'R2', 'date': '2023-04-11'},
     {'rat_id': 'R2', 'date': '2023-04-18'},
     {'rat_id': 'R2', 'date': '2023-04-21'},
     {'rat_id': 'R2', 'date': '2023-05-03'},
-    #{'rat_id': 'R2', 'date': '2023-05-09'},
+    {'rat_id': 'R2', 'date': '2023-05-09'},
     {'rat_id': 'R2', 'date': '2024-09-30'},
     {'rat_id': 'R2', 'date': '2024-10-29'},
     {'rat_id': 'R3', 'date': '2025-01-23'},
@@ -197,11 +208,11 @@ def main():
     if args.dump_label_generator_output:
         print("=== Dumping CustomEventLabelGeneratorYt output ===")
         debug_label_kwargs = {
-            'window_days': args.window_days,
+            'window_days': WINDOW_DAYS,
             'window_step_days': args.window_step_days,
             'date_format': '%Y-%m-%d',
-            'use_fixed_control_window': args.use_fixed_control_window,
-            'fixed_control_start_days': args.fixed_control_start_days
+            'use_fixed_control_window': True,
+            'fixed_control_start_days': CONTROL_WINDOW_DAYS
         }
         label_generator_debug = CustomEventLabelGeneratorYt(**debug_label_kwargs)
         label_generator_debug.fit(X, y)
@@ -309,7 +320,7 @@ def main():
             window_step_days=-2,
             date_format='%Y-%m-%d',
             use_fixed_control_window=True,
-            fixed_control_start_days=9  # Creates 3-day control window: days 9, 8, 7
+            fixed_control_start_days=CONTROL_WINDOW_DAYS  # Creates 3-day control window: days 9, 8, 7
         )),
     ]
     if args.auto_hypnogram:
@@ -324,6 +335,7 @@ def main():
             sampling_rate=250,
             fail_on_missing_data=False  # Set to False for testing with missing data
         )),
+        ('sample_scaler', MaxMinSampleScaler()),
         ('feature_extractor', REMDailyMultiStatExtractorYt(
             window_days=3,
             handle_empty_days='zero',
@@ -346,11 +358,11 @@ def main():
 
     # Define parameter grid for linear classifiers
     base_params = {
-        #'rem_calculator__window_size_hours': [ 3, ],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        'rem_calculator__window_size_hours': [ 2, 3 ],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
         #'rem_calculator__step_size_hours': [1,],# 4, 5, 6, 7, 8],
         #'feature_extractor__window_days': [3, ],  # Match label_generator window_days
         #'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
-        #'feature_extractor__daily_statistic': ['max_min_diff', 'mean', 'max'],  # Different statistics to extract
+        'feature_extractor__daily_statistics': [['max_min_diff', 'mean'], ['max_min_diff'], ['mean']],  # Different statistics to extract
         #'feature_extractor__handle_empty_days': ['zero', 'mean'],  # How to handle missing days
     }
 
@@ -386,11 +398,29 @@ def main():
         'classifier__tol': [1e-4, 1e-5],
         #'classifier__max_iter': [1000],
     })
+
+    # KNN grid
+    knn_params = base_params.copy()
+    knn_params.update({
+        'classifier': [KNeighborsClassifier(n_neighbors=3)],
+        'classifier__n_neighbors': [ 5, 7, 9, 11, 13, ],
+        'classifier__weights': ['uniform', 'distance'],
+        'classifier__metric': ['euclidean', 'manhattan', 'chebyshev', 'minkowski'],
+    })
     
+    # Decision Tree grid
+    dt_params = base_params.copy()
+    dt_params.update({
+        'classifier': [DecisionTreeClassifier()],
+        'classifier__max_depth': [1, 2],
+        'classifier__min_samples_split': [ 9, 10, 12, 14, 15],
+    })
+
+
     # Combine parameter grids
     #param_grid = [lr_params_l2, lr_params_l1, svm_params]
 
-    param_grid = [lr_params_l2]#, lr_params_l1, svm_params]
+    param_grid = [dt_params]#, lr_params_l1, svm_params]
     
     
     # Add head section
@@ -403,12 +433,12 @@ def main():
     print("Head section added to report.")
     
     # 5. Pre-cache all hypnograms before experiments
-    window_positions = list(range(6, -7, -1))  # Window positions from 6 to 3
+    window_positions = list(range(STARTPOINT_DAYS, ENDPOINT_DAYS, -1))  # Window positions from 6 to 3
     cache_results = cache_manager.precache_for_experiment(
         events,
         window_positions,
-        window_days=3,
-        fixed_control_start_days=9,
+        window_days=WINDOW_DAYS,
+        fixed_control_start_days=CONTROL_WINDOW_DAYS,
         progress_callback=(lambda m: print(m)) if not args.quiet else None
     )
     
@@ -436,8 +466,8 @@ def main():
             cache_results = cache_manager.precache_for_experiment(
                 events,
                 window_positions,
-                window_days=3,
-                fixed_control_start_days=9,
+                window_days=WINDOW_DAYS,
+                fixed_control_start_days=CONTROL_WINDOW_DAYS,
                 progress_callback=(lambda m: print(m)) if not args.quiet else None
             )
             print(f"After auto-hypnogram: {cache_results['cached']}/{cache_results['total']} cached, "
@@ -502,8 +532,8 @@ def main():
         window_end = window_pos  # End day (closest to event)
         
         # Control window: 3 days starting at fixed_control_start_days (days 9, 8, 7 before event)
-        control_window_start = 9 # 9, 8, 7
-        control_window_end = 7  # 3 days: 9, 8, 7
+        control_window_start = CONTROL_WINDOW_DAYS # 7, 6, 5
+        control_window_end = CONTROL_WINDOW_DAYS-WINDOW_DAYS  # 1 day: 7
         
         # Format window range string (handle negative numbers)
         immediate_range = f"{window_start} to {window_end}" if window_end >= 0 else f"{window_start} to {window_end}"
@@ -521,11 +551,11 @@ def main():
         
         steps = [
             ('label_generator', CustomEventLabelGeneratorYt(
-                window_days=3,
+                window_days=WINDOW_DAYS,
                 window_step_days=window_step_days_for_gen,
                 date_format='%Y-%m-%d',
                 use_fixed_control_window=True,
-                fixed_control_start_days=9,  # Creates 3-day window: days 7, 6, 5 (fixed_control_window_days = window_days = 3)
+                fixed_control_start_days=CONTROL_WINDOW_DAYS,  # Creates 2-day window: days 7, 6 (fixed_control_window_days = window_days = 2)
                 original_position=window_pos  # Pass original position to distinguish positive from negative
             )),
         ]
@@ -541,8 +571,9 @@ def main():
                 sampling_rate=250,
                 fail_on_missing_data=False
             )),
+            ('sample_scaler', MaxMinSampleScaler()),
             ('feature_extractor', REMDailyMultiStatExtractorYt(
-                window_days=3,
+                window_days=WINDOW_DAYS,
                 handle_empty_days='zero',
                 daily_statistics=['mean', 'max_min_diff']
             )),
@@ -559,7 +590,7 @@ def main():
         grid_search = GridSearchCVYt(
             estimator=pipe,
             param_grid=param_grid,
-            cv=17,
+            cv=19,
             scoring=yt_accuracy_scorer,
             n_jobs=MAX_CORES,  # 13 parallel jobs
             verbose=1,
