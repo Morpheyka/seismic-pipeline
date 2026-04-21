@@ -14,7 +14,7 @@ import sys
 WINDOW_DAYS = 3
 CONTROL_WINDOW_DAYS = 8
 STARTPOINT_DAYS = 4
-ENDPOINT_DAYS = -6
+ENDPOINT_DAYS = -5
 
 MAX_CORES = 15  # Number of parallel jobs for GridSearchCV
 THREADS_PER_JOB = 1  # Each job uses 1 thread
@@ -358,8 +358,8 @@ def main():
 
     # Define parameter grid for linear classifiers
     base_params = {
-        'rem_calculator__window_size_hours': [ 2, 3 ],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        #'rem_calculator__step_size_hours': [1,],# 4, 5, 6, 7, 8],
+        'rem_calculator__window_size_hours': [ 2, 3, 6],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        #'rem_calculator__step_size_hours': [1, 2],# 4, 5, 6, 7, 8],
         #'feature_extractor__window_days': [3, ],  # Match label_generator window_days
         #'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
         'feature_extractor__daily_statistics': [['max_min_diff', 'mean'], ['max_min_diff'], ['mean']],  # Different statistics to extract
@@ -413,7 +413,7 @@ def main():
     dt_params.update({
         'classifier': [DecisionTreeClassifier()],
         'classifier__max_depth': [1, 2],
-        'classifier__min_samples_split': [ 9, 10, 12, 14, 15],
+        'classifier__min_samples_split': [9],
     })
 
 
@@ -421,6 +421,7 @@ def main():
     #param_grid = [lr_params_l2, lr_params_l1, svm_params]
 
     param_grid = [dt_params]#, lr_params_l1, svm_params]
+
     
     
     # Add head section
@@ -590,7 +591,7 @@ def main():
         grid_search = GridSearchCVYt(
             estimator=pipe,
             param_grid=param_grid,
-            cv=19,
+            cv=20,
             scoring=yt_accuracy_scorer,
             n_jobs=MAX_CORES,  # 13 parallel jobs
             verbose=1,

@@ -43,14 +43,14 @@ Pipeline steps:
 | feature_extractor → daily_statistics | ['max_min_diff', 'mean'], ['max_min_diff'], ['mean'] |
 | classifier | DecisionTreeClassifier() |
 | classifier → max_depth | 1, 2 |
-| classifier → min_samples_split | 9, 10, 12, 14, 15 |
+| classifier → min_samples_split | 15 |
 
 
 ---
 
 ## Позиция сдвига относительно события 4 (аномальное окно: дни 6 to 4; контрольное окно: дни 8 to 5)
 
-![Визуализация сетки гиперпараметров](4-6-to-4-8-to-5__01.png)
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_4.png)
 
 **Лучшие параметры:**
 
@@ -60,17 +60,17 @@ Pipeline steps:
 | classifier → max_depth | 2 |
 | classifier → min_samples_split | 15 |
 | feature_extractor → daily_statistics | ['mean'] |
-| rem_calculator → window_size_hours | 3 |
+| rem_calculator → window_size_hours | 2 |
 
 **Результаты кросс-валидации:**
 
 | Метрика | Значение |
 |----------|----------|
-| Accuracy | 0.5263 ± 0.3023 |
-| Precision class 0 | 0.2105 ± 0.3370 |
-| Precision class 1 | 0.2544 ± 0.3349 |
-| Recall | 0.3553 ± 0.3174 |
-| Roc-auc | 0.3553 ± 0.3174 |
+| Accuracy | 0.5000 ± 0.2236 |
+| Precision class 0 | 0.2000 ± 0.2449 |
+| Precision class 1 | 0.1000 ± 0.2000 |
+| Recall | 0.3000 ± 0.2449 |
+| Roc-auc | 0.2000 ± 0.2449 |
 
 ```
 В данном эксперименте в качестве контрольного (нормального) окна шириной 3 дня используются дни с 9 по 7 до сейсмического события, положение же целевого (аномального) окна в каждом эксперименте сдвигается на сутки вперед: от окна, совпадающего с контрольным, до окна с 6 по 8 день после события.
@@ -89,7 +89,7 @@ Pipeline steps:
 
 ## Позиция сдвига относительно события 3 (аномальное окно: дни 5 to 3; контрольное окно: дни 8 to 5)
 
-![Визуализация сетки гиперпараметров](3-5-to-3-8-to-5__01.png)
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_3.png)
 
 **Лучшие параметры:**
 
@@ -97,7 +97,7 @@ Pipeline steps:
 |----------|----------|
 | classifier | DecisionTreeClassifier() |
 | classifier → max_depth | 1 |
-| classifier → min_samples_split | 9 |
+| classifier → min_samples_split | 15 |
 | feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
 | rem_calculator → window_size_hours | 2 |
 
@@ -105,18 +105,18 @@ Pipeline steps:
 
 | Метрика | Значение |
 |----------|----------|
-| Accuracy | 0.5789 ± 0.2930 |
-| Precision class 0 | 0.5789 ± 0.2930 |
-| Precision class 1 | 0.2895 ± 0.4388 |
-| Recall | 0.5789 ± 0.2816 |
-| Roc-auc | 0.5789 ± 0.2816 |
+| Accuracy | 0.6250 ± 0.2681 |
+| Precision class 0 | 0.6000 ± 0.3391 |
+| Precision class 1 | 0.3750 ± 0.4710 |
+| Recall | 0.6250 ± 0.3112 |
+| Roc-auc | 0.6250 ± 0.3112 |
 
 
 ---
 
 ## Позиция сдвига относительно события 2 (аномальное окно: дни 4 to 2; контрольное окно: дни 8 to 5)
 
-![Визуализация сетки гиперпараметров](2-4-to-2-8-to-5__01.png)
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_2.png)
 
 **Лучшие параметры:**
 
@@ -124,7 +124,7 @@ Pipeline steps:
 |----------|----------|
 | classifier | DecisionTreeClassifier() |
 | classifier → max_depth | 2 |
-| classifier → min_samples_split | 9 |
+| classifier → min_samples_split | 15 |
 | feature_extractor → daily_statistics | ['mean'] |
 | rem_calculator → window_size_hours | 2 |
 
@@ -132,45 +132,18 @@ Pipeline steps:
 
 | Метрика | Значение |
 |----------|----------|
-| Accuracy | 0.6974 ± 0.2877 |
-| Precision class 0 | 0.5526 ± 0.4260 |
-| Precision class 1 | 0.5526 ± 0.4260 |
-| Recall | 0.6842 ± 0.2907 |
-| Roc-auc | 0.6842 ± 0.3329 |
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.5750 ± 0.4265 |
+| Precision class 1 | 0.5750 ± 0.4265 |
+| Recall | 0.7000 ± 0.2915 |
+| Roc-auc | 0.7000 ± 0.3317 |
 
 
 ---
 
 ## Позиция сдвига относительно события 1 (аномальное окно: дни 3 to 1; контрольное окно: дни 8 to 5)
 
-![Визуализация сетки гиперпараметров](1-3-to-1-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 2 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['max_min_diff'] |
-| rem_calculator → window_size_hours | 3 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.6184 ± 0.3075 |
-| Precision class 0 | 0.3947 ± 0.4466 |
-| Precision class 1 | 0.5263 ± 0.3795 |
-| Recall | 0.5789 ± 0.3250 |
-| Roc-auc | 0.5921 ± 0.3163 |
-
-
----
-
-## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](0-2-to-0-8-to-5__01.png)
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_1.png)
 
 **Лучшие параметры:**
 
@@ -178,142 +151,7 @@ Pipeline steps:
 |----------|----------|
 | classifier | DecisionTreeClassifier() |
 | classifier → max_depth | 1 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['max_min_diff'] |
-| rem_calculator → window_size_hours | 3 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.6184 ± 0.2047 |
-| Precision class 0 | 0.5702 ± 0.2977 |
-| Precision class 1 | 0.2632 ± 0.4403 |
-| Recall | 0.5789 ± 0.2930 |
-| Roc-auc | 0.5789 ± 0.2930 |
-
-
----
-
-## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](1-1-to-1-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 1 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['mean'] |
-| rem_calculator → window_size_hours | 3 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.6447 ± 0.2728 |
-| Precision class 0 | 0.4211 ± 0.4372 |
-| Precision class 1 | 0.5263 ± 0.3431 |
-| Recall | 0.6447 ± 0.2194 |
-| Roc-auc | 0.6447 ± 0.2194 |
-
-
----
-
-## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](2-0-to-2-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 2 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['max_min_diff'] |
-| rem_calculator → window_size_hours | 3 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.6447 ± 0.3174 |
-| Precision class 0 | 0.6053 ± 0.3069 |
-| Precision class 1 | 0.3421 ± 0.4603 |
-| Recall | 0.6316 ± 0.2735 |
-| Roc-auc | 0.6053 ± 0.3069 |
-
-
----
-
-## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](3-1-to-3-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 1 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['mean'] |
-| rem_calculator → window_size_hours | 3 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.6184 ± 0.3476 |
-| Precision class 0 | 0.4211 ± 0.4937 |
-| Precision class 1 | 0.5789 ± 0.3722 |
-| Recall | 0.5921 ± 0.3736 |
-| Roc-auc | 0.5921 ± 0.3736 |
-
-
----
-
-## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](4-2-to-4-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 2 |
-| classifier → min_samples_split | 9 |
-| feature_extractor → daily_statistics | ['max_min_diff'] |
-| rem_calculator → window_size_hours | 2 |
-
-**Результаты кросс-валидации:**
-
-| Метрика | Значение |
-|----------|----------|
-| Accuracy | 0.5526 ± 0.3201 |
-| Precision class 0 | 0.5000 ± 0.4292 |
-| Precision class 1 | 0.4211 ± 0.4663 |
-| Recall | 0.5526 ± 0.3939 |
-| Roc-auc | 0.4737 ± 0.4435 |
-
-
----
-
-## Позиция сдвига относительно события -5 (аномальное окно: дни -3 to -5; контрольное окно: дни 8 to 5)
-
-![Визуализация сетки гиперпараметров](5-3-to-5-8-to-5__01.png)
-
-**Лучшие параметры:**
-
-| Параметр | Значение |
-|----------|----------|
-| classifier | DecisionTreeClassifier() |
-| classifier → max_depth | 2 |
-| classifier → min_samples_split | 9 |
+| classifier → min_samples_split | 15 |
 | feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
 | rem_calculator → window_size_hours | 3 |
 
@@ -321,11 +159,146 @@ Pipeline steps:
 
 | Метрика | Значение |
 |----------|----------|
-| Accuracy | 0.6667 ± 0.2810 |
-| Precision class 0 | 0.3947 ± 0.4751 |
-| Precision class 1 | 0.5000 ± 0.3974 |
-| Recall | 0.5395 ± 0.3651 |
-| Roc-auc | 0.5263 ± 0.3795 |
+| Accuracy | 0.6000 ± 0.2000 |
+| Precision class 0 | 0.5750 ± 0.2385 |
+| Precision class 1 | 0.2250 ± 0.4023 |
+| Recall | 0.6000 ± 0.2000 |
+| Roc-auc | 0.6000 ± 0.2000 |
+
+
+---
+
+## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_0.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 15 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2861 |
+| Precision class 0 | 0.4500 ± 0.4717 |
+| Precision class 1 | 0.6250 ± 0.3491 |
+| Recall | 0.6750 ± 0.2861 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+
+---
+
+## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 15 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.6500 ± 0.3905 |
+| Precision class 1 | 0.5500 ± 0.4717 |
+| Recall | 0.7000 ± 0.3317 |
+| Roc-auc | 0.6750 ± 0.3961 |
+
+
+---
+
+## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 15 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.3317 |
+| Precision class 0 | 0.6250 ± 0.3491 |
+| Precision class 1 | 0.3500 ± 0.4770 |
+| Recall | 0.6250 ± 0.3491 |
+| Roc-auc | 0.5750 ± 0.3631 |
+
+
+---
+
+## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 15 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.2550 |
+| Precision class 0 | 0.6000 ± 0.2550 |
+| Precision class 1 | 0.2000 ± 0.4000 |
+| Recall | 0.6000 ± 0.2550 |
+| Roc-auc | 0.5500 ± 0.2693 |
+
+
+---
+
+## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 15 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.3269 |
+| Precision class 0 | 0.5000 ± 0.4743 |
+| Precision class 1 | 0.5250 ± 0.4023 |
+| Recall | 0.6750 ± 0.3269 |
+| Roc-auc | 0.4000 ± 0.4637 |
 
 
 ---
@@ -334,7 +307,1072 @@ Pipeline steps:
 
 **Динамика метрик по позициям окна:**
 
-![Динамика метрик по позициям окна](section-12__01.png)
+![Динамика метрик по позициям окна](section-11__01.png)
+
+
+---
+
+## Позиция сдвига относительно события 4 (аномальное окно: дни 6 to 4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.5000 ± 0.2236 |
+| Precision class 0 | 0.2250 ± 0.2487 |
+| Precision class 1 | 0.1000 ± 0.2000 |
+| Recall | 0.3250 ± 0.2385 |
+| Roc-auc | 0.2500 ± 0.2958 |
+
+```
+В данном эксперименте в качестве контрольного (нормального) окна шириной 3 дня используются дни с 9 по 7 до сейсмического события, положение же целевого (аномального) окна в каждом эксперименте сдвигается на сутки вперед: от окна, совпадающего с контрольным, до окна с 6 по 8 день после события.
+
+В кажом отчете представленны результаты 4-fold кросс-валидаци с проекциями пространства гиперпараметров в точке оптимума точности (Accuracy).
+
+В конце отчета находится сводный график метрик разделимости данных подобранных моделей для разных окон со средними и отклонением по 4-м фолдам кросс-валидации.
+
+В качестве признака используется размахи профиля на некотором разбиении вектора быстроволнового сна. Диаметр разбиения, а также ширина и шаг скользаящего окна для вычисления самого вектора являются гиперпараметрами и в каждом эксперементе различаются.
+
+Для классификации используются простейшие модели: Логистическая регрессия и Метод опорных векторов с разными ядрами, решателями и прочими гиперпараметрами.
+```
+
+
+---
+
+## Позиция сдвига относительно события 3 (аномальное окно: дни 5 to 3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6250 ± 0.2681 |
+| Precision class 0 | 0.5500 ± 0.3500 |
+| Precision class 1 | 0.3250 ± 0.4548 |
+| Recall | 0.5750 ± 0.3269 |
+| Roc-auc | 0.5750 ± 0.3269 |
+
+
+---
+
+## Позиция сдвига относительно события 2 (аномальное окно: дни 4 to 2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.5750 ± 0.4265 |
+| Precision class 1 | 0.5750 ± 0.4265 |
+| Recall | 0.7000 ± 0.2915 |
+| Roc-auc | 0.7000 ± 0.3317 |
+
+
+---
+
+## Позиция сдвига относительно события 1 (аномальное окно: дни 3 to 1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.2000 |
+| Precision class 0 | 0.5750 ± 0.2385 |
+| Precision class 1 | 0.2250 ± 0.4023 |
+| Recall | 0.6000 ± 0.2000 |
+| Roc-auc | 0.6000 ± 0.2000 |
+
+
+---
+
+## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_0.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2861 |
+| Precision class 0 | 0.4500 ± 0.4717 |
+| Precision class 1 | 0.6250 ± 0.3491 |
+| Recall | 0.6750 ± 0.2861 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+
+---
+
+## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.6500 ± 0.3905 |
+| Precision class 1 | 0.5500 ± 0.4717 |
+| Recall | 0.7000 ± 0.3317 |
+| Roc-auc | 0.6750 ± 0.3961 |
+
+
+---
+
+## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.3317 |
+| Precision class 0 | 0.6250 ± 0.3491 |
+| Precision class 1 | 0.3500 ± 0.4770 |
+| Recall | 0.6250 ± 0.3491 |
+| Roc-auc | 0.5750 ± 0.3631 |
+
+
+---
+
+## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.2550 |
+| Precision class 0 | 0.6000 ± 0.2550 |
+| Precision class 1 | 0.2000 ± 0.4000 |
+| Recall | 0.6000 ± 0.2550 |
+| Roc-auc | 0.5500 ± 0.2693 |
+
+
+---
+
+## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.3631 |
+| Precision class 0 | 0.5500 ± 0.4444 |
+| Precision class 1 | 0.5000 ± 0.4183 |
+| Recall | 0.7000 ± 0.2915 |
+| Roc-auc | 0.4000 ± 0.4637 |
+
+
+---
+
+## Динамика разделимости по метрикам
+
+**Динамика метрик по позициям окна:**
+
+![Динамика метрик по позициям окна](section-21__01.png)
+
+
+---
+
+## Позиция сдвига относительно события 4 (аномальное окно: дни 6 to 4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7250 ± 0.2947 |
+| Precision class 0 | 0.5500 ± 0.4975 |
+| Precision class 1 | 0.7250 ± 0.3345 |
+| Recall | 0.7250 ± 0.3345 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+```
+В данном эксперименте в качестве контрольного (нормального) окна шириной 3 дня используются дни с 9 по 7 до сейсмического события, положение же целевого (аномального) окна в каждом эксперименте сдвигается на сутки вперед: от окна, совпадающего с контрольным, до окна с 6 по 8 день после события.
+
+В кажом отчете представленны результаты 4-fold кросс-валидаци с проекциями пространства гиперпараметров в точке оптимума точности (Accuracy).
+
+В конце отчета находится сводный график метрик разделимости данных подобранных моделей для разных окон со средними и отклонением по 4-м фолдам кросс-валидации.
+
+В качестве признака используется размахи профиля на некотором разбиении вектора быстроволнового сна. Диаметр разбиения, а также ширина и шаг скользаящего окна для вычисления самого вектора являются гиперпараметрами и в каждом эксперементе различаются.
+
+Для классификации используются простейшие модели: Логистическая регрессия и Метод опорных векторов с разными ядрами, решателями и прочими гиперпараметрами.
+```
+
+
+---
+
+## Позиция сдвига относительно события 3 (аномальное окно: дни 5 to 3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6500 ± 0.3571 |
+| Precision class 0 | 0.5750 ± 0.4548 |
+| Precision class 1 | 0.5750 ± 0.4548 |
+| Recall | 0.6500 ± 0.3905 |
+| Roc-auc | 0.6750 ± 0.3961 |
+
+
+---
+
+## Позиция сдвига относительно события 2 (аномальное окно: дни 4 to 2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7250 ± 0.2487 |
+| Precision class 0 | 0.6750 ± 0.4265 |
+| Precision class 1 | 0.6500 ± 0.4500 |
+| Recall | 0.7250 ± 0.3700 |
+| Roc-auc | 0.6500 ± 0.4500 |
+
+
+---
+
+## Позиция сдвига относительно события 1 (аномальное окно: дни 3 to 1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.3250 ± 0.4548 |
+| Precision class 1 | 0.5750 ± 0.3269 |
+| Recall | 0.6000 ± 0.3000 |
+| Roc-auc | 0.6750 ± 0.3269 |
+
+
+---
+
+## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_0.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → step_size_hours | 1 |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2861 |
+| Precision class 0 | 0.4500 ± 0.4717 |
+| Precision class 1 | 0.6250 ± 0.3491 |
+| Recall | 0.6750 ± 0.2861 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+
+---
+
+## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7250 ± 0.2487 |
+| Precision class 0 | 0.5500 ± 0.4717 |
+| Precision class 1 | 0.6750 ± 0.3631 |
+| Recall | 0.7250 ± 0.2947 |
+| Roc-auc | 0.7250 ± 0.2947 |
+
+
+---
+
+## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7250 ± 0.2947 |
+| Precision class 0 | 0.7000 ± 0.3317 |
+| Precision class 1 | 0.4500 ± 0.4975 |
+| Recall | 0.7000 ± 0.3317 |
+| Roc-auc | 0.6500 ± 0.3571 |
+
+
+---
+
+## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → step_size_hours | 2 |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7750 ± 0.2487 |
+| Precision class 0 | 0.7750 ± 0.2487 |
+| Precision class 1 | 0.5000 ± 0.5000 |
+| Recall | 0.7750 ± 0.2487 |
+| Roc-auc | 0.7250 ± 0.2947 |
+
+
+---
+
+## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → step_size_hours | 1 |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.3631 |
+| Precision class 0 | 0.6000 ± 0.4359 |
+| Precision class 1 | 0.5250 ± 0.4323 |
+| Recall | 0.7250 ± 0.2947 |
+| Roc-auc | 0.4500 ± 0.4717 |
+
+
+---
+
+## Динамика разделимости по метрикам
+
+**Динамика метрик по позициям окна:**
+
+![Динамика метрик по позициям окна](section-31__01.png)
+
+
+---
+
+## Позиция сдвига относительно события 4 (аномальное окно: дни 6 to 4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.5000 ± 0.2236 |
+| Precision class 0 | 0.2250 ± 0.2487 |
+| Precision class 1 | 0.1000 ± 0.2000 |
+| Recall | 0.3250 ± 0.2385 |
+| Roc-auc | 0.2500 ± 0.2958 |
+
+```
+В данном эксперименте в качестве контрольного (нормального) окна шириной 3 дня используются дни с 9 по 7 до сейсмического события, положение же целевого (аномального) окна в каждом эксперименте сдвигается на сутки вперед: от окна, совпадающего с контрольным, до окна с 6 по 8 день после события.
+
+В кажом отчете представленны результаты 4-fold кросс-валидаци с проекциями пространства гиперпараметров в точке оптимума точности (Accuracy).
+
+В конце отчета находится сводный график метрик разделимости данных подобранных моделей для разных окон со средними и отклонением по 4-м фолдам кросс-валидации.
+
+В качестве признака используется размахи профиля на некотором разбиении вектора быстроволнового сна. Диаметр разбиения, а также ширина и шаг скользаящего окна для вычисления самого вектора являются гиперпараметрами и в каждом эксперементе различаются.
+
+Для классификации используются простейшие модели: Логистическая регрессия и Метод опорных векторов с разными ядрами, решателями и прочими гиперпараметрами.
+```
+
+
+---
+
+## Позиция сдвига относительно события 3 (аномальное окно: дни 5 to 3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6250 ± 0.2681 |
+| Precision class 0 | 0.5500 ± 0.3500 |
+| Precision class 1 | 0.3250 ± 0.4548 |
+| Recall | 0.5750 ± 0.3269 |
+| Roc-auc | 0.5750 ± 0.3269 |
+
+
+---
+
+## Позиция сдвига относительно события 2 (аномальное окно: дни 4 to 2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.5750 ± 0.4265 |
+| Precision class 1 | 0.5750 ± 0.4265 |
+| Recall | 0.7000 ± 0.2915 |
+| Roc-auc | 0.7000 ± 0.3317 |
+
+
+---
+
+## Позиция сдвига относительно события 1 (аномальное окно: дни 3 to 1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.5000 ± 0.1581 |
+| Precision class 0 | 0.0500 ± 0.2179 |
+| Precision class 1 | 0.4250 ± 0.2385 |
+| Recall | 0.4250 ± 0.2385 |
+| Roc-auc | 0.4250 ± 0.2385 |
+
+
+---
+
+## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_0.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2861 |
+| Precision class 0 | 0.4500 ± 0.4717 |
+| Precision class 1 | 0.6250 ± 0.3491 |
+| Recall | 0.6750 ± 0.2861 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+
+---
+
+## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.5750 ± 0.2385 |
+| Precision class 0 | 0.4500 ± 0.3500 |
+| Precision class 1 | 0.3000 ± 0.4000 |
+| Recall | 0.5500 ± 0.2693 |
+| Roc-auc | 0.5000 ± 0.3162 |
+
+
+---
+
+## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.4062 |
+| Precision class 0 | 0.5500 ± 0.4444 |
+| Precision class 1 | 0.4000 ± 0.4899 |
+| Recall | 0.5500 ± 0.4444 |
+| Roc-auc | 0.5000 ± 0.4472 |
+
+
+---
+
+## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.3000 |
+| Precision class 0 | 0.4000 ± 0.3742 |
+| Precision class 1 | 0.3000 ± 0.3674 |
+| Recall | 0.5500 ± 0.2693 |
+| Roc-auc | 0.4750 ± 0.3700 |
+
+
+---
+
+## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.5500 ± 0.2693 |
+| Precision class 0 | 0.4500 ± 0.4153 |
+| Precision class 1 | 0.3750 ± 0.4437 |
+| Recall | 0.5250 ± 0.3700 |
+| Roc-auc | 0.4250 ± 0.4265 |
+
+
+---
+
+## Динамика разделимости по метрикам
+
+**Динамика метрик по позициям окна:**
+
+![Динамика метрик по позициям окна](section-41__01.png)
+
+
+---
+
+## Позиция сдвига относительно события 4 (аномальное окно: дни 6 to 4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 6 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2915 |
+| Precision class 0 | 0.4250 ± 0.4815 |
+| Precision class 1 | 0.5500 ± 0.4153 |
+| Recall | 0.5750 ± 0.3961 |
+| Roc-auc | 0.5250 ± 0.4323 |
+
+```
+В данном эксперименте в качестве контрольного (нормального) окна шириной 3 дня используются дни с 9 по 7 до сейсмического события, положение же целевого (аномального) окна в каждом эксперименте сдвигается на сутки вперед: от окна, совпадающего с контрольным, до окна с 6 по 8 день после события.
+
+В кажом отчете представленны результаты 4-fold кросс-валидаци с проекциями пространства гиперпараметров в точке оптимума точности (Accuracy).
+
+В конце отчета находится сводный график метрик разделимости данных подобранных моделей для разных окон со средними и отклонением по 4-м фолдам кросс-валидации.
+
+В качестве признака используется размахи профиля на некотором разбиении вектора быстроволнового сна. Диаметр разбиения, а также ширина и шаг скользаящего окна для вычисления самого вектора являются гиперпараметрами и в каждом эксперементе различаются.
+
+Для классификации используются простейшие модели: Логистическая регрессия и Метод опорных векторов с разными ядрами, решателями и прочими гиперпараметрами.
+```
+
+
+---
+
+## Позиция сдвига относительно события 3 (аномальное окно: дни 5 to 3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6250 ± 0.2681 |
+| Precision class 0 | 0.5500 ± 0.3500 |
+| Precision class 1 | 0.3250 ± 0.4548 |
+| Recall | 0.5750 ± 0.3269 |
+| Roc-auc | 0.5750 ± 0.3269 |
+
+
+---
+
+## Позиция сдвига относительно события 2 (аномальное окно: дни 4 to 2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 6 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.8000 ± 0.2449 |
+| Precision class 0 | 0.6000 ± 0.4637 |
+| Precision class 1 | 0.7250 ± 0.3345 |
+| Recall | 0.7750 ± 0.2487 |
+| Roc-auc | 0.7750 ± 0.2947 |
+
+
+---
+
+## Позиция сдвига относительно события 1 (аномальное окно: дни 3 to 1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['mean'] |
+| rem_calculator → window_size_hours | 6 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2385 |
+| Precision class 0 | 0.4500 ± 0.4444 |
+| Precision class 1 | 0.5750 ± 0.3631 |
+| Recall | 0.6750 ± 0.2385 |
+| Roc-auc | 0.6750 ± 0.2385 |
+
+
+---
+
+## Позиция сдвига относительно события 0 (аномальное окно: дни 2 to 0; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_0.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 2 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.2861 |
+| Precision class 0 | 0.4500 ± 0.4717 |
+| Precision class 1 | 0.6250 ± 0.3491 |
+| Recall | 0.6750 ± 0.2861 |
+| Roc-auc | 0.7500 ± 0.3354 |
+
+
+---
+
+## Позиция сдвига относительно события -1 (аномальное окно: дни 1 to -1; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-1.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 6 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.2449 |
+| Precision class 0 | 0.7000 ± 0.2915 |
+| Precision class 1 | 0.4500 ± 0.4975 |
+| Recall | 0.7000 ± 0.2915 |
+| Roc-auc | 0.7000 ± 0.2915 |
+
+
+---
+
+## Позиция сдвига относительно события -2 (аномальное окно: дни 0 to -2; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-2.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.7000 ± 0.3317 |
+| Precision class 0 | 0.6250 ± 0.3491 |
+| Precision class 1 | 0.3500 ± 0.4770 |
+| Recall | 0.6250 ± 0.3491 |
+| Roc-auc | 0.5750 ± 0.3631 |
+
+
+---
+
+## Позиция сдвига относительно события -3 (аномальное окно: дни -1 to -3; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-3.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 1 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 6 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6000 ± 0.2000 |
+| Precision class 0 | 0.6000 ± 0.2000 |
+| Precision class 1 | 0.1500 ± 0.3571 |
+| Recall | 0.6000 ± 0.2000 |
+| Roc-auc | 0.5500 ± 0.2179 |
+
+
+---
+
+## Позиция сдвига относительно события -4 (аномальное окно: дни -2 to -4; контрольное окно: дни 8 to 5)
+
+![Визуализация сетки гиперпараметров](Hyperparameter_Grid_Search_pos_-4.png)
+
+**Лучшие параметры:**
+
+| Параметр | Значение |
+|----------|----------|
+| classifier | DecisionTreeClassifier() |
+| classifier → max_depth | 2 |
+| classifier → min_samples_split | 9 |
+| feature_extractor → daily_statistics | ['max_min_diff', 'mean'] |
+| rem_calculator → window_size_hours | 3 |
+
+**Результаты кросс-валидации:**
+
+| Метрика | Значение |
+|----------|----------|
+| Accuracy | 0.6750 ± 0.3631 |
+| Precision class 0 | 0.5250 ± 0.4603 |
+| Precision class 1 | 0.5000 ± 0.4183 |
+| Recall | 0.6750 ± 0.3269 |
+| Roc-auc | 0.4000 ± 0.4637 |
+
+
+---
+
+## Динамика разделимости по метрикам
+
+**Динамика метрик по позициям окна:**
+
+![Динамика метрик по позициям окна](section-51__01.png)
 
 
 ---

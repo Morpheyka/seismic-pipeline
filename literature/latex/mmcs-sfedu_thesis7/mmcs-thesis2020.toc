@@ -1,0 +1,11 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{Постановка задачи}{3}{}%
+\contentsline {section}{Введение}{4}{}%
+\contentsline {section}{\numberline {1.\relax }Описание полученных результатов}{5}{}%
+\contentsline {subsection}{\numberline {1.1.\relax }Рекомендуемые объёмы работ}{6}{}%
+\contentsline {subsection}{\numberline {1.2.\relax }Вставка изображений и таблиц}{6}{}%
+\contentsline {subsection}{\numberline {1.3.\relax }Фрагменты исходного кода}{6}{}%
+\contentsline {subsubsection}{\numberline {1.3.1.\relax }Примеры фрагментов кода}{7}{}%
+\contentsline {section}{\numberline {2.\relax }Примеры оформления формул}{8}{}%
+\contentsline {section}{Заключение}{9}{}%
+\contentsline {section}{Литература}{10}{}%
