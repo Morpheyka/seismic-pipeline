@@ -1,7 +1,6 @@
 \babel@toc {russian}{}\relax 
 \contentsline {section}{Постановка задачи}{3}{}%
 \contentsline {section}{Введение}{4}{}%
-\contentsline {section}{\numberline {1.\relax }Описание полученных результатов}{9}{}%
-\contentsline {subsection}{\numberline {1.1.\relax }Материалы и методы}{9}{}%
-\contentsline {subsection}{\numberline {1.2.\relax }Поиск ширины аномального окна}{15}{}%
+\contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}%
+\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{16}{}%
 \contentsline {section}{Литература}{23}{}%
