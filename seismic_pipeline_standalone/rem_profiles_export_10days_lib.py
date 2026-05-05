@@ -63,29 +63,27 @@ def _normalize_rem_profile_params(
     rem_stage: int,
 ) -> tuple[int, int, int]:
     """Validate and normalize REM profile generation parameters."""
-    try:
-        window_size_hours = int(window_size_hours)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"window_size_hours must be an integer, got {window_size_hours!r}") from exc
+    raw = {
+        "window_size_hours": window_size_hours,
+        "step_size_hours": step_size_hours,
+        "rem_stage": rem_stage,
+    }
+    coerced: dict[str, int] = {}
+    for name, value in raw.items():
+        try:
+            coerced[name] = int(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{name} must be an integer, got {value!r}") from exc
 
-    try:
-        step_size_hours = int(step_size_hours)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"step_size_hours must be an integer, got {step_size_hours!r}") from exc
+    w, s, r = coerced["window_size_hours"], coerced["step_size_hours"], coerced["rem_stage"]
+    if w <= 0:
+        raise ValueError(f"window_size_hours must be > 0, got {w}")
+    if s <= 0:
+        raise ValueError(f"step_size_hours must be > 0, got {s}")
+    if r < 0:
+        raise ValueError(f"rem_stage must be >= 0, got {r}")
 
-    try:
-        rem_stage = int(rem_stage)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"rem_stage must be an integer, got {rem_stage!r}") from exc
-
-    if window_size_hours <= 0:
-        raise ValueError(f"window_size_hours must be > 0, got {window_size_hours}")
-    if step_size_hours <= 0:
-        raise ValueError(f"step_size_hours must be > 0, got {step_size_hours}")
-    if rem_stage < 0:
-        raise ValueError(f"rem_stage must be >= 0, got {rem_stage}")
-
-    return window_size_hours, step_size_hours, rem_stage
+    return w, s, r
 
 
 def _parse_event_date(date_str: str) -> datetime:
@@ -1182,15 +1180,11 @@ def sample_model(
         if backend == "pymc":
             trace = pm.sample(**sample_kwargs)
         elif backend in {"numpyro", "blackjax"}:
-            # With a single GPU, JAX "parallel" chains via pmap may fail for chains>1.
-            # Prefer vectorized chains in that case.
-            try:
-                import jax
-                device_count = int(jax.device_count())
-            except Exception:
-                device_count = 1
+            import jax
 
-            nuts_sampler_kwargs = {}
+            # With a single device, JAX "parallel" chains via pmap may fail for chains>1.
+            device_count = int(jax.device_count())
+            nuts_sampler_kwargs: dict[str, object] = {}
             if chains > 1 and device_count < chains:
                 nuts_sampler_kwargs["chain_method"] = "vectorized"
             # BlackJAX progress bar uses IO callbacks, which can fail under vectorized/vmap.
@@ -1203,40 +1197,12 @@ def sample_model(
                     **sample_kwargs,
                 )
             except ValueError as exc:
-                msg = str(exc)
-                if "Model can not be sampled with NUTS alone" in msg:
+                if "Model can not be sampled with NUTS alone" in str(exc):
                     raise ValueError(
                         "JAX backend requires a fully continuous differentiable model. "
                         "Use tau_mode='marginalized' (or backend='pymc')."
                     ) from exc
-                if (
-                    "cannot select an axis to squeeze out" in msg
-                    and "shape=(4, 2)" in msg
-                    and "dimensions=(0,)" in msg
-                ):
-                    # Retry with explicit vectorized chain mode.
-                    trace = pm.sample(
-                        nuts_sampler=backend,
-                        nuts_sampler_kwargs={"chain_method": "vectorized"},
-                        **sample_kwargs,
-                    )
-                    return trace
                 raise
-            except RuntimeError as exc:
-                msg = str(exc)
-                if (
-                    "Unknown backend: 'gpu' requested" in msg
-                    and "Platforms present are: cpu" in msg
-                ):
-                    # If GPU is requested but unavailable, force CPU and retry once.
-                    os.environ["JAX_PLATFORM_NAME"] = "cpu"
-                    print(
-                        "Requested JAX backend 'gpu' is not available on this machine. "
-                        "Falling back to CPU for sampling."
-                    )
-                    trace = pm.sample(nuts_sampler=backend, **sample_kwargs)
-                else:
-                    raise
         else:
             raise ValueError(
                 "Unsupported nuts_backend. Use one of: 'pymc', 'numpyro', 'blackjax'."
@@ -1653,10 +1619,8 @@ def run_variant(
     """Full scenario run: features -> model -> MCMC -> summary -> plots."""
     normalized_rem_profile_params: dict[str, int] | None = None
     if rem_profile_params is not None:
-        if not isinstance(rem_profile_params, dict):
-            raise ValueError("rem_profile_params must be a dict with REM profile settings.")
         required_keys = {"window_size_hours", "step_size_hours", "rem_stage"}
-        missing = sorted(required_keys - set(rem_profile_params.keys()))
+        missing = sorted(required_keys - set(rem_profile_params))
         if missing:
             raise ValueError(
                 "rem_profile_params is missing required keys: "
@@ -1676,8 +1640,7 @@ def run_variant(
     backend = str(nuts_backend).strip().lower()
     if backend in {"numpyro", "blackjax"} and str(tau_mode).strip().lower() == "discrete":
         print(
-            "JAX NUTS backend requested with discrete tau; "
-            "switching tau_mode='marginalized' automatically."
+            "JAX NUTS backend with discrete tau is unsupported; using tau_mode='marginalized'."
         )
         tau_mode = "marginalized"
 
@@ -1783,22 +1746,16 @@ def run_variant(
         summary = pd.DataFrame()
         print("Summary: no scalar parameters selected for compact table.")
 
-    try:
-        diverging = _sampler_stat(trace, "diverging")
-        n_div = int(np.asarray(diverging).sum())
-        print(f"Дивергенции: {n_div}")
-    except Exception:
-        print("Дивергенции: недоступно для текущего шага сэмплера.")
+    diverging = _sampler_stat(trace, "diverging")
+    n_div = int(np.asarray(diverging).sum())
+    print(f"Дивергенции: {n_div}")
 
-    try:
-        energy = np.asarray(_sampler_stat(trace, "energy"), dtype=float).reshape(-1)
-        if energy.size > 1 and np.var(energy) > 0:
-            bfmi = float(np.mean(np.diff(energy) ** 2) / np.var(energy))
-            print(f"BFMI (approx): {bfmi:.3f}")
-        else:
-            print("BFMI (approx): недостаточно данных.")
-    except Exception:
-        print("BFMI (approx): недоступно для текущего шага сэмплера.")
+    energy = np.asarray(_sampler_stat(trace, "energy"), dtype=float).reshape(-1)
+    if energy.size > 1 and np.var(energy) > 0:
+        bfmi = float(np.mean(np.diff(energy) ** 2) / np.var(energy))
+        print(f"BFMI (approx): {bfmi:.3f}")
+    else:
+        print("BFMI (approx): недостаточно данных.")
 
     support, probs = tau_probabilities(trace)
     print("Вероятности tau:")

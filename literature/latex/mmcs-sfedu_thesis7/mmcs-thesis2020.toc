@@ -3,4 +3,8 @@
 \contentsline {section}{Введение}{4}{}%
 \contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}%
 \contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}%
-\contentsline {section}{Литература}{23}{}%
+\contentsline {section}{\numberline {3.\relax }Программная реализация}{22}{}%
+\contentsline {subsection}{\numberline {3.1.\relax }Логика работы с временными рядами}{23}{}%
+\contentsline {subsection}{\numberline {3.2.\relax }Предобработка}{23}{}%
+\contentsline {subsection}{\numberline {3.3.\relax }Байесовский метод}{23}{}%
+\contentsline {section}{Литература}{24}{}%
