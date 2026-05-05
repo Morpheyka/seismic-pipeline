@@ -332,7 +332,63 @@
 
 \subsection{Байесовский метод}
 
+Рассмотренная выше вероятностная модель с единственной точкой разладки реализована в виде одной иерархической модели PyMC: для каждого используемого признака задаются два набора параметров распределения наблюдений по чанкам времени --- <<до>> и <<после>> предполагаемого момента $\tau$. Конкретный перечень признаков и семейства правдоподобий задаются конфигурацией на уровне эксперимента (в Jupyter-ноутбуке --- через словарь \texttt{parameter\_selection}, см. листинг~\ref{stud-lst:bayes-priors}); программная сборка графа модели и запуск NUTS выполняются функциями модуля \texttt{rem\_profiles\_export\_10days\_lib.py}.
 
+Для каждого имени признака из активного набора формируется словарь спецификаций: строка \texttt{likelihood} задаёт семейство правдоподобия (\texttt{normal}, \texttt{student\_t}, \texttt{lognormal}, \texttt{gamma}, \texttt{beta}), а вложенные поля \texttt{mu\_prior}, \texttt{sigma\_prior}, \texttt{nu\_prior}, \texttt{alpha\_prior}, \texttt{beta\_prior} описывают априоры для параметров этого семейства. Пользовательские значения объединяются с базовыми умолчаниями функцией \texttt{\_parse\_parameter\_selection}, так что в модель попадает полностью развёрнутая конфигурация по каждому признаку. Априорные распределения создаются единообразно функцией \texttt{\_build\_prior} (листинг~\ref{stud-lst:bayes-prior-builder}; полный текст --- листинг~\ref{app-lst:bayes-build-prior-full}): поддерживаются, в частности, нормальное, полунормальное и полу-$t$ распределения, экспоненциальное, логнормальное, а также конструкция \texttt{exponential\_plus} ($\nu = z+\nu_{\mathrm{off}}$, $z \sim \mathrm{Exp}(\lambda)$). Для параметров с областью значений $(0,+\infty)$ используется флаг \texttt{positive\_only}, ограничивающий допустимые типы априоров.
+
+Имена случайных величин PyMC кодируют два режима с индексами \texttt{\_1} и \texttt{\_2} (<<до>> и <<после>> разладки). Режим работы с $\tau$ задаётся аргументом \texttt{tau\_mode}. При \texttt{tau\_mode="discrete"} в модель включается узел $\tau \sim \mathrm{Uniform}\{\tau_{\min},\ldots,\tau_{\max}\}$, а условные параметры правдоподобия для каждого чанка выбираются через \texttt{pm.math.switch} по условию на индекс чанка и значение $\tau$. При \texttt{tau\_mode="marginalized"} узел $\tau$ из пространства сэмплирования исключается: для каждого допустимого $k$ строится маска чанков, относящихся к первому режиму, вычисляются суммы логарифмов правдоподобия по всем чанкам и признакам, что даёт вектор вкладов \texttt{loglik\_by\_tau}. Маргинальный логарифм правдоподобия по $\tau$ с равномерным априором $p(\tau=k)=1/n_{\tau}$ (согласованным с~\eqref{eq:tau_prior}) добавляется в модель как потенциал с использованием численно устойчивого \texttt{log-sum-exp}, что соответствует~\eqref{eq:marginal_loglik}. Нормализованные веса $\pi_k$ при фиксированных непрерывных параметрах восстанавливаются через \texttt{softmax} и сохраняются как \texttt{tau\_probs} (согласование с~\eqref{eq:cond_tau_probs}); также формируются опорная решётка \texttt{tau\_support} и среднее по распределению на решётке \texttt{tau\_mean}. Итоговые оценки $\hat{p}_k \approx p(\tau=k\mid\mathcal{D})$ получаются усреднением по итерациям MCMC (реализовано в функции \texttt{tau\_probabilities}), что соответствует~\eqref{eq:marginal_tau}. Фрагмент реализации маргинализации приведён в листинге~\ref{stud-lst:bayes-tau-marginal}; развёрнутый каркас функции \texttt{build\_changepoint\_model} --- в листинге~\ref{app-lst:bayes-changepoint}.
+
+Вывод апостериорного распределения выполняется функцией \texttt{sample\_model}: вызывается \texttt{pm.sample} с алгоритмом NUTS; поддерживаются backend \texttt{pymc}, а также JAX-реализации \texttt{numpyro} и \texttt{blackjax}. Для последних требуется гладкая по всем сэмплируемым параметрам целевая функция, поэтому при выборе JAX-backend и заданном изначально дискретном $\tau$ сценарный интерфейс \texttt{run\_variant} автоматически переключает модель на режим \texttt{marginalized} (листинг~\ref{stud-lst:bayes-jax-tau}). Полная процедура построения данных по чанкам, сборки модели и сэмплирования объединена в \texttt{run\_variant}.
+
+\begin{lstlisting}[language=Python, caption={Фрагмент задания семейств правдоподобий и априоров в ноутбуке эксперимента}, label=stud-lst:bayes-priors]
+parameter_selection_mixed = {
+    "mean": {
+        "likelihood": "student_t",
+        "mu_prior": {"dist": "normal", "mu": 0.5, "sigma": 0.25},
+        "sigma_prior": {"dist": "halfnormal", "sigma": 0.2},
+        "nu_prior": {"dist": "exponential_plus", "lam": 0.05,
+                     "offset": 2.0},
+    },
+    # ... остальные признаки задаются аналогично
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Создание априорной случайной величины по текстовой спецификации (\texttt{\_build\_prior})}, label=stud-lst:bayes-prior-builder]
+def _build_prior(var_name: str, spec: dict, *, positive_only: bool = False):
+    dist = str(spec.get("dist", "")).strip().lower()
+    if dist == "normal":
+        return pm.Normal(var_name, mu=float(spec.get("mu", 0.0)),
+                         sigma=float(spec.get("sigma", 1.0)))
+    if dist == "halfnormal":
+        return pm.HalfNormal(var_name, sigma=float(spec.get("sigma", 1.0)))
+    if dist == "exponential_plus":
+        lam = float(spec.get("lam", 0.05))
+        offset = float(spec.get("offset", 2.0))
+        raw = pm.Exponential(f"{var_name}_raw", lam=lam)
+        return pm.Deterministic(var_name, raw + offset)
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Маргинализация $\tau$: потенциал с \texttt{logsumexp} и восстановление вероятностей на решётке}, label=stud-lst:bayes-tau-marginal]
+if tau_mode == "marginalized":
+    log_w = loglik_by_tau - np.log(float(n_tau))
+    pm.Potential("tau_marginalized_logp", pm.math.logsumexp(log_w))
+    tau_probs = pm.Deterministic("tau_probs", pm.math.softmax(log_w))
+    tau_support = pm.Deterministic(
+        "tau_support",
+        pt.as_tensor_variable(tau_values.astype(np.float64)),
+    )
+    pm.Deterministic("tau_mean", pm.math.sum(tau_probs * tau_support))
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Автоматический переход к \texttt{marginalized} при JAX-backend в сценарии \texttt{run\_variant}}, label=stud-lst:bayes-jax-tau]
+backend = str(nuts_backend).strip().lower()
+if backend in {"numpyro", "blackjax"} and str(tau_mode).strip().lower() == "discrete":
+    print(
+        "JAX NUTS backend with discrete tau is unsupported; "
+        "using tau_mode='marginalized'."
+    )
+    tau_mode = "marginalized"
+\end{lstlisting}
 
 
 %=======================
@@ -343,5 +399,119 @@
 
 \bibliographystyle{plainnat}
 \bibliography{mmcs-thesis2020}
+
+\newpage
+\section*{Приложение}
+\addcontentsline{toc}{section}{Приложение}
+
+Ниже приведены расширенные листинги функций модуля \texttt{rem\_profiles\_export\_10days\_lib.py}, дополняющие краткие фрагменты в подразделе <<Байесовский метод>>.
+
+\begin{lstlisting}[language=Python, caption={Полная реализация \texttt{\_build\_prior}}, label=app-lst:bayes-build-prior-full]
+def _build_prior(var_name: str, spec: dict, *, positive_only: bool = False):
+    if not isinstance(spec, dict):
+        raise ValueError(f"Prior spec for '{var_name}' must be a dict.")
+    dist = str(spec.get("dist", "")).strip().lower()
+    if not dist:
+        raise ValueError(f"Prior spec for '{var_name}' must include 'dist'.")
+
+    positive_dists = {"halfnormal", "halfstudentt", "exponential",
+                      "lognormal", "exponential_plus"}
+    if positive_only and dist not in positive_dists:
+        raise ValueError(
+            f"Prior '{var_name}' must be positive; use one of "
+            f"{sorted(positive_dists)}, got '{dist}'."
+        )
+
+    if dist == "normal":
+        return pm.Normal(var_name, mu=float(spec.get("mu", 0.0)),
+                         sigma=float(spec.get("sigma", 1.0)))
+    if dist == "halfnormal":
+        return pm.HalfNormal(var_name, sigma=float(spec.get("sigma", 1.0)))
+    if dist == "halfstudentt":
+        return pm.HalfStudentT(
+            var_name,
+            nu=float(spec.get("nu", 4.0)),
+            sigma=float(spec.get("sigma", 1.0)),
+        )
+    if dist == "exponential":
+        return pm.Exponential(var_name, lam=float(spec.get("lam", 1.0)))
+    if dist == "lognormal":
+        return pm.LogNormal(
+            var_name,
+            mu=float(spec.get("mu", 0.0)),
+            sigma=float(spec.get("sigma", 1.0)),
+        )
+    if dist == "exponential_plus":
+        lam = float(spec.get("lam", 0.05))
+        offset = float(spec.get("offset", 2.0))
+        raw = pm.Exponential(f"{var_name}_raw", lam=lam)
+        return pm.Deterministic(var_name, raw + offset)
+
+    raise ValueError(
+        f"Unsupported prior dist '{dist}' for '{var_name}'. "
+        "Use one of: normal, halfnormal, halfstudentt, exponential, "
+        "lognormal, exponential_plus."
+    )
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={Каркас \texttt{build\_changepoint\_model}: режимы $\tau$ и маргинализация (прочие ветви правдоподобия опущены)}, label=app-lst:bayes-changepoint]
+def build_changepoint_model(
+    group_data: dict,
+    tau_lower: int = 2,
+    tau_upper: int | None = None,
+    parameter_selection: dict | None = None,
+    tau_mode: str = "discrete",
+):
+    first_group = next(iter(group_data.values()))
+    first_feat = next(iter(first_group.values()))
+    n_group_chunks = first_feat.shape[1]
+
+    if tau_upper is None:
+        tau_upper = n_group_chunks
+    active_features = {feat for features in group_data.values()
+                       for feat in features.keys()}
+    parameter_cfg = _parse_parameter_selection(parameter_selection,
+                                                active_features)
+
+    with pm.Model() as model:
+        idx = np.arange(n_group_chunks)
+        tau_values = np.arange(tau_lower, tau_upper + 1, dtype=np.int64)
+        n_tau = tau_values.size
+
+        if tau_mode == "discrete":
+            tau = pm.DiscreteUniform("tau", lower=tau_lower, upper=tau_upper)
+            loglik_by_tau = None
+            mask_before = None
+        else:
+            mask_before = (
+                idx[None, :] < (tau_values[:, None] - 1)
+            ).astype(float)
+            loglik_by_tau = np.zeros(n_tau, dtype=float)
+
+        for group_name, features in group_data.items():
+            for feat_name, observed_df in features.items():
+                observed = observed_df.to_numpy()
+                spec = parameter_cfg[feat_name]
+                likelihood = str(spec.get("likelihood", "normal")).strip().lower()
+                _ = (observed, spec, likelihood)
+                # ... ветвление по likelihood; накопление loglik_by_tau
+
+        if tau_mode == "marginalized":
+            log_w = loglik_by_tau - np.log(float(n_tau))
+            pm.Potential("tau_marginalized_logp", pm.math.logsumexp(log_w))
+            tau_probs = pm.Deterministic("tau_probs", pm.math.softmax(log_w))
+            tau_support = pm.Deterministic(
+                "tau_support",
+                pt.as_tensor_variable(
+                    tau_values.astype(np.float64)
+                ),
+            )
+            pm.Deterministic(
+                "tau_mean",
+                pm.math.sum(tau_probs * tau_support),
+            )
+
+    return model
+\end{lstlisting}
 
 \end{document}
