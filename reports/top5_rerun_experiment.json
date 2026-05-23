@@ -1,0 +1,1676 @@
+[
+  {
+    "title": "__HEAD__",
+    "head_title_text": "Top-model rerun report (8-day exhaustive)",
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Run setup",
+      "content": "Reruns settings: draws=50, tune=50, chains=2, tau_mode=marginalized, tau range [2, 8]. Lists: top_loo, top_waic, top_mean_loo, top_p_tau.",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Comparative summary",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "All unique rerun models",
+      "data": [
+        {
+          "fingerprint": "19fe92898819d40c",
+          "shown_in": "top_loo, top_waic",
+          "loo": 25.070601332640603,
+          "waic": 10.160329009672175,
+          "p_tau_gt_threshold": 8.70531702278504e-07,
+          "tau_MAP": 4,
+          "r_hat_max": 1.07,
+          "ess_min_bulk": 27.0,
+          "influential_n_pareto_gt_0.7": 3
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          9
+        ],
+        "columns": [
+          "fingerprint",
+          "shown_in",
+          "loo",
+          "waic",
+          "p_tau_gt_threshold",
+          "tau_MAP",
+          "r_hat_max",
+          "ess_min_bulk",
+          "influential_n_pareto_gt_0.7"
+        ],
+        "dtypes": {
+          "fingerprint": "str",
+          "shown_in": "str",
+          "loo": "float64",
+          "waic": "float64",
+          "p_tau_gt_threshold": "float64",
+          "tau_MAP": "int64",
+          "r_hat_max": "float64",
+          "ess_min_bulk": "float64",
+          "influential_n_pareto_gt_0.7": "int64"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo, top_waic\nn_chunks: 16\nfeature_selection: {\"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 25.0706\nWAIC: 10.1603\nP(tau > threshold): 8.70532e-07\ntau_MAP: 4\nr_hat_max: 1.07\ness_min_bulk: 27\ness_min_tail: 45\npareto_k_max: 1.7164\ninfluential observations (k > 0.7): 3\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/19fe92898819d40c.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.7164038133918278,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 5,
+          "pareto_k": 0.7546572169322054,
+          "rat_id": "R2",
+          "event_date": "2025-07-02",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 8,
+          "pareto_k": 0.7069293177207321,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          3,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Figure trace - 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "trace (Shown in top_loo, top_waic)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/19fe92898819d40c_trace_key_params.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  },
+  {
+    "title": "Figure tau - 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "tau (Shown in top_loo, top_waic)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/19fe92898819d40c_tau_posterior.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  },
+  {
+    "title": "Figure profiles - 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "profiles (Shown in top_loo, top_waic)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/19fe92898819d40c_likelihood_profiles.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  },
+  {
+    "title": "Comparative summary",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "All unique rerun models",
+      "data": [
+        {
+          "fingerprint": "19fe92898819d40c",
+          "shown_in": "top_loo, top_waic",
+          "loo": 16.44615556812919,
+          "waic": 8.5969913078529,
+          "p_tau_gt_threshold": 7.481769843420918e-05,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 19476.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "8e05f760f68711e3",
+          "shown_in": "top_loo, top_waic",
+          "loo": -10.852310390639492,
+          "waic": -28.953805130027646,
+          "p_tau_gt_threshold": 4.298166160331351e-10,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 23207.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "446a60fa5456da9b",
+          "shown_in": "top_loo, top_waic",
+          "loo": -19.615939434332574,
+          "waic": -29.510100537586624,
+          "p_tau_gt_threshold": 0.0007851446151932516,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 19242.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "18617bd5ffd5f7ac",
+          "shown_in": "top_loo",
+          "loo": 16.53086561144447,
+          "waic": 16.190846706247807,
+          "p_tau_gt_threshold": 0.106463068976297,
+          "tau_MAP": 3,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 9490.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "fcc42f2cf0b157eb",
+          "shown_in": "top_loo",
+          "loo": -20.048230233908633,
+          "waic": -29.473123169704603,
+          "p_tau_gt_threshold": 0.0007510012678296432,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 19384.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "0bbcca81e0c63a78",
+          "shown_in": "top_waic",
+          "loo": -9.235617475440563,
+          "waic": -27.052145804314097,
+          "p_tau_gt_threshold": 7.890090232469961e-10,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 25326.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "1daa9f5ddb69a4df",
+          "shown_in": "top_waic",
+          "loo": -8.272194720350923,
+          "waic": -29.1884333169814,
+          "p_tau_gt_threshold": 1.02894942629667e-09,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 23462.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "6dbb590a8bf512d3",
+          "shown_in": "top_mean_loo",
+          "loo": 56.17899907841339,
+          "waic": 35.95242973222154,
+          "p_tau_gt_threshold": 2.9251084499915e-10,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 16681.0,
+          "influential_n_pareto_gt_0.7": 1
+        },
+        {
+          "fingerprint": "67bc1db938bb8b88",
+          "shown_in": "top_mean_loo",
+          "loo": 75.36555896709395,
+          "waic": 68.39078890683085,
+          "p_tau_gt_threshold": 0.0002115441925307039,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 16077.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "074da89906d99b74",
+          "shown_in": "top_mean_loo",
+          "loo": 55.05606232029386,
+          "waic": 35.95487403979247,
+          "p_tau_gt_threshold": 3.79134534628694e-10,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 19988.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "560bafec0f62b133",
+          "shown_in": "top_mean_loo",
+          "loo": 80.50079150020751,
+          "waic": 72.56496372480575,
+          "p_tau_gt_threshold": 8.969897850237324e-05,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 11970.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "efe3570810efd3e9",
+          "shown_in": "top_mean_loo",
+          "loo": 45.77669235234816,
+          "waic": 36.203201661782856,
+          "p_tau_gt_threshold": 0.00011211413635083934,
+          "tau_MAP": 4,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 16501.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "6ce20266fe185d3b",
+          "shown_in": "top_p_tau",
+          "loo": 94.44298381419176,
+          "waic": 97.23915408884112,
+          "p_tau_gt_threshold": 0.09537550156103193,
+          "tau_MAP": 5,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 15490.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "c8dbad95ffca951b",
+          "shown_in": "top_p_tau",
+          "loo": 151.50994830398008,
+          "waic": 158.81675883525878,
+          "p_tau_gt_threshold": 0.2594000938251601,
+          "tau_MAP": 5,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 12268.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "0b80d2435865009d",
+          "shown_in": "top_p_tau",
+          "loo": 277.8263357618581,
+          "waic": 274.24207624667724,
+          "p_tau_gt_threshold": 0.5466466979468899,
+          "tau_MAP": 6,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 11373.0,
+          "influential_n_pareto_gt_0.7": 2
+        },
+        {
+          "fingerprint": "f26b67eec9d05813",
+          "shown_in": "top_p_tau",
+          "loo": 324.7223783486991,
+          "waic": 314.43001413098517,
+          "p_tau_gt_threshold": 0.6544849883064848,
+          "tau_MAP": 6,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 8899.0,
+          "influential_n_pareto_gt_0.7": 3
+        },
+        {
+          "fingerprint": "7bd83eba07e13f05",
+          "shown_in": "top_p_tau",
+          "loo": 333.53611033276667,
+          "waic": 330.0559800038592,
+          "p_tau_gt_threshold": 0.8128660242688326,
+          "tau_MAP": 6,
+          "r_hat_max": 1.0,
+          "ess_min_bulk": 11589.0,
+          "influential_n_pareto_gt_0.7": 2
+        }
+      ],
+      "metadata": {
+        "shape": [
+          17,
+          9
+        ],
+        "columns": [
+          "fingerprint",
+          "shown_in",
+          "loo",
+          "waic",
+          "p_tau_gt_threshold",
+          "tau_MAP",
+          "r_hat_max",
+          "ess_min_bulk",
+          "influential_n_pareto_gt_0.7"
+        ],
+        "dtypes": {
+          "fingerprint": "str",
+          "shown_in": "str",
+          "loo": "float64",
+          "waic": "float64",
+          "p_tau_gt_threshold": "float64",
+          "tau_MAP": "int64",
+          "r_hat_max": "float64",
+          "ess_min_bulk": "float64",
+          "influential_n_pareto_gt_0.7": "int64"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo, top_waic\nn_chunks: 16\nfeature_selection: {\"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 16.4462\nWAIC: 8.59699\nP(tau > threshold): 7.48177e-05\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 19476\ness_min_tail: 13846\npareto_k_max: 1.99284\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/19fe92898819d40c.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 19fe92898819d40c",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 0.7658758213813363,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.9928424643170255,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 8e05f760f68711e3",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo, top_waic\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: -10.8523\nWAIC: -28.9538\nP(tau > threshold): 4.29817e-10\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 23207\ness_min_tail: 13177\npareto_k_max: 3.48895\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/8e05f760f68711e3.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 8e05f760f68711e3",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.488952118698124,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 446a60fa5456da9b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo, top_waic\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: -19.6159\nWAIC: -29.5101\nP(tau > threshold): 0.000785145\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 19242\ness_min_tail: 12294\npareto_k_max: 2.78783\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/446a60fa5456da9b.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 446a60fa5456da9b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 2.787826470516159,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 18617bd5ffd5f7ac",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo\nn_chunks: 16\nfeature_selection: {\"even\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 16.5309\nWAIC: 16.1908\nP(tau > threshold): 0.106463\ntau_MAP: 3\nr_hat_max: 1\ness_min_bulk: 9490\ness_min_tail: 8016\npareto_k_max: 1.08343\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/18617bd5ffd5f7ac.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 18617bd5ffd5f7ac",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.0834306951162076,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model fcc42f2cf0b157eb",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_loo\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 3}\nwindow_size_hours: 3\nstep_size_hours: 1\nLOO: -20.0482\nWAIC: -29.4731\nP(tau > threshold): 0.000751001\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 19384\ness_min_tail: 12907\npareto_k_max: 3.01847\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/fcc42f2cf0b157eb.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for fcc42f2cf0b157eb",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.0184694899847395,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 0bbcca81e0c63a78",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_waic\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: -9.23562\nWAIC: -27.0521\nP(tau > threshold): 7.89009e-10\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 25326\ness_min_tail: 13699\npareto_k_max: 3.13633\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/0bbcca81e0c63a78.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 0bbcca81e0c63a78",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.1363259292982,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 1daa9f5ddb69a4df",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_waic\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 3}\nwindow_size_hours: 3\nstep_size_hours: 1\nLOO: -8.27219\nWAIC: -29.1884\nP(tau > threshold): 1.02895e-09\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 23462\ness_min_tail: 13049\npareto_k_max: 3.12735\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/1daa9f5ddb69a4df.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 1daa9f5ddb69a4df",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 0.7054592138350918,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.127353703773789,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 6dbb590a8bf512d3",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_mean_loo\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"student_t\"}, \"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 56.179\nWAIC: 35.9524\nP(tau > threshold): 2.92511e-10\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 16681\ness_min_tail: 13243\npareto_k_max: 3.30911\ninfluential observations (k > 0.7): 1\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/6dbb590a8bf512d3.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 6dbb590a8bf512d3",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.30911137471836,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          1,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 67bc1db938bb8b88",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_mean_loo\nn_chunks: 16\nfeature_selection: {\"even\": [\"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"normal\"}, \"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 75.3656\nWAIC: 68.3908\nP(tau > threshold): 0.000211544\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 16077\ness_min_tail: 13427\npareto_k_max: 2.76105\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/67bc1db938bb8b88.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 67bc1db938bb8b88",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 0.9073721338846472,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 2.761045734092353,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 074da89906d99b74",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_mean_loo\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"normal\"}, \"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 55.0561\nWAIC: 35.9549\nP(tau > threshold): 3.79135e-10\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 19988\ness_min_tail: 13011\npareto_k_max: 3.08423\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/074da89906d99b74.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 074da89906d99b74",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 1.0167259797939894,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 3.084234185732464,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 560bafec0f62b133",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_mean_loo\nn_chunks: 16\nfeature_selection: {\"even\": [\"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"student_t\"}, \"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 80.5008\nWAIC: 72.565\nP(tau > threshold): 8.9699e-05\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 11970\ness_min_tail: 13730\npareto_k_max: 2.43162\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/560bafec0f62b133.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 560bafec0f62b133",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 0.7824865464049212,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 2.431622217708173,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model efe3570810efd3e9",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_mean_loo\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"mean\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"student_t\"}, \"range\": {\"likelihood\": \"lognormal\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 1, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 1\nLOO: 45.7767\nWAIC: 36.2032\nP(tau > threshold): 0.000112114\ntau_MAP: 4\nr_hat_max: 1\ness_min_bulk: 16501\ness_min_tail: 11724\npareto_k_max: 2.98558\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/efe3570810efd3e9.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for efe3570810efd3e9",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 0,
+          "pareto_k": 0.8077400174169476,
+          "rat_id": "R2",
+          "event_date": "2022-11-07",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 1,
+          "pareto_k": 2.98558301666266,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 6ce20266fe185d3b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_p_tau\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"range\": {\"likelihood\": \"beta\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: 94.443\nWAIC: 97.2392\nP(tau > threshold): 0.0953755\ntau_MAP: 5\nr_hat_max: 1\ness_min_bulk: 15490\ness_min_tail: 12448\npareto_k_max: 1.28852\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/6ce20266fe185d3b.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 6ce20266fe185d3b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.2885244416961217,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 22,
+          "pareto_k": 1.26257163632469,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "after_reversed"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model c8dbad95ffca951b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_p_tau\nn_chunks: 16\nfeature_selection: {\"concat\": [\"range\"], \"even\": [\"mean\", \"range\"], \"odd\": [\"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"normal\"}, \"range\": {\"likelihood\": \"beta\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: 151.51\nWAIC: 158.817\nP(tau > threshold): 0.2594\ntau_MAP: 5\nr_hat_max: 1\ness_min_bulk: 12268\ness_min_tail: 13476\npareto_k_max: 1.31677\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/c8dbad95ffca951b.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for c8dbad95ffca951b",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.1956293725357166,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 22,
+          "pareto_k": 1.3167660108376522,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "after_reversed"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 0b80d2435865009d",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_p_tau\nn_chunks: 16\nfeature_selection: {\"concat\": [\"mean\", \"range\"], \"even\": [\"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"student_t\"}, \"range\": {\"likelihood\": \"beta\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: 277.826\nWAIC: 274.242\nP(tau > threshold): 0.546647\ntau_MAP: 6\nr_hat_max: 1\ness_min_bulk: 11373\ness_min_tail: 13909\npareto_k_max: 1.64964\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/0b80d2435865009d.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 0b80d2435865009d",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.6496356281942106,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 22,
+          "pareto_k": 1.0244164053312657,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "after_reversed"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model f26b67eec9d05813",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_p_tau\nn_chunks: 16\nfeature_selection: {\"concat\": [\"mean\", \"range\"], \"even\": [\"mean\", \"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"normal\"}, \"range\": {\"likelihood\": \"beta\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: 324.722\nWAIC: 314.43\nP(tau > threshold): 0.654485\ntau_MAP: 6\nr_hat_max: 1\ness_min_bulk: 8899\ness_min_tail: 12911\npareto_k_max: 1.88242\ninfluential observations (k > 0.7): 3\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/f26b67eec9d05813.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for f26b67eec9d05813",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.8824206414972182,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 14,
+          "pareto_k": 0.734260815689765,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "after_reversed"
+        },
+        {
+          "event_observation_index": 22,
+          "pareto_k": 1.0827022408345068,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "after_reversed"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          3,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Model 7bd83eba07e13f05",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": {
+      "description": "Model details",
+      "content": "Shown in: top_p_tau\nn_chunks: 16\nfeature_selection: {\"concat\": [\"mean\", \"range\"], \"even\": [\"mean\", \"range\"], \"odd\": [\"mean\", \"range\"]}\nparameter_selection: {\"mean\": {\"likelihood\": \"student_t\"}, \"range\": {\"likelihood\": \"beta\"}}\nrem_profile_params: {\"rem_stage\": 2, \"step_size_hours\": 2, \"window_size_hours\": 2}\nwindow_size_hours: 2\nstep_size_hours: 2\nLOO: 333.536\nWAIC: 330.056\nP(tau > threshold): 0.812866\ntau_MAP: 6\nr_hat_max: 1\ness_min_bulk: 11589\ness_min_tail: 13156\npareto_k_max: 1.69399\ninfluential observations (k > 0.7): 2\ntrace_netcdf: /home/ponomattik/Work/Main project/run_output_8day/traces/7bd83eba07e13f05.nc\n",
+      "is_file": false
+    },
+    "table": null,
+    "figure": null
+  },
+  {
+    "title": "Influential events for 7bd83eba07e13f05",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": {
+      "description": "Pareto-k > 0.7",
+      "data": [
+        {
+          "event_observation_index": 1,
+          "pareto_k": 1.6939850546292856,
+          "rat_id": "R2",
+          "event_date": "2024-09-30",
+          "window_direction": "before"
+        },
+        {
+          "event_observation_index": 22,
+          "pareto_k": 1.0750476924369259,
+          "rat_id": "R1",
+          "event_date": "2025-07-20",
+          "window_direction": "after_reversed"
+        }
+      ],
+      "metadata": {
+        "shape": [
+          2,
+          5
+        ],
+        "columns": [
+          "event_observation_index",
+          "pareto_k",
+          "rat_id",
+          "event_date",
+          "window_direction"
+        ],
+        "dtypes": {
+          "event_observation_index": "int64",
+          "pareto_k": "float64",
+          "rat_id": "str",
+          "event_date": "str",
+          "window_direction": "str"
+        }
+      },
+      "is_file": false
+    },
+    "figure": null
+  },
+  {
+    "title": "Figure trace - 7bd83eba07e13f05",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "trace (Shown in top_p_tau)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/7bd83eba07e13f05_trace_key_params.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  },
+  {
+    "title": "Figure tau - 7bd83eba07e13f05",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "tau (Shown in top_p_tau)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/7bd83eba07e13f05_tau_posterior.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  },
+  {
+    "title": "Figure profiles - 7bd83eba07e13f05",
+    "head_title_text": null,
+    "samples": null,
+    "pipeline_structure": null,
+    "best_params": null,
+    "param_grid": null,
+    "hyperparameter_grid_visualization": null,
+    "scores": null,
+    "error_matrix": null,
+    "text": null,
+    "table": null,
+    "figure": {
+      "description": "profiles (Shown in top_p_tau)",
+      "path": "/home/ponomattik/Work/Main project/reports/figures/7bd83eba07e13f05_likelihood_profiles.png",
+      "is_file": true,
+      "is_matplotlib": false
+    }
+  }
+]

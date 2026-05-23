@@ -1,0 +1,65 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Albert(2009)]{bayes_on_R}
+Jim Albert.
+\newblock \emph{Bayesian Computation with {R}}.
+\newblock Springer, New York, NY, 2 edition, 2009.
+
+\bibitem[Davidson-Pilon(2015)]{DavidPil2015}
+Cameron Davidson-Pilon.
+\newblock \emph{Bayesian Methods for Hackers: Probabilistic Programming and
+  {B}ayesian Inference}.
+\newblock Addison-Wesley, 2015.
+\newblock URL
+  \url{https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers}.
+\newblock Includes the text-message change-point example.
+
+\bibitem[Durmus et~al.(2023)Durmus, Gruffaz, Kailas, Saksman, and
+  Vihola]{Durmus2023}
+Alain Durmus, Samuel Gruffaz, Miika Kailas, Eero Saksman, and Matti Vihola.
+\newblock On the convergence of dynamic implementations of {H}amiltonian
+  {M}onte {C}arlo and {N}o {U}-turn samplers, 2023.
+\newblock URL \url{https://arxiv.org/abs/2307.03460}.
+
+\bibitem[Fang et~al.(2010)Fang, Xia, Zhang, Liu, and Yao]{Fang2010}
+Guangzhan Fang, Yiwen Xia, Chunguang Zhang, Tiejun Liu, and Dezhong Yao.
+\newblock Optimized single electroencephalogram channel sleep staging in rats.
+\newblock \emph{Laboratory Animals}, 44:\penalty0 312--322, 2010.
+\newblock \doi{10.1258/la.2010.009081}.
+
+\bibitem[Hoffman and Gelman(2014)]{HoffmanGelman2014}
+Matthew~D. Hoffman and Andrew Gelman.
+\newblock The no-{U}-turn sampler: Adaptively setting path lengths in
+  {H}amiltonian {M}onte {C}arlo.
+\newblock \emph{Journal of Machine Learning Research}, 15:\penalty0 1593--1623,
+  2014.
+\newblock URL \url{https://www.jmlr.org/papers/v15/hoffman14a.html}.
+
+\bibitem[Lai et~al.(2023)Lai, Burroni, Guan, and
+  Sheldon]{lai2023automaticallymarginalizedmcmcprobabilistic}
+Jinlin Lai, Javier Burroni, Hui Guan, and Daniel Sheldon.
+\newblock Automatically marginalized {MCMC} in probabilistic programming, 2023.
+\newblock URL \url{https://arxiv.org/abs/2302.00564}.
+
+\bibitem[Saevskiy et~al.(2025)Saevskiy, Suntsova, Kosenko, Alam, and
+  Kostin]{Saevskiy2025}
+Anton Saevskiy, Natalia Suntsova, Peter Kosenko, Md~Noor Alam, and Andrey
+  Kostin.
+\newblock Open-source algorithm for automated vigilance state classification
+  using single-channel electroencephalogram in rodents.
+\newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 921, 2025.
+\newblock \doi{10.3390/s25030921}.
+
+\bibitem[Vyazovskiy and Tobler(2005)]{Vyazovskiy2005}
+Vladyslav~V. Vyazovskiy and Irene Tobler.
+\newblock Theta activity in the waking {EEG} is a marker of sleep propensity in
+  the rat.
+\newblock \emph{Brain Research}, 1050\penalty0 (1--2):\penalty0 64--71, 2005.
+\newblock \doi{10.1016/j.brainres.2005.05.022}.
+
+\end{thebibliography}

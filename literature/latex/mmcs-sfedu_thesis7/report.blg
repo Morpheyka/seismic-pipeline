@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: report.aux
+A level-1 auxiliary file: TitulBak.aux
+The style file: plainnat.bst
+Database file #1: mmcs-thesis2020.bib
+Warning--I didn't find a database entry for "scikit-learn"
+Warning--I didn't find a database entry for "carlin1992hierarchical"
+You've used 8 entries,
+            2773 wiz_defined-function locations,
+            657 strings with 6644 characters,
+and the built_in function-call counts, 3747 in all, are:
+= -- 325
+> -- 245
+< -- 4
++ -- 83
+- -- 75
+* -- 314
+:= -- 599
+add.period$ -- 30
+call.type$ -- 8
+change.case$ -- 48
+chr.to.int$ -- 8
+cite$ -- 16
+duplicate$ -- 154
+empty$ -- 287
+format.name$ -- 87
+if$ -- 766
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 8
+newline$ -- 54
+num.names$ -- 32
+pop$ -- 96
+preamble$ -- 1
+purify$ -- 41
+quote$ -- 0
+skip$ -- 126
+stack$ -- 0
+substring$ -- 100
+swap$ -- 8
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 78
+warning$ -- 0
+while$ -- 31
+width$ -- 0
+write$ -- 121
+(There were 2 warnings)

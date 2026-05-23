@@ -95,7 +95,13 @@ def _parse_event_date(date_str: str) -> datetime:
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def _build_10day_inputs(events: Iterable[Dict[str, str]]) -> List[Dict[str, object]]:
+def _build_nday_inputs(
+    events: Iterable[Dict[str, str]],
+    window_days: int = 10,
+) -> List[Dict[str, object]]:
+    if window_days <= 0:
+        raise ValueError(f"window_days must be > 0, got {window_days}")
+
     out: List[Dict[str, object]] = []
     for event in events:
         dt = _parse_event_date(event["date"])
@@ -114,13 +120,13 @@ def _build_10day_inputs(events: Iterable[Dict[str, str]]) -> List[Dict[str, obje
         if direction == "before":
             window_dates = [
                 (dt - timedelta(days=offset)).strftime("%Y_%m_%d")
-                for offset in range(10, 0, -1)
+                for offset in range(window_days, 0, -1)
             ]
         else:
-            # Reverse order for post-event window: +10, +9, ... +1.
+            # Reverse order for post-event window: +N, +(N-1), ... +1.
             window_dates = [
                 (dt + timedelta(days=offset)).strftime("%Y_%m_%d")
-                for offset in range(10, 0, -1)
+                for offset in range(window_days, 0, -1)
             ]
         out.append(
             {
@@ -132,6 +138,11 @@ def _build_10day_inputs(events: Iterable[Dict[str, str]]) -> List[Dict[str, obje
             }
         )
     return out
+
+
+def _build_10day_inputs(events: Iterable[Dict[str, str]]) -> List[Dict[str, object]]:
+    """Backward-compatible 10-day alias."""
+    return _build_nday_inputs(events, window_days=10)
 
 
 def _cache_needed_dates(
@@ -150,10 +161,10 @@ def _cache_needed_dates(
         if cache_manager.get_cached_hypnogram(rat_id, date) is not None:
             cached.append((rat_id, date))
             continue
-        if cache_manager.cache_hypnogram(rat_id, date, source="local"):
+        if cache_manager.cache_hypnogram(rat_id, date, source="s3"):
             cached.append((rat_id, date))
             continue
-        if cache_manager.cache_hypnogram(rat_id, date, source="s3"):
+        if cache_manager.cache_hypnogram(rat_id, date, source="local"):
             cached.append((rat_id, date))
             continue
         missing.append((rat_id, date))
@@ -258,6 +269,7 @@ def export_rem_profiles_10days_cached_only(
     local_hypnogram_cache_dir: str = "./hypnogram_cache_legacy10",
     window_size_hours: int = 6,
     step_size_hours: int = 1,
+    window_days: int = 10,
     rem_stage: int = 2,
     epoch_length_sec: int = 5,
     sampling_rate: int = 250,
@@ -286,6 +298,7 @@ def export_rem_profiles_10days_cached_only(
         "local_hypnogram_cache_dir": local_hypnogram_cache_dir,
         "window_size_hours": window_size_hours,
         "step_size_hours": step_size_hours,
+        "window_days": window_days,
         "rem_stage": rem_stage,
         "epoch_length_sec": epoch_length_sec,
         "sampling_rate": sampling_rate,
@@ -314,7 +327,7 @@ def export_rem_profiles_10days_cached_only(
         allow_local_root_fallback=True,
     )
 
-    rows = _build_10day_inputs(events)
+    rows = _build_nday_inputs(events, window_days=window_days)
     cached_pairs, missing_pairs = _cache_needed_dates(cache_manager, rows)
     print(f"Total required (rat,date) pairs: {len(cached_pairs) + len(missing_pairs)}")
     print(f"Initially cached/available: {len(cached_pairs)}")
@@ -1553,6 +1566,15 @@ def tau_probabilities(trace):
     raise ValueError("Neither 'tau' nor ('tau_probs' and 'tau_support') found in trace.")
 
 
+def p_tau_gt_from_trace(trace, threshold: float = 6.0) -> float:
+    """Posterior probability P(tau > threshold)."""
+    support, probs = tau_probabilities(trace)
+    support = np.asarray(support, dtype=float)
+    probs = np.asarray(probs, dtype=float)
+    probs = probs / probs.sum()
+    return float(probs[support > float(threshold)].sum())
+
+
 def _positive_feature_values(values: np.ndarray) -> np.ndarray:
     arr = np.asarray(values, dtype=float).reshape(-1)
     arr = arr[np.isfinite(arr)]
@@ -1690,6 +1712,21 @@ def _likelihood_pdf_from_posterior(
     )
 
 
+def _likelihood_profile_log_density_y(
+    log_density_y: bool | set[tuple[str, str]] | None,
+    group_name: str,
+    feat_name: str,
+) -> bool:
+    if log_density_y is True:
+        return True
+    if not log_density_y:
+        return False
+    key = (str(group_name).strip().lower(), str(feat_name).strip().lower())
+    return key in {
+        (str(g).strip().lower(), str(f).strip().lower()) for g, f in log_density_y
+    }
+
+
 def feature_likelihood_profiles(
     trace,
     group_data: dict,
@@ -1697,6 +1734,7 @@ def feature_likelihood_profiles(
     *,
     grid_size: int = 300,
     plot: bool = True,
+    log_density_y: bool | set[tuple[str, str]] | None = None,
 ) -> dict[str, dict[str, pd.DataFrame]]:
     """Return and optionally plot before/after likelihood profiles for each selected feature.
 
@@ -1753,6 +1791,9 @@ def feature_likelihood_profiles(
             profiles[group_name][feat_name] = profile_df
 
             if plot:
+                use_log_y = _likelihood_profile_log_density_y(
+                    log_density_y, group_name, feat_name
+                )
                 plt.figure(figsize=(7, 4))
                 if likelihood in {"lognormal", "gamma"}:
                     obs_plot = _positive_feature_values(observed)
@@ -1768,12 +1809,16 @@ def feature_likelihood_profiles(
                         color="green",
                         label="observed",
                     )
-                plt.plot(x, y_before, color="#A60628", linewidth=2.0, label="до tau")
-                plt.plot(x, y_after, color="#7A68A6", linewidth=2.0, label="после tau")
+                y_plot_before = np.maximum(y_before, 1e-300) if use_log_y else y_before
+                y_plot_after = np.maximum(y_after, 1e-300) if use_log_y else y_after
+                plt.plot(x, y_plot_before, color="#A60628", linewidth=2.0, label="до tau")
+                plt.plot(x, y_plot_after, color="#7A68A6", linewidth=2.0, label="после tau")
+                if use_log_y:
+                    plt.yscale("log")
                 plt.title(f"Likelihood profile: {group_name}/{feat_name} ({likelihood})")
                 plt.xlabel("value")
-                plt.ylabel("density")
-                plt.grid(alpha=0.25)
+                plt.ylabel("density (log scale)" if use_log_y else "density")
+                plt.grid(alpha=0.25, which="both" if use_log_y else "major")
                 plt.legend()
                 plt.tight_layout()
                 plt.show()
@@ -1942,12 +1987,16 @@ def score_changepoint_trace(
     model=None,
     criterion: str = "waic",
     warn_on_fallback: bool = True,
+    loo_report: str = "ic",
 ) -> dict[str, Any]:
     """Summarize a changepoint trace for model comparison and Metropolis-Hastings scoring.
 
     Returns keys including: p_tau_gt_threshold, map_tau, map_tau_prob, tau_entropy,
     tau_concentration, r_hat_max, ess_min_bulk, ess_min_tail, n_divergences, bfmi / bfmi_approx,
     and when ``model`` is provided: elpd, waic / loo, p_waic / p_loo, criterion metadata.
+
+    ``loo_report`` controls the scale stored in ``loo``: ``"elpd"`` uses ArviZ ``elpd_loo``
+    (log predictive density); ``"ic"`` uses LOO-IC (``-2 * elpd_loo`` when ``.loo`` is absent).
     """
     support, probs = tau_probabilities(trace)
     support = np.asarray(support, dtype=float)
@@ -2028,6 +2077,7 @@ def score_changepoint_trace(
     waic_stat = float("nan")
     p_waic = float("nan")
     loo_stat = float("nan")
+    elpd_loo = float("nan")
     p_loo = float("nan")
     waic_warning_flag = False
     waic_warning_messages: List[str] = []
@@ -2053,10 +2103,14 @@ def score_changepoint_trace(
 
             ic_loo = az.loo(idata_ic, scale="log")
             p_loo = _float_ic_scalar(getattr(ic_loo, "p_loo", float("nan")))
-            loo_stat = _float_ic_scalar(getattr(ic_loo, "loo", float("nan")))
             elpd_loo = _float_ic_scalar(getattr(ic_loo, "elpd_loo", float("nan")))
-            if not math.isfinite(loo_stat) and math.isfinite(elpd_loo):
-                loo_stat = float(-2.0 * elpd_loo)
+            loo_ic = _float_ic_scalar(getattr(ic_loo, "loo", float("nan")))
+            if not math.isfinite(loo_ic) and math.isfinite(elpd_loo):
+                loo_ic = float(-2.0 * elpd_loo)
+            if str(loo_report).strip().lower() == "elpd":
+                loo_stat = elpd_loo
+            else:
+                loo_stat = loo_ic
 
             if crit == "waic":
                 elpd = elpd_waic
@@ -2098,6 +2152,7 @@ def score_changepoint_trace(
         "ic_computed": ic_computed,
         "waic": waic_stat,
         "p_waic": p_waic,
+        "elpd_loo": elpd_loo,
         "loo": loo_stat,
         "p_loo": p_loo,
         "waic_warning_flag": waic_warning_flag,
@@ -2467,6 +2522,57 @@ def _group_metric_shape_signature_from_config(
     return tuple(sorted(blocks))
 
 
+def _exhaustive_model_signature(
+    config: dict,
+    *,
+    include_rem_profile: bool = False,
+) -> tuple:
+    """Signature of what exhaustive_model_search actually fits on fixed data_norm."""
+    n_chunks = int(config.get("n_chunks"))
+    tau_threshold = float(config.get("tau_threshold", 6.0))
+
+    fs_raw = config.get("feature_selection") or {}
+    fs_sig: tuple[tuple[str, tuple[str, ...]], ...] = tuple(
+        sorted(
+            (
+                str(group_name).strip().lower(),
+                tuple(
+                    sorted(
+                        str(metric_name).strip().lower()
+                        for metric_name in (metrics or [])
+                    )
+                ),
+            )
+            for group_name, metrics in fs_raw.items()
+        )
+    )
+
+    ps_raw = config.get("parameter_selection") or {}
+    ps_sig: tuple[tuple[str, str], ...] = tuple(
+        sorted(
+            (
+                str(metric_name).strip().lower(),
+                str((params or {}).get("likelihood", "")).strip().lower(),
+            )
+            for metric_name, params in ps_raw.items()
+        )
+    )
+
+    rem_sig: tuple[int, int, int] | None = None
+    if include_rem_profile:
+        rem = config.get("rem_profile_params") or {}
+        rem_sig = (
+            int(rem.get("window_size_hours", 0)),
+            int(rem.get("step_size_hours", 0)),
+            int(rem.get("rem_stage", 0)),
+        )
+
+    # By default rem_profile_params are excluded because exhaustive_model_search
+    # can run on fixed `data_norm`. When runtime export/prepare configs exist and
+    # per-REM recalculation is enabled, rem_sig is included.
+    return (n_chunks, tau_threshold, fs_sig, ps_sig, rem_sig)
+
+
 def _collect_pareto_k_stats(
     trace,
     model,
@@ -2589,6 +2695,7 @@ def exhaustive_model_search(
     proposal_options: dict,
     data_norm: np.ndarray,
     *,
+    configs: list[dict] | None = None,
     draws: int = 500,
     tune: int = 1000,
     nuts_backend: str = "pymc",
@@ -2602,35 +2709,103 @@ def exhaustive_model_search(
     verbose: bool = True,
     progressbar: bool = True,
 ) -> dict:
-    """Evaluate all changepoint model configurations from a proposal grid."""
+    """Evaluate all changepoint model configurations from a proposal grid.
+
+    Each result record's ``loo`` field (and ``elpd_loo`` when present) uses ArviZ
+    ``elpd_loo`` (log predictive density sum), not LOO-IC (``-2 * elpd_loo``).
+    """
     t0 = time.perf_counter()
     _ = np.random.default_rng(int(seed))
     tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
     pareto_threshold = float(proposal_options.get("pareto_threshold", 0.7))
 
-    all_configs = _generate_exhaustive_configs(proposal_options, tau_threshold=tau_threshold)
-    n_total = len(all_configs)
-    n_events = int(np.asarray(data_norm).shape[0])
-
-    dedup_seen: set[tuple[int, tuple[tuple[str, str, int, int], ...]]] = set()
-    unique_configs: list[dict] = []
-    n_filtered_degenerate = 0
-    for cfg in all_configs:
-        sig = (
-            int(cfg["n_chunks"]),
-            _group_metric_shape_signature_from_config(cfg, n_events=n_events),
+    use_rem_profile_recalc = False
+    if configs is not None:
+        all_configs = [_clone_config(cfg) for cfg in configs]
+        n_total = len(all_configs)
+        unique_configs = all_configs
+        n_filtered_degenerate = 0
+    else:
+        all_configs = _generate_exhaustive_configs(proposal_options, tau_threshold=tau_threshold)
+        n_total = len(all_configs)
+        n_events = int(np.asarray(data_norm).shape[0])
+        use_rem_profile_recalc = (
+            _RUNTIME_LAST_EXPORT_CFG is not None
+            and any(cfg.get("rem_profile_params") for cfg in all_configs)
         )
-        if sig in dedup_seen:
-            n_filtered_degenerate += 1
-            continue
-        dedup_seen.add(sig)
-        unique_configs.append(cfg)
+
+        dedup_seen: set[tuple] = set()
+        unique_configs = []
+        n_filtered_degenerate = 0
+        for cfg in all_configs:
+            # Deduplicate by model semantics actually used by
+            # exhaustive_model_search on fixed `data_norm`.
+            # Keep likelihood differences; collapse rem_profile-only duplicates.
+            sig = _exhaustive_model_signature(
+                cfg,
+                include_rem_profile=use_rem_profile_recalc,
+            )
+            if sig in dedup_seen:
+                n_filtered_degenerate += 1
+                continue
+            dedup_seen.add(sig)
+            unique_configs.append(cfg)
 
     trace_cache: dict[str, Any] = {}
     model_cache: dict[str, Any] = {}
     score_cache: dict[str, dict[str, Any]] = {}
+    rem_data_cache: dict[str, np.ndarray] = {}
     results: list[dict[str, Any]] = []
     n_fit_errors = 0
+
+    def rem_output_dir_for_config(cfg: dict) -> str | None:
+        rpp = cfg.get("rem_profile_params")
+        if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
+            return None
+        base_output_dir = str(_RUNTIME_LAST_EXPORT_CFG.get("output_dir", "."))
+        return os.path.join(
+            base_output_dir,
+            (
+                f"rem_w{int(rpp['window_size_hours'])}"
+                f"_s{int(rpp['step_size_hours'])}"
+                f"_stage{int(rpp['rem_stage'])}"
+            ),
+        )
+
+    def ensure_data_for_config(cfg: dict) -> np.ndarray:
+        if not use_rem_profile_recalc:
+            return data_norm
+        rpp = cfg.get("rem_profile_params")
+        if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
+            return data_norm
+        rem_key = json.dumps(
+            {
+                "window_size_hours": int(rpp["window_size_hours"]),
+                "step_size_hours": int(rpp["step_size_hours"]),
+                "rem_stage": int(rpp["rem_stage"]),
+            },
+            sort_keys=True,
+        )
+        if rem_key in rem_data_cache:
+            return rem_data_cache[rem_key]
+        export_cfg = dict(_RUNTIME_LAST_EXPORT_CFG)
+        rem_output_dir = rem_output_dir_for_config(cfg)
+        export_cfg.update(
+            {
+                "output_dir": rem_output_dir,
+                "window_size_hours": int(rpp["window_size_hours"]),
+                "step_size_hours": int(rpp["step_size_hours"]),
+                "rem_stage": int(rpp["rem_stage"]),
+            }
+        )
+        export_result = export_rem_profiles_10days_cached_only(**export_cfg)
+        prep_cfg = _RUNTIME_LAST_PREPARE_CFG or {}
+        prep = prepare_model_data(
+            csv_path=export_result["paths"]["nanpad_output_csv"],
+            bad_sample_indices=prep_cfg.get("bad_sample_indices"),
+        )
+        rem_data_cache[rem_key] = prep["data_norm"]
+        return rem_data_cache[rem_key]
 
     iterator: Iterable[tuple[int, dict]]
     iterator = enumerate(unique_configs, start=1)
@@ -2656,8 +2831,9 @@ def exhaustive_model_search(
                 trace = trace_cache[fp]
                 model = model_cache[fp]
             else:
+                data_work = ensure_data_for_config(config)
                 group_data = build_group_data(
-                    data_norm,
+                    data_work,
                     n_chunks=int(config["n_chunks"]),
                     feature_selection=config["feature_selection"],
                 )
@@ -2688,6 +2864,7 @@ def exhaustive_model_search(
                     model=model,
                     criterion="loo",
                     warn_on_fallback=False,
+                    loo_report="elpd",
                 )
                 if cache_fits:
                     score_cache[fp] = score_parts
@@ -2703,10 +2880,14 @@ def exhaustive_model_search(
             record = {
                 "config": _clone_config(config),
                 "fingerprint": fp,
+                "data_shape": tuple(int(x) for x in np.asarray(data_work).shape),
+                "data_output_dir": rem_output_dir_for_config(config) if use_rem_profile_recalc else None,
+                "bad_sample_indices": list((_RUNTIME_LAST_PREPARE_CFG or {}).get("bad_sample_indices") or []),
                 "waic": float(score_parts.get("waic", float("nan"))),
                 "waic_warning_flag": bool(score_parts.get("waic_warning_flag", False)),
                 "waic_warning_messages": list(score_parts.get("waic_warning_messages") or []),
                 "loo": float(score_parts.get("loo", float("nan"))),
+                "elpd_loo": float(score_parts.get("elpd_loo", float("nan"))),
                 "loo_pareto_k_max": loo_k_max,
                 "loo_n_over_threshold": int(loo_n_over),
                 "r_hat_max": float(score_parts.get("r_hat_max", float("nan"))),
@@ -2715,6 +2896,7 @@ def exhaustive_model_search(
                 "bfmi": float(score_parts.get("bfmi", score_parts.get("bfmi_approx", float("nan")))),
                 "n_divergences": int(score_parts.get("n_divergences", 0)),
                 "p_tau_gt_threshold": float(score_parts.get("p_tau_gt_threshold", float("nan"))),
+                "p_tau_gt_6": float(p_tau_gt_from_trace(trace, 6.0)),
                 "tau_map": int(score_parts.get("map_tau", -1)),
                 "tau_map_concentration": float(score_parts.get("tau_concentration", float("nan"))),
                 "n_feature_blocks": int(score_parts.get("n_feature_blocks", 0)),
@@ -2726,8 +2908,10 @@ def exhaustive_model_search(
             if verbose:
                 print(
                     f"[exhaustive] model {idx}/{len(unique_configs)} config fp={fp} "
-                    f"loo={record['loo']:.3f} waic={record['waic']:.3f} "
-                    f"r_hat={record['r_hat_max']:.3f} ok",
+                    f"elpd_loo={record['loo']:.3f} waic={record['waic']:.3f} "
+                    f"r_hat={record['r_hat_max']:.3f} "
+                    f"tau_map={record['tau_map']} "
+                    f"P(tau)={record['tau_map_concentration']:.3f} ok",
                     flush=True,
                 )
         except Exception as exc:
@@ -2740,6 +2924,7 @@ def exhaustive_model_search(
                 "waic_warning_flag": False,
                 "waic_warning_messages": [],
                 "loo": float("nan"),
+                "elpd_loo": float("nan"),
                 "loo_pareto_k_max": float("nan"),
                 "loo_n_over_threshold": 0,
                 "r_hat_max": float("nan"),
@@ -2834,8 +3019,164 @@ def compute_model_distance_matrix(configs: list[dict]) -> np.ndarray:
     return dist
 
 
+def _config_feature_label(config: dict) -> str:
+    fs = config.get("feature_selection") or {}
+    parts = []
+    for group_name in sorted(fs):
+        metrics = ", ".join(str(m) for m in fs[group_name])
+        parts.append(f"{group_name}: {metrics}")
+    return "; ".join(parts)
+
+
+def exhaustive_tau_map_table(
+    search_result: dict,
+    *,
+    top_n: int | None = 20,
+    sort_by: str = "loo",
+    valid_only: bool = False,
+) -> pd.DataFrame:
+    """Build a table of MAP tau and concentration per exhaustive-search model.
+
+    The ``elpd_loo`` column matches exhaustive search scoring (not LOO-IC).
+    """
+    results = list(search_result.get("results") or [])
+    if valid_only:
+        results = [
+            r
+            for r in results
+            if r.get("status") == "ok"
+            and math.isfinite(float(r.get("loo", float("nan"))))
+            and float(r.get("r_hat_max", float("inf"))) <= 1.05
+            and float(r.get("ess_min_bulk", float("-inf"))) >= 100.0
+            and int(r.get("n_divergences", 1)) == 0
+        ]
+    else:
+        results = [r for r in results if r.get("status") == "ok"]
+
+    key = str(sort_by).strip().lower()
+    if key not in {"loo", "waic", "tau_map", "tau_map_concentration"}:
+        raise ValueError("sort_by must be one of: loo, waic, tau_map, tau_map_concentration")
+
+    def _sort_val(rec: dict) -> float:
+        v = float(rec.get(key, float("nan")))
+        return v if math.isfinite(v) else float("-inf")
+
+    results = sorted(results, key=_sort_val, reverse=True)
+    if top_n is not None:
+        results = results[: max(1, int(top_n))]
+
+    rows: list[dict[str, Any]] = []
+    for rank, rec in enumerate(results, start=1):
+        cfg = rec.get("config") or {}
+        rem = cfg.get("rem_profile_params") or {}
+        rows.append(
+            {
+                "rank": rank,
+                "fingerprint": str(rec.get("fingerprint", "")),
+                "features": _config_feature_label(cfg),
+                "w_h": int(rem.get("window_size_hours", -1)),
+                "step_h": int(rem.get("step_size_hours", -1)),
+                "elpd_loo": float(rec.get("elpd_loo", rec.get("loo", float("nan")))),
+                "waic": float(rec.get("waic", float("nan"))),
+                "tau_map": int(rec.get("tau_map", -1)),
+                "P_tau_map": float(rec.get("tau_map_concentration", float("nan"))),
+                "p_tau_gt_threshold": float(rec.get("p_tau_gt_threshold", float("nan"))),
+                "r_hat_max": float(rec.get("r_hat_max", float("nan"))),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def print_exhaustive_tau_map_table(
+    search_result: dict,
+    *,
+    top_n: int | None = 20,
+    sort_by: str = "loo",
+    valid_only: bool = False,
+) -> pd.DataFrame:
+    """Print and return MAP-tau table for exhaustive-search models."""
+    table = exhaustive_tau_map_table(
+        search_result,
+        top_n=top_n,
+        sort_by=sort_by,
+        valid_only=valid_only,
+    )
+    if table.empty:
+        print("No exhaustive-search records with status='ok' to display.")
+        return table
+    print(table.to_string(index=False, float_format=lambda x: f"{x:.3f}"))
+    return table
+
+
+def _exhaustive_p_tau_gt(rec: dict, threshold: float) -> float:
+    thr = float(threshold)
+    if thr == 6.0 and "p_tau_gt_6" in rec:
+        return float(rec.get("p_tau_gt_6", float("nan")))
+    cfg_thr = float((rec.get("config") or {}).get("tau_threshold", float("nan")))
+    if math.isfinite(cfg_thr) and abs(cfg_thr - thr) < 1e-9:
+        return float(rec.get("p_tau_gt_threshold", float("nan")))
+    return float("nan")
+
+
+def select_exhaustive_top_configs(
+    search_result: dict,
+    *,
+    top_n: int = 150,
+    r_hat_max: float = 1.02,
+    p_tau_gt_min: float = 0.5,
+    tau_gt_threshold: float = 6.0,
+    sort_by: str = "loo",
+) -> tuple[list[dict], pd.DataFrame]:
+    """Select top-N exhaustive-search configs by elpd_loo with r_hat and P(tau>threshold) gates."""
+    results = [r for r in (search_result.get("results") or []) if r.get("status") == "ok"]
+    filtered: list[dict] = []
+    for rec in results:
+        rh = float(rec.get("r_hat_max", float("inf")))
+        p_gt = _exhaustive_p_tau_gt(rec, tau_gt_threshold)
+        if rh <= float(r_hat_max) and math.isfinite(p_gt) and p_gt >= float(p_tau_gt_min):
+            filtered.append(rec)
+
+    key = str(sort_by).strip().lower()
+    if key not in {"loo", "waic", "tau_map", "tau_map_concentration"}:
+        raise ValueError("sort_by must be one of: loo, waic, tau_map, tau_map_concentration")
+
+    def _sort_val(rec: dict) -> float:
+        v = float(rec.get(key, float("nan")))
+        return v if math.isfinite(v) else float("-inf")
+
+    filtered = sorted(filtered, key=_sort_val, reverse=True)
+    if top_n is not None:
+        filtered = filtered[: max(1, int(top_n))]
+
+    configs = [_clone_config(rec["config"]) for rec in filtered if rec.get("config")]
+    rows: list[dict[str, Any]] = []
+    for rank, rec in enumerate(filtered, start=1):
+        cfg = rec.get("config") or {}
+        rem = cfg.get("rem_profile_params") or {}
+        rows.append(
+            {
+                "rank": rank,
+                "fingerprint": str(rec.get("fingerprint", "")),
+                "features": _config_feature_label(cfg),
+                "w_h": int(rem.get("window_size_hours", -1)),
+                "step_h": int(rem.get("step_size_hours", -1)),
+                "elpd_loo": float(rec.get("elpd_loo", rec.get("loo", float("nan")))),
+                "waic": float(rec.get("waic", float("nan"))),
+                "tau_map": int(rec.get("tau_map", -1)),
+                "P_tau_map": float(rec.get("tau_map_concentration", float("nan"))),
+                "p_tau_gt_6": _exhaustive_p_tau_gt(rec, tau_gt_threshold),
+                "r_hat_max": float(rec.get("r_hat_max", float("nan"))),
+            }
+        )
+    return configs, pd.DataFrame(rows)
+
+
 def summarize_exhaustive_search(search_result: dict) -> dict:
-    """Compute summary statistics from exhaustive search results."""
+    """Compute summary statistics from exhaustive search results.
+
+    ``best_loo`` and nested ``loo`` fields use ``elpd_loo`` scale (same as ArviZ
+    ``elpd_loo``), not LOO-IC, for exhaustive search runs.
+    """
     from collections import Counter
 
     results = list(search_result.get("results") or [])
@@ -2914,12 +3255,13 @@ def summarize_exhaustive_search(search_result: dict) -> dict:
         "n_filtered": int(search_result.get("n_filtered", 0)),
         "n_valid": int(len(valid)),
         "best_loo": best_loo,
+        "best_elpd_loo": best_loo,
         "best_waic": best_waic,
         "best_config_fingerprint": best_fp,
         "top_fingerprints_by_loo": [
             {
                 "fingerprint": str(r.get("fingerprint")),
-                "loo": float(r.get("loo", float("nan"))),
+                "elpd_loo": float(r.get("elpd_loo", r.get("loo", float("nan")))),
             }
             for r in valid_sorted[:10]
         ],
@@ -2931,7 +3273,110 @@ def summarize_exhaustive_search(search_result: dict) -> dict:
         "n_local_optima": int(n_local_optima),
         "loo_range_top20": loo_range_top20,
         "tau_map_mode": tau_mode,
+        "top_tau_by_loo": [
+            {
+                "fingerprint": str(r.get("fingerprint")),
+                "elpd_loo": float(r.get("elpd_loo", r.get("loo", float("nan")))),
+                "tau_map": int(r.get("tau_map", -1)),
+                "tau_map_concentration": float(r.get("tau_map_concentration", float("nan"))),
+                "features": _config_feature_label(r.get("config") or {}),
+            }
+            for r in top10
+        ],
     }
+
+
+def _config_likelihood_label(config: dict) -> str:
+    ps = config.get("parameter_selection") or {}
+    parts = []
+    for metric_name in sorted(ps):
+        likelihood = (ps[metric_name] or {}).get("likelihood", "")
+        parts.append(f"{metric_name}={likelihood}")
+    return "; ".join(parts)
+
+
+def export_exhaustive_search_results_to_csv(
+    search_result: dict,
+    output_csv: str,
+    *,
+    output_summary_json: str | None = None,
+) -> dict[str, str]:
+    """Export exhaustive-search model records to CSV and optional summary JSON."""
+    csv_dir = os.path.dirname(output_csv)
+    if csv_dir:
+        os.makedirs(csv_dir, exist_ok=True)
+
+    rows: list[dict[str, Any]] = []
+    for rank, rec in enumerate(search_result.get("results") or [], start=1):
+        cfg = rec.get("config") or {}
+        rem = cfg.get("rem_profile_params") or {}
+        rows.append(
+            {
+                "rank_by_loo": rank,
+                "fingerprint": rec.get("fingerprint"),
+                "status": rec.get("status"),
+                "error": rec.get("error"),
+                "features": _config_feature_label(cfg),
+                "likelihoods": _config_likelihood_label(cfg),
+                "n_chunks": cfg.get("n_chunks"),
+                "tau_threshold": cfg.get("tau_threshold"),
+                "window_size_hours": rem.get("window_size_hours"),
+                "step_size_hours": rem.get("step_size_hours"),
+                "rem_stage": rem.get("rem_stage"),
+                "loo": rec.get("loo"),
+                "elpd_loo": rec.get("elpd_loo", rec.get("loo")),
+                "waic": rec.get("waic"),
+                "r_hat_max": rec.get("r_hat_max"),
+                "ess_min_bulk": rec.get("ess_min_bulk"),
+                "ess_min_tail": rec.get("ess_min_tail"),
+                "bfmi": rec.get("bfmi"),
+                "n_divergences": rec.get("n_divergences"),
+                "tau_map": rec.get("tau_map"),
+                "tau_map_concentration": rec.get("tau_map_concentration"),
+                "p_tau_gt_threshold": rec.get("p_tau_gt_threshold"),
+                "e_tau": rec.get("e_tau"),
+                "p_tau_gt_6": rec.get("p_tau_gt_6"),
+                "loo_pareto_k_max": rec.get("loo_pareto_k_max"),
+                "loo_n_over_threshold": rec.get("loo_n_over_threshold"),
+                "waic_warning_flag": rec.get("waic_warning_flag"),
+                "n_feature_blocks": rec.get("n_feature_blocks"),
+                "elapsed_time": rec.get("elapsed_time"),
+                "data_shape": str(rec.get("data_shape")),
+                "data_output_dir": rec.get("data_output_dir"),
+                "bad_sample_indices": str(rec.get("bad_sample_indices")),
+                "config_json": json.dumps(cfg, ensure_ascii=False, sort_keys=True),
+            }
+        )
+
+    df_results = pd.DataFrame(rows)
+    df_results.to_csv(output_csv, index=False)
+
+    paths: dict[str, str] = {"results_csv": output_csv}
+    if output_summary_json:
+        summary_dir = os.path.dirname(output_summary_json)
+        if summary_dir:
+            os.makedirs(summary_dir, exist_ok=True)
+        summary_payload: dict[str, Any] = {
+            **summarize_exhaustive_search(search_result),
+            "elapsed_total_sec": float(search_result.get("elapsed_total", float("nan"))),
+            "results_csv": output_csv,
+            "n_rows_saved": int(len(df_results)),
+        }
+        def _json_default(obj: Any) -> Any:
+            if isinstance(obj, tuple):
+                return list(obj)
+            raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+        with open(output_summary_json, "w", encoding="utf-8") as f:
+            json.dump(
+                summary_payload,
+                f,
+                ensure_ascii=False,
+                indent=2,
+                default=_json_default,
+            )
+        paths["summary_json"] = output_summary_json
+    return paths
 
 
 def plot_exhaustive_search_results(
@@ -2963,12 +3408,12 @@ def plot_exhaustive_search_results(
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     ax = axes[0, 0]
-    ax.plot(idx, loo_vals, "o-", ms=4, lw=1.1, color="#1f77b4", label="LOO")
+    ax.plot(idx, loo_vals, "o-", ms=4, lw=1.1, color="#1f77b4", label="elpd_loo")
     ax.scatter(idx, waic_vals, s=18, alpha=0.4, color="#7f7f7f", label="WAIC")
-    ax.axhline(float(np.nanmax(loo_vals)), color="#2ca02c", ls="--", lw=1.0, label="best LOO")
-    ax.set_xlabel("Model rank (by LOO)")
+    ax.axhline(float(np.nanmax(loo_vals)), color="#2ca02c", ls="--", lw=1.0, label="best elpd_loo")
+    ax.set_xlabel("Model rank (by elpd_loo)")
     ax.set_ylabel("Score (log scale)")
-    ax.set_title("LOO vs model rank (WAIC overlay)")
+    ax.set_title("elpd_loo vs model rank (WAIC overlay)")
     ax.grid(alpha=0.3)
     ax.legend(loc="best", fontsize=8)
 
@@ -2994,9 +3439,9 @@ def plot_exhaustive_search_results(
         alpha=0.85,
         edgecolors="none",
     )
-    ax.set_xlabel("LOO")
-    ax.set_ylabel("P(tau > threshold)")
-    ax.set_title("LOO vs tau signal (color=n_feature_blocks)")
+    ax.set_xlabel("elpd_loo")
+    ax.set_ylabel("E(tau)")
+    ax.set_title("elpd_loo vs tau signal (color=n_feature_blocks)")
     ax.grid(alpha=0.3)
     cbar = fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("n_feature_blocks")
@@ -3937,6 +4382,7 @@ def run_variant(
     data_norm: np.ndarray | None = None,
     plot_likelihood_profiles: bool = True,
     likelihood_profile_grid_size: int = 300,
+    likelihood_profile_log_density_y: bool | set[tuple[str, str]] | None = None,
     return_likelihood_profiles: bool = False,
 ):
     """Full scenario run: features -> model -> MCMC -> summary -> plots."""
@@ -4095,6 +4541,7 @@ def run_variant(
         parameter_selection=parameter_selection,
         grid_size=likelihood_profile_grid_size,
         plot=plot_likelihood_profiles,
+        log_density_y=likelihood_profile_log_density_y,
     )
     if return_likelihood_profiles:
         return trace, summary, likelihood_profiles
@@ -4451,6 +4898,11 @@ __all__ = [
     "model_config_hamming_distance",
     "compute_model_distance_matrix",
     "summarize_exhaustive_search",
+    "export_exhaustive_search_results_to_csv",
+    "exhaustive_tau_map_table",
+    "print_exhaustive_tau_map_table",
+    "select_exhaustive_top_configs",
+    "p_tau_gt_from_trace",
     "plot_exhaustive_search_results",
     "summarize_model_search",
     "plot_model_search_results",
