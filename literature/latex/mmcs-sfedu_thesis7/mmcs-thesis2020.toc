@@ -3,8 +3,8 @@
 \contentsline {section}{Введение}{4}{}%
 \contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}%
 \contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}%
-\contentsline {section}{\numberline {3.\relax }Программная реализация}{22}{}%
+\contentsline {section}{\numberline {3.\relax }Программная реализация}{23}{}%
 \contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{23}{}%
-\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{26}{}%
-\contentsline {section}{Литература}{31}{}%
-\contentsline {section}{Приложение}{32}{}%
+\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{27}{}%
+\contentsline {section}{Литература}{32}{}%
+\contentsline {section}{Приложение}{33}{}%

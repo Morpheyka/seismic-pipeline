@@ -10,9 +10,11 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import itertools
 import json
 import math
 import os
+import time
 import warnings
 from datetime import datetime, timedelta
 from typing import Any, Dict, Iterable, List, Tuple
@@ -949,6 +951,133 @@ def build_group_data(
     return out
 
 
+def _chunk_group_idx_map(n_chunks: int) -> dict[str, np.ndarray]:
+    return {
+        "all": np.arange(n_chunks),
+        "odd": np.arange(0, n_chunks, 2),
+        "even": np.arange(1, n_chunks, 2),
+        "concat": np.arange(n_chunks // 2),
+    }
+
+
+def _rem_profile_key_tuple(rem_profile_params: dict | None) -> tuple[int, int]:
+    rpp = rem_profile_params or {}
+    return (
+        int(rpp.get("window_size_hours", 0)),
+        int(rpp.get("step_size_hours", 0)),
+    )
+
+
+def precompute_all_features(data_norm: np.ndarray, config: dict) -> dict[tuple, np.ndarray]:
+    """Precompute chunk features for all proposal-grid combinations.
+
+    Returns a dict keyed by ``(window_size, step_size, n_chunks, group, metric)``
+    mapping to arrays of shape ``(n_events, n_chunks_for_group)``.
+    """
+    proposal_options = config.get("proposal_options", config)
+    rem_choices = list(proposal_options.get("rem_profile_choices") or [])
+    n_choices = list(proposal_options.get("n_chunks_choices") or [])
+    groups = list(proposal_options.get("allowed_groups") or ["concat", "odd", "even", "all"])
+    metrics = list(proposal_options.get("allowed_metrics") or ["mean", "range"])
+
+    if not n_choices:
+        raise ValueError("precompute_all_features requires n_chunks_choices in proposal_options")
+
+    export_cfg_base = _RUNTIME_LAST_EXPORT_CFG
+    prep_cfg = _RUNTIME_LAST_PREPARE_CFG or {}
+    fallback_rem = config.get("rem_profile_params")
+    rem_profiles: list[dict | None]
+    if rem_choices:
+        rem_profiles = [dict(r) for r in rem_choices]
+    elif fallback_rem:
+        rem_profiles = [dict(fallback_rem)]
+    else:
+        rem_profiles = [None]
+
+    precomputed: dict[tuple, np.ndarray] = {}
+    for rem in rem_profiles:
+        if rem and export_cfg_base:
+            export_cfg = dict(export_cfg_base)
+            export_cfg.update(
+                {
+                    "window_size_hours": int(rem["window_size_hours"]),
+                    "step_size_hours": int(rem["step_size_hours"]),
+                    "rem_stage": int(rem["rem_stage"]),
+                }
+            )
+            export_result = export_rem_profiles_10days_cached_only(**export_cfg)
+            prep = prepare_model_data(
+                csv_path=export_result["paths"]["nanpad_output_csv"],
+                bad_sample_indices=prep_cfg.get("bad_sample_indices"),
+            )
+            dnorm = prep["data_norm"]
+        else:
+            dnorm = data_norm
+
+        w_key, s_key = _rem_profile_key_tuple(rem if rem else fallback_rem)
+
+        for n_chunks in n_choices:
+            n_chunks = int(n_chunks)
+            feature_map = compute_chunk_feature_map(dnorm, n_chunks=n_chunks)
+            concat_feature_map = None
+            if "concat" in groups:
+                concat_feature_map = compute_concat_chunk_feature_map(dnorm, n_chunks=n_chunks)
+            idx_map = _chunk_group_idx_map(n_chunks)
+            feature_source_map = {
+                "all": feature_map,
+                "odd": feature_map,
+                "even": feature_map,
+                "concat": concat_feature_map,
+            }
+
+            for group in groups:
+                if group not in idx_map:
+                    continue
+                src = feature_source_map.get(group)
+                if src is None:
+                    continue
+                for metric in metrics:
+                    if metric not in src:
+                        continue
+                    key = (w_key, s_key, n_chunks, group, metric)
+                    precomputed[key] = src[metric][:, idx_map[group]].copy()
+
+    return precomputed
+
+
+def group_data_from_precomputed(
+    precomputed: dict[tuple, np.ndarray],
+    config: dict,
+) -> dict:
+    """Build group_data from a precomputed feature dict (same layout as build_group_data)."""
+    n_chunks = int(config["n_chunks"])
+    rem_key = _rem_profile_key_tuple(config.get("rem_profile_params"))
+    selection = _parse_feature_selection(config["feature_selection"])
+    out: dict[str, dict[str, pd.DataFrame]] = {}
+    for group_key, metric_list in selection.items():
+        out[group_key] = {}
+        for metric_name in metric_list:
+            key = (*rem_key, n_chunks, group_key, metric_name)
+            if key not in precomputed:
+                raise KeyError(
+                    f"Precomputed features missing for key={key!r}. "
+                    "Check rem_profile_choices, n_chunks_choices, allowed_groups, and allowed_metrics."
+                )
+            prefix = metric_name if group_key == "all" else f"{metric_name}_{group_key}"
+            out[group_key][metric_name] = _to_feature_df(precomputed[key], prefix)
+
+    counts = set()
+    for feats in out.values():
+        for df in feats.values():
+            counts.add(df.shape[1])
+    if len(counts) > 1:
+        raise ValueError(
+            "Selected groups produce different chunk counts, incompatible with shared tau. "
+            f"Chunk counts found: {sorted(counts)}."
+        )
+    return out
+
+
 def prepare_variant_data(data_norm: np.ndarray, mode: str):
     """Backward-compatible scenario helper returning grouped range/mean DataFrames."""
     if mode == "ten_unsplit":
@@ -1080,20 +1209,42 @@ def build_changepoint_model(
         if tau_mode == "discrete":
             tau = pm.DiscreteUniform("tau", lower=tau_lower, upper=tau_upper)
             loglik_by_tau = None
+            loglik_by_tau_rows = None
             mask_before = None
         else:
             # For each candidate tau value, mark chunks that belong to "before tau" regime.
             mask_before = (idx[None, :] < (tau_values[:, None] - 1)).astype(float)
             loglik_by_tau = np.zeros(n_tau, dtype=float)
+            loglik_by_tau_rows = None
+            loglik_rows_n: int | None = None
+            mask_before_t = mask_before.T
+            mask_after_t = (1.0 - mask_before).T
+
+        def _accumulate_marginalized_loglik(ll_1, ll_2, n_rows_obs: int) -> None:
+            nonlocal loglik_by_tau, loglik_by_tau_rows, loglik_rows_n
+            ll_tau_rows = pt.dot(ll_1, mask_before_t) + pt.dot(ll_2, mask_after_t)  # (n_rows, n_tau)
+            ll_tau = ll_tau_rows.sum(axis=0)  # (n_tau,)
+            loglik_by_tau = loglik_by_tau + ll_tau
+            ll_tau_rows_t = ll_tau_rows.T  # (n_tau, n_rows)
+            if loglik_by_tau_rows is None:
+                loglik_by_tau_rows = ll_tau_rows_t
+                loglik_rows_n = int(n_rows_obs)
+            else:
+                if loglik_rows_n is not None and int(loglik_rows_n) != int(n_rows_obs):
+                    raise ValueError(
+                        "All selected feature blocks must have the same number of rows for "
+                        "marginalized tau WAIC/LOO pointwise aggregation."
+                    )
+                loglik_by_tau_rows = loglik_by_tau_rows + ll_tau_rows_t
 
         for group_name, features in group_data.items():
             for feat_name, observed_df in features.items():
                 observed = observed_df.to_numpy()
+                n_obs_rows = int(observed.shape[0])
                 spec = parameter_cfg[feat_name]
                 likelihood = str(spec.get("likelihood", "normal")).strip().lower()
 
                 if likelihood in {"normal", "student_t", "lognormal"}:
-                    n_obs_rows = int(observed.shape[0])
                     mu_1, mu_2 = _build_mu_regime_normals(
                         group_name,
                         feat_name,
@@ -1124,10 +1275,7 @@ def build_changepoint_model(
                         else:
                             ll_1 = pm.logp(pm.Normal.dist(mu=mu_1, sigma=sigma_1), observed)
                             ll_2 = pm.logp(pm.Normal.dist(mu=mu_2, sigma=sigma_2), observed)
-                            ll_1_chunk = ll_1.sum(axis=0)
-                            ll_2_chunk = ll_2.sum(axis=0)
-                            ll_tau = (mask_before * ll_1_chunk[None, :] + (1.0 - mask_before) * ll_2_chunk[None, :]).sum(axis=1)
-                            loglik_by_tau = loglik_by_tau + ll_tau
+                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows)
                     elif likelihood == "student_t":
                         nu = _build_prior(
                             f"nu_{group_name}_{feat_name}",
@@ -1147,10 +1295,7 @@ def build_changepoint_model(
                         else:
                             ll_1 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_1, sigma=sigma_1), observed)
                             ll_2 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_2, sigma=sigma_2), observed)
-                            ll_1_chunk = ll_1.sum(axis=0)
-                            ll_2_chunk = ll_2.sum(axis=0)
-                            ll_tau = (mask_before * ll_1_chunk[None, :] + (1.0 - mask_before) * ll_2_chunk[None, :]).sum(axis=1)
-                            loglik_by_tau = loglik_by_tau + ll_tau
+                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows)
                     else:
                         if tau_mode == "discrete":
                             mu = pm.math.switch(tau > idx + 1, mu_1, mu_2)
@@ -1164,10 +1309,7 @@ def build_changepoint_model(
                         else:
                             ll_1 = pm.logp(pm.LogNormal.dist(mu=mu_1, sigma=sigma_1), observed)
                             ll_2 = pm.logp(pm.LogNormal.dist(mu=mu_2, sigma=sigma_2), observed)
-                            ll_1_chunk = ll_1.sum(axis=0)
-                            ll_2_chunk = ll_2.sum(axis=0)
-                            ll_tau = (mask_before * ll_1_chunk[None, :] + (1.0 - mask_before) * ll_2_chunk[None, :]).sum(axis=1)
-                            loglik_by_tau = loglik_by_tau + ll_tau
+                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows)
                     continue
 
                 if likelihood == "gamma":
@@ -1203,10 +1345,7 @@ def build_changepoint_model(
                     else:
                         ll_1 = pm.logp(pm.Gamma.dist(alpha=alpha_1, beta=beta_1), observed)
                         ll_2 = pm.logp(pm.Gamma.dist(alpha=alpha_2, beta=beta_2), observed)
-                        ll_1_chunk = ll_1.sum(axis=0)
-                        ll_2_chunk = ll_2.sum(axis=0)
-                        ll_tau = (mask_before * ll_1_chunk[None, :] + (1.0 - mask_before) * ll_2_chunk[None, :]).sum(axis=1)
-                        loglik_by_tau = loglik_by_tau + ll_tau
+                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows)
                     continue
 
                 if likelihood == "beta":
@@ -1246,10 +1385,7 @@ def build_changepoint_model(
                     else:
                         ll_1 = pm.logp(pm.Beta.dist(alpha=alpha_1, beta=beta_1), observed_beta)
                         ll_2 = pm.logp(pm.Beta.dist(alpha=alpha_2, beta=beta_2), observed_beta)
-                        ll_1_chunk = ll_1.sum(axis=0)
-                        ll_2_chunk = ll_2.sum(axis=0)
-                        ll_tau = (mask_before * ll_1_chunk[None, :] + (1.0 - mask_before) * ll_2_chunk[None, :]).sum(axis=1)
-                        loglik_by_tau = loglik_by_tau + ll_tau
+                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows)
                     continue
 
                 raise ValueError(
@@ -1260,7 +1396,11 @@ def build_changepoint_model(
         if tau_mode == "marginalized":
             # p(y|theta) = logsumexp_k [ log p(y|tau=k, theta) + log p(tau=k) ]
             log_w = loglik_by_tau - np.log(float(n_tau))
-            # Scalar joint log-likelihood (one "observation" for WAIC) — tau is marginalized.
+            log_w_rows = loglik_by_tau_rows - np.log(float(n_tau))
+            # Pointwise (per-row) marginalized log-likelihood for WAIC/LOO.
+            pointwise_log_lik = pm.math.logsumexp(log_w_rows, axis=0)
+            pm.Deterministic("changepoint_pointwise_log_lik", pointwise_log_lik)
+            # Scalar joint log-likelihood (kept for diagnostics / backward compatibility).
             pm.Deterministic("changepoint_joint_log_lik", pm.math.logsumexp(log_w))
             pm.Potential("tau_marginalized_logp", pm.math.logsumexp(log_w))
             tau_probs = pm.Deterministic("tau_probs", pm.math.softmax(log_w))
@@ -1281,6 +1421,7 @@ def sample_model(
     nuts_backend: str = "pymc",
     chains: int = 4,
     cores: int | None = None,
+    progressbar: bool = True,
 ):
     """Run MCMC sampling and return MultiTrace.
 
@@ -1299,6 +1440,7 @@ def sample_model(
         compute_convergence_checks=False,
         target_accept=0.9,
         chains=chains,
+        progressbar=bool(progressbar),
     )
     if cores is not None:
         sample_kwargs["cores"] = cores
@@ -1312,10 +1454,12 @@ def sample_model(
             # With a single device, JAX "parallel" chains via pmap may fail for chains>1.
             device_count = int(jax.device_count())
             nuts_sampler_kwargs: dict[str, object] = {}
-            if chains > 1 and device_count < chains:
+            jax_vectorized = chains > 1 and device_count < chains
+            if jax_vectorized:
                 nuts_sampler_kwargs["chain_method"] = "vectorized"
-            # BlackJAX progress bar uses IO callbacks, which can fail under vectorized/vmap.
-            sample_kwargs["progressbar"] = False
+            # BlackJAX progress bar uses IO callbacks that can fail under vectorized chains.
+            if jax_vectorized:
+                sample_kwargs["progressbar"] = False
 
             try:
                 trace = pm.sample(
@@ -1757,7 +1901,16 @@ def _idata_for_waic_from_trace(trace, model) -> az.InferenceData:
     if not posterior:
         raise ValueError("No posterior variables found in trace for WAIC/LOO.")
 
-    if "changepoint_joint_log_lik" in _available_varnames(trace):
+    trace_vars = _available_varnames(trace)
+    if "changepoint_pointwise_log_lik" in trace_vars:
+        ll_chains = _values_by_chain(trace, "changepoint_pointwise_log_lik")
+        ll = np.stack(ll_chains, axis=0).astype(float)
+        if ll.ndim == 2:
+            ll = ll[..., np.newaxis]
+        loglik_group = {"changepoint_pointwise_log_lik": ll}
+        return az.from_dict(posterior=posterior, log_likelihood=loglik_group)
+
+    if "changepoint_joint_log_lik" in trace_vars:
         ll_chains = _values_by_chain(trace, "changepoint_joint_log_lik")
         ll = np.stack(ll_chains, axis=0).astype(float)
         if ll.ndim == 2:
@@ -1854,6 +2007,15 @@ def score_changepoint_trace(
             pass
 
     n_feat_blocks = sum(len(v) for v in group_data.values())
+    n_events = 0
+    n_chunks = 0
+    if group_data:
+        first_group = next(iter(group_data.values()), {})
+        if first_group:
+            first_block = next(iter(first_group.values()))
+            n_events = int(first_block.shape[0])
+            n_chunks = int(first_block.shape[1])
+    n_observations = int(n_events * n_chunks)
     active_features = sorted({feat for feats in group_data.values() for feat in feats.keys()})
     likelihoods: dict[str, str] = {}
     if parameter_selection:
@@ -1867,26 +2029,39 @@ def score_changepoint_trace(
     p_waic = float("nan")
     loo_stat = float("nan")
     p_loo = float("nan")
+    waic_warning_flag = False
+    waic_warning_messages: List[str] = []
     criterion_error: str | None = None
     ic_computed = False
 
     if model is not None and crit in {"waic", "loo"}:
         try:
             idata_ic = _idata_for_waic_from_trace(trace, model)
+            with warnings.catch_warnings(record=True) as waic_warns:
+                warnings.simplefilter("always")
+                ic_waic = az.waic(idata_ic, scale="log")
+            p_waic = _float_ic_scalar(getattr(ic_waic, "p_waic", float("nan")))
+            waic_stat = _float_ic_scalar(getattr(ic_waic, "waic", float("nan")))
+            elpd_waic = _float_ic_scalar(getattr(ic_waic, "elpd_waic", float("nan")))
+            if not math.isfinite(waic_stat) and math.isfinite(elpd_waic):
+                waic_stat = float(-2.0 * elpd_waic)
+            for w in waic_warns:
+                msg = str(w.message)
+                waic_warning_messages.append(msg)
+                if "posterior variance of the log predictive densities exceeds 0.4" in msg:
+                    waic_warning_flag = True
+
+            ic_loo = az.loo(idata_ic, scale="log")
+            p_loo = _float_ic_scalar(getattr(ic_loo, "p_loo", float("nan")))
+            loo_stat = _float_ic_scalar(getattr(ic_loo, "loo", float("nan")))
+            elpd_loo = _float_ic_scalar(getattr(ic_loo, "elpd_loo", float("nan")))
+            if not math.isfinite(loo_stat) and math.isfinite(elpd_loo):
+                loo_stat = float(-2.0 * elpd_loo)
+
             if crit == "waic":
-                ic = az.waic(idata_ic, scale="log")
-                elpd = _float_ic_scalar(getattr(ic, "elpd_waic", float("nan")))
-                p_waic = _float_ic_scalar(getattr(ic, "p_waic", float("nan")))
-                waic_stat = _float_ic_scalar(getattr(ic, "waic", float("nan")))
-                if not math.isfinite(waic_stat) and math.isfinite(elpd):
-                    waic_stat = float(-2.0 * elpd)
+                elpd = elpd_waic
             else:
-                ic = az.loo(idata_ic, scale="log")
-                elpd = _float_ic_scalar(getattr(ic, "elpd_loo", float("nan")))
-                p_loo = _float_ic_scalar(getattr(ic, "p_loo", float("nan")))
-                loo_stat = _float_ic_scalar(getattr(ic, "loo", float("nan")))
-                if not math.isfinite(loo_stat) and math.isfinite(elpd):
-                    loo_stat = float(-2.0 * elpd)
+                elpd = elpd_loo
             ic_computed = True
         except Exception as exc:
             criterion_error = str(exc)
@@ -1913,6 +2088,9 @@ def score_changepoint_trace(
         "bfmi": bfmi,
         "bfmi_approx": bfmi,
         "n_feature_blocks": n_feat_blocks,
+        "n_events": n_events,
+        "n_chunks": n_chunks,
+        "n_observations": n_observations,
         "active_features": active_features,
         "likelihoods": likelihoods,
         "elpd": elpd,
@@ -1922,6 +2100,8 @@ def score_changepoint_trace(
         "p_waic": p_waic,
         "loo": loo_stat,
         "p_loo": p_loo,
+        "waic_warning_flag": waic_warning_flag,
+        "waic_warning_messages": waic_warning_messages,
         "criterion_error": criterion_error,
     }
     return out
@@ -2219,13 +2399,18 @@ def _fit_config_once(
     tau_lower: int,
     tau_upper: int | None,
     ic_criterion: str = "waic",
+    sampler_progressbar: bool = True,
+    precomputed_features: dict[tuple, np.ndarray] | None = None,
 ) -> Tuple[dict, Any, dict, Any]:
     """Build group_data, sample, return (group_data, trace, score_parts, model)."""
-    group_data = build_group_data(
-        data_norm,
-        n_chunks=int(config["n_chunks"]),
-        feature_selection=config["feature_selection"],
-    )
+    if precomputed_features is not None:
+        group_data = group_data_from_precomputed(precomputed_features, config)
+    else:
+        group_data = build_group_data(
+            data_norm,
+            n_chunks=int(config["n_chunks"]),
+            feature_selection=config["feature_selection"],
+        )
     first_group = next(iter(group_data.values()))
     first_feat = next(iter(first_group.values()))
     n_group_chunks = first_feat.shape[1]
@@ -2244,6 +2429,7 @@ def _fit_config_once(
         nuts_backend=nuts_backend,
         chains=chains,
         cores=cores,
+        progressbar=sampler_progressbar,
     )
     summ_vars = _build_summary_var_names(group_data, trace)
     score_parts = score_changepoint_trace(
@@ -2257,6 +2443,586 @@ def _fit_config_once(
         warn_on_fallback=False,
     )
     return group_data, trace, score_parts, model
+
+
+def _nonempty_subsets(items: list[tuple[str, str]]) -> Iterable[tuple[tuple[str, str], ...]]:
+    for r in range(1, len(items) + 1):
+        yield from itertools.combinations(items, r)
+
+
+def _group_metric_shape_signature_from_config(
+    config: dict,
+    *,
+    n_events: int,
+) -> tuple[tuple[str, str, int, int], ...]:
+    n_chunks = int(config["n_chunks"])
+    idx_map = _chunk_group_idx_map(n_chunks)
+    fs = _parse_feature_selection(config.get("feature_selection", {}))
+    blocks: list[tuple[str, str, int, int]] = []
+    for group_name in sorted(fs.keys()):
+        chunk_count = int(len(idx_map[group_name]))
+        metrics = sorted(set(str(m).strip().lower() for m in fs[group_name]))
+        for metric_name in metrics:
+            blocks.append((group_name, metric_name, int(n_events), chunk_count))
+    return tuple(sorted(blocks))
+
+
+def _collect_pareto_k_stats(
+    trace,
+    model,
+    *,
+    pareto_threshold: float = 0.7,
+) -> tuple[float, int]:
+    try:
+        idata_ic = _idata_for_waic_from_trace(trace, model)
+        loo_obj = az.loo(idata_ic, scale="log", pointwise=True)
+        pareto = getattr(loo_obj, "pareto_k", None)
+        if pareto is None:
+            return float("nan"), 0
+        pareto_vals = np.asarray(pareto, dtype=float).reshape(-1)
+        pareto_vals = pareto_vals[np.isfinite(pareto_vals)]
+        if pareto_vals.size == 0:
+            return float("nan"), 0
+        return float(np.max(pareto_vals)), int(np.sum(pareto_vals > float(pareto_threshold)))
+    except Exception:
+        return float("nan"), 0
+
+
+def _generate_exhaustive_configs(
+    proposal_options: dict,
+    *,
+    tau_threshold: float | None = None,
+) -> list[dict]:
+    if tau_threshold is None:
+        tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
+    rem_profile_choices = list(proposal_options.get("rem_profile_choices") or [])
+    n_chunks_choices = [int(x) for x in (proposal_options.get("n_chunks_choices") or [])]
+    allowed_groups = [str(g).strip().lower() for g in (proposal_options.get("allowed_groups") or [])]
+    allowed_metrics = [str(m).strip().lower() for m in (proposal_options.get("allowed_metrics") or [])]
+    likelihood_choices_by_metric = dict(proposal_options.get("likelihood_choices_by_metric") or {})
+
+    if not rem_profile_choices:
+        raise ValueError("proposal_options['rem_profile_choices'] must be a non-empty list.")
+    if not n_chunks_choices:
+        raise ValueError("proposal_options['n_chunks_choices'] must be a non-empty list.")
+    if not allowed_groups:
+        raise ValueError("proposal_options['allowed_groups'] must be a non-empty list.")
+    if not allowed_metrics:
+        raise ValueError("proposal_options['allowed_metrics'] must be a non-empty list.")
+
+    defaults = _default_parameter_selection()
+    valid_groups = {"all", "odd", "even", "concat"}
+    valid_metrics = set(defaults.keys())
+    unknown_groups = sorted(set(allowed_groups) - valid_groups)
+    unknown_metrics = sorted(set(allowed_metrics) - valid_metrics)
+    if unknown_groups:
+        raise ValueError(f"Unknown groups in allowed_groups: {unknown_groups}")
+    if unknown_metrics:
+        raise ValueError(f"Unknown metrics in allowed_metrics: {unknown_metrics}")
+
+    rem_normed: list[dict[str, int]] = []
+    for rem in rem_profile_choices:
+        if not isinstance(rem, dict):
+            raise ValueError("Each rem_profile choice must be a dict.")
+        w, s, r = _normalize_rem_profile_params(
+            window_size_hours=int(rem["window_size_hours"]),
+            step_size_hours=int(rem["step_size_hours"]),
+            rem_stage=int(rem["rem_stage"]),
+        )
+        rem_normed.append(
+            {
+                "window_size_hours": w,
+                "step_size_hours": s,
+                "rem_stage": r,
+            }
+        )
+
+    block_space = sorted((g, m) for g in allowed_groups for m in allowed_metrics)
+    out: list[dict] = []
+    for rem_params in rem_normed:
+        for n_chunks in n_chunks_choices:
+            if int(n_chunks) <= 0:
+                raise ValueError(f"n_chunks must be > 0, got {n_chunks}")
+            for subset in _nonempty_subsets(block_space):
+                feature_selection: dict[str, list[str]] = {}
+                for group_name, metric_name in subset:
+                    feature_selection.setdefault(group_name, [])
+                    if metric_name not in feature_selection[group_name]:
+                        feature_selection[group_name].append(metric_name)
+                feature_selection = {
+                    g: sorted(v)
+                    for g, v in sorted(feature_selection.items())
+                }
+                active_metrics = sorted({m for _, m in subset})
+                metric_likelihood_choices: list[list[str]] = []
+                for metric_name in active_metrics:
+                    opts_raw = likelihood_choices_by_metric.get(metric_name)
+                    if opts_raw is None:
+                        opts = [str(defaults[metric_name]["likelihood"]).strip().lower()]
+                    else:
+                        opts = [str(x).strip().lower() for x in list(opts_raw)]
+                        opts = [x for x in opts if x]
+                        if not opts:
+                            raise ValueError(
+                                "likelihood_choices_by_metric contains an empty list "
+                                f"for metric '{metric_name}'."
+                            )
+                    metric_likelihood_choices.append(sorted(set(opts)))
+                for likelihood_combo in itertools.product(*metric_likelihood_choices):
+                    parameter_selection = {
+                        metric_name: {"likelihood": likelihood_name}
+                        for metric_name, likelihood_name in zip(active_metrics, likelihood_combo)
+                    }
+                    out.append(
+                        {
+                            "rem_profile_params": dict(rem_params),
+                            "n_chunks": int(n_chunks),
+                            "feature_selection": copy.deepcopy(feature_selection),
+                            "parameter_selection": parameter_selection,
+                            "tau_threshold": float(tau_threshold),
+                        }
+                    )
+    return out
+
+
+def exhaustive_model_search(
+    proposal_options: dict,
+    data_norm: np.ndarray,
+    *,
+    draws: int = 500,
+    tune: int = 1000,
+    nuts_backend: str = "pymc",
+    chains: int = 2,
+    cores: int | None = None,
+    tau_mode: str = "marginalized",
+    tau_lower: int = 2,
+    tau_upper: int = 10,
+    cache_fits: bool = True,
+    seed: int = 42,
+    verbose: bool = True,
+    progressbar: bool = True,
+) -> dict:
+    """Evaluate all changepoint model configurations from a proposal grid."""
+    t0 = time.perf_counter()
+    _ = np.random.default_rng(int(seed))
+    tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
+    pareto_threshold = float(proposal_options.get("pareto_threshold", 0.7))
+
+    all_configs = _generate_exhaustive_configs(proposal_options, tau_threshold=tau_threshold)
+    n_total = len(all_configs)
+    n_events = int(np.asarray(data_norm).shape[0])
+
+    dedup_seen: set[tuple[int, tuple[tuple[str, str, int, int], ...]]] = set()
+    unique_configs: list[dict] = []
+    n_filtered_degenerate = 0
+    for cfg in all_configs:
+        sig = (
+            int(cfg["n_chunks"]),
+            _group_metric_shape_signature_from_config(cfg, n_events=n_events),
+        )
+        if sig in dedup_seen:
+            n_filtered_degenerate += 1
+            continue
+        dedup_seen.add(sig)
+        unique_configs.append(cfg)
+
+    trace_cache: dict[str, Any] = {}
+    model_cache: dict[str, Any] = {}
+    score_cache: dict[str, dict[str, Any]] = {}
+    results: list[dict[str, Any]] = []
+    n_fit_errors = 0
+
+    iterator: Iterable[tuple[int, dict]]
+    iterator = enumerate(unique_configs, start=1)
+    if progressbar:
+        try:
+            from tqdm.auto import tqdm  # type: ignore
+
+            iterator = tqdm(
+                iterator,
+                total=len(unique_configs),
+                desc="exhaustive models",
+                leave=True,
+            )
+        except Exception:
+            pass
+
+    for idx, config in iterator:
+        fp = changepoint_model_config_fingerprint(config)
+        t_model0 = time.perf_counter()
+        try:
+            if cache_fits and fp in score_cache:
+                score_parts = score_cache[fp]
+                trace = trace_cache[fp]
+                model = model_cache[fp]
+            else:
+                group_data = build_group_data(
+                    data_norm,
+                    n_chunks=int(config["n_chunks"]),
+                    feature_selection=config["feature_selection"],
+                )
+                tu = int(tau_upper) if tau_upper is not None else None
+                model = build_changepoint_model(
+                    group_data,
+                    tau_lower=int(tau_lower),
+                    tau_upper=tu,
+                    parameter_selection=config["parameter_selection"],
+                    tau_mode=tau_mode,
+                )
+                trace = sample_model(
+                    model,
+                    draws=draws,
+                    tune=tune,
+                    nuts_backend=nuts_backend,
+                    chains=chains,
+                    cores=cores,
+                    progressbar=False,
+                )
+                summary_vars = _build_summary_var_names(group_data, trace)
+                score_parts = score_changepoint_trace(
+                    trace,
+                    group_data=group_data,
+                    parameter_selection=config["parameter_selection"],
+                    tau_threshold=float(config.get("tau_threshold", tau_threshold)),
+                    summary_var_names=summary_vars if summary_vars else None,
+                    model=model,
+                    criterion="loo",
+                    warn_on_fallback=False,
+                )
+                if cache_fits:
+                    score_cache[fp] = score_parts
+                    trace_cache[fp] = trace
+                    model_cache[fp] = model
+
+            loo_k_max, loo_n_over = _collect_pareto_k_stats(
+                trace,
+                model,
+                pareto_threshold=pareto_threshold,
+            )
+            elapsed = time.perf_counter() - t_model0
+            record = {
+                "config": _clone_config(config),
+                "fingerprint": fp,
+                "waic": float(score_parts.get("waic", float("nan"))),
+                "waic_warning_flag": bool(score_parts.get("waic_warning_flag", False)),
+                "waic_warning_messages": list(score_parts.get("waic_warning_messages") or []),
+                "loo": float(score_parts.get("loo", float("nan"))),
+                "loo_pareto_k_max": loo_k_max,
+                "loo_n_over_threshold": int(loo_n_over),
+                "r_hat_max": float(score_parts.get("r_hat_max", float("nan"))),
+                "ess_min_bulk": float(score_parts.get("ess_min_bulk", float("nan"))),
+                "ess_min_tail": float(score_parts.get("ess_min_tail", float("nan"))),
+                "bfmi": float(score_parts.get("bfmi", score_parts.get("bfmi_approx", float("nan")))),
+                "n_divergences": int(score_parts.get("n_divergences", 0)),
+                "p_tau_gt_threshold": float(score_parts.get("p_tau_gt_threshold", float("nan"))),
+                "tau_map": int(score_parts.get("map_tau", -1)),
+                "tau_map_concentration": float(score_parts.get("tau_concentration", float("nan"))),
+                "n_feature_blocks": int(score_parts.get("n_feature_blocks", 0)),
+                "elapsed_time": float(elapsed),
+                "status": "ok",
+                "error": None,
+            }
+            results.append(record)
+            if verbose:
+                print(
+                    f"[exhaustive] model {idx}/{len(unique_configs)} config fp={fp} "
+                    f"loo={record['loo']:.3f} waic={record['waic']:.3f} "
+                    f"r_hat={record['r_hat_max']:.3f} ok",
+                    flush=True,
+                )
+        except Exception as exc:
+            n_fit_errors += 1
+            elapsed = time.perf_counter() - t_model0
+            err_record = {
+                "config": _clone_config(config),
+                "fingerprint": fp,
+                "waic": float("nan"),
+                "waic_warning_flag": False,
+                "waic_warning_messages": [],
+                "loo": float("nan"),
+                "loo_pareto_k_max": float("nan"),
+                "loo_n_over_threshold": 0,
+                "r_hat_max": float("nan"),
+                "ess_min_bulk": float("nan"),
+                "ess_min_tail": float("nan"),
+                "bfmi": float("nan"),
+                "n_divergences": 0,
+                "p_tau_gt_threshold": float("nan"),
+                "tau_map": -1,
+                "tau_map_concentration": float("nan"),
+                "n_feature_blocks": 0,
+                "elapsed_time": float(elapsed),
+                "status": "error",
+                "error": str(exc),
+            }
+            results.append(err_record)
+            if verbose:
+                print(
+                    f"[exhaustive] model {idx}/{len(unique_configs)} config fp={fp} "
+                    f"failed error={exc}",
+                    flush=True,
+                )
+
+    def _loo_sort_key(rec: dict[str, Any]) -> float:
+        v = float(rec.get("loo", float("nan")))
+        return v if math.isfinite(v) else float("-inf")
+
+    results_sorted = sorted(results, key=_loo_sort_key, reverse=True)
+    top_configs = [
+        rec for rec in results_sorted if rec.get("status") == "ok"
+    ][:20]
+    n_fitted = int(sum(1 for r in results if r.get("status") == "ok"))
+    n_filtered = int(n_filtered_degenerate + n_fit_errors)
+
+    return {
+        "results": results_sorted,
+        "n_total": int(n_total),
+        "n_fitted": n_fitted,
+        "n_filtered": n_filtered,
+        "top_configs": top_configs,
+        "elapsed_total": float(time.perf_counter() - t0),
+    }
+
+
+def model_config_hamming_distance(config1: dict, config2: dict) -> int:
+    """Number of differing parameters between two model configs."""
+    d = 0
+    r1 = (
+        config1.get("rem_profile_params", {}).get("window_size_hours"),
+        config1.get("rem_profile_params", {}).get("step_size_hours"),
+    )
+    r2 = (
+        config2.get("rem_profile_params", {}).get("window_size_hours"),
+        config2.get("rem_profile_params", {}).get("step_size_hours"),
+    )
+    if r1 != r2:
+        d += 1
+    if config1.get("n_chunks") != config2.get("n_chunks"):
+        d += 1
+
+    def _blocks(cfg: dict) -> set[tuple[str, str]]:
+        fs = cfg.get("feature_selection", {})
+        if not isinstance(fs, dict):
+            return set()
+        out: set[tuple[str, str]] = set()
+        for g, ms in fs.items():
+            for m in ms or []:
+                out.add((str(g), str(m)))
+        return out
+
+    d += len(_blocks(config1).symmetric_difference(_blocks(config2)))
+    ps1 = config1.get("parameter_selection", {})
+    ps2 = config2.get("parameter_selection", {})
+    all_metrics = set(ps1.keys()) | set(ps2.keys())
+    for metric_name in all_metrics:
+        ll1 = (ps1.get(metric_name) or {}).get("likelihood")
+        ll2 = (ps2.get(metric_name) or {}).get("likelihood")
+        if ll1 != ll2:
+            d += 1
+    return d
+
+
+def compute_model_distance_matrix(configs: list[dict]) -> np.ndarray:
+    """N×N Hamming distance matrix for a list of configs."""
+    n = len(configs)
+    dist = np.zeros((n, n), dtype=int)
+    for i in range(n):
+        for j in range(i + 1, n):
+            d = model_config_hamming_distance(configs[i], configs[j])
+            dist[i, j] = d
+            dist[j, i] = d
+    return dist
+
+
+def summarize_exhaustive_search(search_result: dict) -> dict:
+    """Compute summary statistics from exhaustive search results."""
+    from collections import Counter
+
+    results = list(search_result.get("results") or [])
+    valid = [
+        r
+        for r in results
+        if r.get("status") == "ok"
+        and math.isfinite(float(r.get("loo", float("nan"))))
+        and float(r.get("r_hat_max", float("inf"))) <= 1.05
+        and float(r.get("ess_min_bulk", float("-inf"))) >= 100.0
+        and int(r.get("n_divergences", 1)) == 0
+    ]
+    valid_sorted = sorted(valid, key=lambda x: float(x.get("loo", float("-inf"))), reverse=True)
+
+    best = valid_sorted[0] if valid_sorted else None
+    top10 = valid_sorted[:10]
+    top20 = valid_sorted[:20]
+
+    feature_counter: Counter[str] = Counter()
+    like_counter: dict[str, Counter[str]] = {}
+    for rec in valid:
+        cfg = rec.get("config") or {}
+        fs = cfg.get("feature_selection") or {}
+        for _, metrics in fs.items():
+            for metric_name in metrics:
+                mk = str(metric_name)
+                feature_counter[mk] += 1
+        ps = cfg.get("parameter_selection") or {}
+        for metric_name, spec in ps.items():
+            mk = str(metric_name)
+            lk = str((spec or {}).get("likelihood", ""))
+            like_counter.setdefault(mk, Counter())
+            like_counter[mk][lk] += 1
+
+    n_local_optima = 0
+    if top20:
+        configs = [rec.get("config") or {} for rec in top20]
+        dist = compute_model_distance_matrix(configs)
+        n = dist.shape[0]
+        visited = [False] * n
+        for i in range(n):
+            if visited[i]:
+                continue
+            n_local_optima += 1
+            stack = [i]
+            visited[i] = True
+            while stack:
+                cur = stack.pop()
+                neigh = np.where(dist[cur] <= 2)[0]
+                for nb in neigh:
+                    j = int(nb)
+                    if not visited[j]:
+                        visited[j] = True
+                        stack.append(j)
+
+    loo_vals_top20 = [float(r.get("loo", float("nan"))) for r in top20]
+    loo_vals_top20 = [v for v in loo_vals_top20 if math.isfinite(v)]
+    if loo_vals_top20:
+        loo_range_top20 = (float(min(loo_vals_top20)), float(max(loo_vals_top20)))
+    else:
+        loo_range_top20 = (float("nan"), float("nan"))
+
+    tau_mode = None
+    if top10:
+        tau_counts = Counter(int(r.get("tau_map", -1)) for r in top10 if int(r.get("tau_map", -1)) >= 0)
+        if tau_counts:
+            tau_mode = int(tau_counts.most_common(1)[0][0])
+
+    best_loo = float(best.get("loo", float("nan"))) if best else float("nan")
+    best_waic = float(best.get("waic", float("nan"))) if best else float("nan")
+    best_fp = str(best.get("fingerprint")) if best else None
+
+    return {
+        "n_total": int(search_result.get("n_total", 0)),
+        "n_fitted": int(search_result.get("n_fitted", 0)),
+        "n_filtered": int(search_result.get("n_filtered", 0)),
+        "n_valid": int(len(valid)),
+        "best_loo": best_loo,
+        "best_waic": best_waic,
+        "best_config_fingerprint": best_fp,
+        "top_fingerprints_by_loo": [
+            {
+                "fingerprint": str(r.get("fingerprint")),
+                "loo": float(r.get("loo", float("nan"))),
+            }
+            for r in valid_sorted[:10]
+        ],
+        "feature_visit_freq": dict(feature_counter),
+        "likelihood_visit_freq": {
+            metric_name: dict(counter)
+            for metric_name, counter in like_counter.items()
+        },
+        "n_local_optima": int(n_local_optima),
+        "loo_range_top20": loo_range_top20,
+        "tau_map_mode": tau_mode,
+    }
+
+
+def plot_exhaustive_search_results(
+    results: list[dict],
+    *,
+    top_n: int = 20,
+    pareto_threshold: float = 0.7,
+) -> None:
+    """Plot diagnostics for exhaustive model search outputs."""
+    ok = [
+        r for r in results
+        if r.get("status") == "ok" and math.isfinite(float(r.get("loo", float("nan"))))
+    ]
+    if not ok:
+        print("No successful exhaustive-search records to plot.")
+        return
+
+    sorted_res = sorted(ok, key=lambda x: float(x.get("loo", float("-inf"))), reverse=True)
+    top = sorted_res[: max(1, int(top_n))]
+
+    loo_vals = np.asarray([float(r.get("loo", float("nan"))) for r in sorted_res], dtype=float)
+    waic_vals = np.asarray([float(r.get("waic", float("nan"))) for r in sorted_res], dtype=float)
+    p_tau_vals = np.asarray([float(r.get("p_tau_gt_threshold", float("nan"))) for r in sorted_res], dtype=float)
+    n_blocks = np.asarray([int(r.get("n_feature_blocks", 0)) for r in sorted_res], dtype=float)
+    rhat_vals = np.asarray([float(r.get("r_hat_max", float("nan"))) for r in sorted_res], dtype=float)
+    ess_vals = np.asarray([float(r.get("ess_min_bulk", float("nan"))) for r in sorted_res], dtype=float)
+    idx = np.arange(1, len(sorted_res) + 1, dtype=float)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+    ax = axes[0, 0]
+    ax.plot(idx, loo_vals, "o-", ms=4, lw=1.1, color="#1f77b4", label="LOO")
+    ax.scatter(idx, waic_vals, s=18, alpha=0.4, color="#7f7f7f", label="WAIC")
+    ax.axhline(float(np.nanmax(loo_vals)), color="#2ca02c", ls="--", lw=1.0, label="best LOO")
+    ax.set_xlabel("Model rank (by LOO)")
+    ax.set_ylabel("Score (log scale)")
+    ax.set_title("LOO vs model rank (WAIC overlay)")
+    ax.grid(alpha=0.3)
+    ax.legend(loc="best", fontsize=8)
+
+    ax = axes[0, 1]
+    top_cfgs = [r.get("config") or {} for r in top]
+    dist = compute_model_distance_matrix(top_cfgs)
+    im = ax.imshow(dist, cmap="viridis", aspect="auto")
+    labels = [str(r.get("fingerprint", ""))[:8] for r in top]
+    ax.set_xticks(np.arange(len(labels)))
+    ax.set_yticks(np.arange(len(labels)))
+    ax.set_xticklabels(labels, rotation=90, fontsize=7)
+    ax.set_yticklabels(labels, fontsize=7)
+    ax.set_title(f"Hamming distance heatmap (top {len(top)})")
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    ax = axes[1, 0]
+    sc = ax.scatter(
+        loo_vals,
+        p_tau_vals,
+        c=n_blocks,
+        cmap="plasma",
+        s=36,
+        alpha=0.85,
+        edgecolors="none",
+    )
+    ax.set_xlabel("LOO")
+    ax.set_ylabel("P(tau > threshold)")
+    ax.set_title("LOO vs tau signal (color=n_feature_blocks)")
+    ax.grid(alpha=0.3)
+    cbar = fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label("n_feature_blocks")
+
+    ax = axes[1, 1]
+    finite_rhat = rhat_vals[np.isfinite(rhat_vals)]
+    finite_ess = ess_vals[np.isfinite(ess_vals)]
+    if finite_rhat.size:
+        ax.hist(finite_rhat, bins=min(20, max(5, finite_rhat.size // 2)), alpha=0.55, label="r_hat_max")
+    if finite_ess.size:
+        ax.hist(finite_ess, bins=min(20, max(5, finite_ess.size // 2)), alpha=0.55, label="ess_min_bulk")
+    ax.axvline(1.05, color="#d62728", ls="--", lw=1.0, label="r_hat threshold")
+    ax.axvline(100.0, color="#2ca02c", ls="--", lw=1.0, label="ESS threshold")
+    ax.set_title("Sampler diagnostics distribution")
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Count")
+    ax.grid(alpha=0.3)
+    ax.legend(loc="best", fontsize=8)
+
+    n_bad_pareto = int(sum(int(r.get("loo_n_over_threshold", 0)) > 0 for r in sorted_res))
+    plt.suptitle(
+        f"Exhaustive search diagnostics (models with Pareto-k > {pareto_threshold:g}: {n_bad_pareto})",
+        y=1.02,
+    )
+    plt.tight_layout()
+    plt.show()
 
 
 def _running_log_target_quantiles(
@@ -2291,12 +3057,107 @@ def _best_fingerprint_by_elpd(score_cache: dict[str, dict[str, Any]]) -> tuple[s
     return best_fp, best_elpd
 
 
+def _model_log_prior_from_score(
+    score_parts: dict[str, Any],
+    *,
+    model_prior_type: str = "bic",
+    model_prior_lambda: float = 0.69,
+) -> float:
+    prior_type = str(model_prior_type).strip().lower()
+    p = max(int(score_parts.get("n_feature_blocks", 0)), 1)
+    if prior_type == "uniform":
+        return 0.0
+    if prior_type == "inverse":
+        return -math.log(float(p))
+    if prior_type == "bic":
+        n_observations = max(float(score_parts.get("n_observations", 1.0)), 1.0)
+        return -0.5 * float(p) * math.log(n_observations)
+    if prior_type == "lambda":
+        return -float(model_prior_lambda) * float(p)
+    raise ValueError(
+        f"Unknown model_prior_type={model_prior_type!r}; "
+        "use one of: 'uniform', 'inverse', 'bic', 'lambda'."
+    )
+
+
+def check_mh_convergence(
+    history: List[dict[str, Any]],
+    config: dict[str, Any],
+) -> tuple[bool, str | None]:
+    if len(history) <= 1:
+        return False, None
+
+    patience = max(1, int(config.get("patience", 30)))
+    window = max(2, int(config.get("window", 50)))
+    tol_mean = float(config.get("tol_mean", 0.1))
+    saturation_threshold = float(config.get("saturation_threshold", 0.1))
+
+    best_log_target = float("-inf")
+    best_iteration = 0
+    for rec in history:
+        lt = rec.get("log_target")
+        if lt is None:
+            continue
+        v = float(lt)
+        if math.isfinite(v) and v > best_log_target + 1e-12:
+            best_log_target = v
+            best_iteration = int(rec.get("iteration", 0))
+    cur_iteration = int(history[-1].get("iteration", 0))
+    if cur_iteration - best_iteration >= patience:
+        return True, "no_log_target_improvement"
+
+    recent = history[-window:]
+    recent_vals: List[float] = []
+    for rec in recent:
+        lt = rec.get("log_target")
+        if lt is None:
+            continue
+        v = float(lt)
+        if math.isfinite(v):
+            recent_vals.append(v)
+    if len(recent_vals) >= 4:
+        split = len(recent_vals) // 2
+        if split > 0:
+            mean_old = float(np.mean(np.asarray(recent_vals[:split], dtype=float)))
+            mean_new = float(np.mean(np.asarray(recent_vals[split:], dtype=float)))
+            if abs(mean_new - mean_old) <= tol_mean:
+                return True, "log_target_stabilized"
+
+    seen_fingerprints: set[str] = set()
+    new_model_flags: List[float] = []
+    for rec in history:
+        fp = rec.get("fingerprint")
+        if not fp:
+            new_model_flags.append(0.0)
+            continue
+        key = str(fp)
+        if key in seen_fingerprints:
+            new_model_flags.append(0.0)
+        else:
+            seen_fingerprints.add(key)
+            new_model_flags.append(1.0)
+    if new_model_flags:
+        recent_new = np.asarray(new_model_flags[-window:], dtype=float)
+        if recent_new.size > 0 and float(np.mean(recent_new)) < saturation_threshold:
+            return True, "model_space_saturated"
+
+    return False, None
+
+
 def metropolis_hastings_model_search(
     *,
     initial_config: dict,
     proposal_options: dict,
     data_norm: np.ndarray,
-    n_iterations: int = 300,
+    n_iterations: int | None = None,
+    min_iterations: int = 100,
+    max_iterations: int = 500,
+    patience: int = 30,
+    window: int = 50,
+    tol_mean: float = 0.1,
+    saturation_threshold: float = 0.1,
+    model_prior_type: str = "bic",
+    model_prior_lambda: float = 0.69,
     draws: int = 800,
     tune: int = 1200,
     nuts_backend: str = "pymc",
@@ -2310,6 +3171,8 @@ def metropolis_hastings_model_search(
     seed: int | None = None,
     target_weights: dict[str, float] | None = None,
     verbose: bool = False,
+    verbose_every: int = 10,
+    show_progress_bar: bool = True,
     ic_criterion: str = "waic",
     quantile_window: int = 20,
     n_mh_chains: int = 1,
@@ -2317,15 +3180,54 @@ def metropolis_hastings_model_search(
     ppc_observed_data: np.ndarray | dict[str, np.ndarray] | None = None,
     ppc_num_pp_samples: int = 300,
     ppc_random_seed: int | None = None,
+    precompute_features: bool = False,
 ) -> dict[str, Any]:
     """Outer Metropolis-Hastings over discrete model configs; inner NUTS per accepted evaluation.
 
     Each iteration proposes one neighboring model, fits it with PyMC, and accepts/rejects
     using ``changepoint_log_target`` on ``score_changepoint_trace`` outputs (WAIC/LOO elpd
     when a PyMC ``model`` is available from the fit step).
+
+    ``verbose_every`` (default 10): when ``verbose`` is True, print MH progress every N iterations.
+
+    When ``precompute_features=True``, REM profiles and chunk features for all combinations
+    in ``proposal_options`` are computed once up front; the MH loop uses cached lookups only.
     """
     tw = target_weights or {}
+    precomputed_features: dict[tuple, np.ndarray] | None = None
+    precompute_seconds = 0.0
+    if precompute_features:
+        t_pre0 = time.perf_counter()
+        precompute_cfg = {
+            "proposal_options": proposal_options,
+            "rem_profile_params": rem_profile_params or initial_config.get("rem_profile_params"),
+        }
+        precomputed_features = precompute_all_features(data_norm, precompute_cfg)
+        precompute_seconds = time.perf_counter() - t_pre0
+        if verbose:
+            print(
+                f"[MH] precompute_all_features: {precompute_seconds:.2f}s "
+                f"({len(precomputed_features)} feature arrays)",
+                flush=True,
+            )
     n_mh_chains = max(1, int(n_mh_chains))
+    ve = max(1, int(verbose_every))
+    early_stopping_enabled = n_iterations is None
+    if n_iterations is not None:
+        fixed_steps = max(0, int(n_iterations))
+        min_iterations_cfg = fixed_steps
+        max_iterations_cfg = fixed_steps
+    else:
+        min_iterations_cfg = max(0, int(min_iterations))
+        max_iterations_cfg = max(1, int(max_iterations))
+        if min_iterations_cfg > max_iterations_cfg:
+            min_iterations_cfg = max_iterations_cfg
+    stop_config = {
+        "patience": max(1, int(patience)),
+        "window": max(2, int(window)),
+        "tol_mean": float(tol_mean),
+        "saturation_threshold": float(saturation_threshold),
+    }
 
     def _final_log_target(chain_result: dict[str, Any]) -> float:
         ch = list(chain_result.get("chain") or [])
@@ -2333,21 +3235,54 @@ def metropolis_hastings_model_search(
             return float("-inf")
         return float(ch[-1].get("log_target", float("-inf")))
 
-    def run_one_chain(seed_local: int | None) -> dict[str, Any]:
+    def run_one_chain(seed_local: int | None, chain_idx: int) -> dict[str, Any]:
+        t_sampling0 = time.perf_counter()
         rng = np.random.default_rng(seed_local)
         current = _clone_config(initial_config)
         if rem_profile_params is not None:
             current["rem_profile_params"] = dict(rem_profile_params)
+        pbar = None
+        if show_progress_bar:
+            try:
+                from tqdm.auto import tqdm  # type: ignore
+
+                pbar = tqdm(
+                    total=max_iterations_cfg + 1,
+                    desc=f"MH chain {chain_idx + 1}/{n_mh_chains}",
+                    leave=True,
+                )
+            except Exception:
+                pbar = None
+
+        def _fmt_ic(v: Any) -> str:
+            try:
+                fv = float(v)
+            except Exception:
+                return "nan"
+            return f"{fv:.3f}" if math.isfinite(fv) else "nan"
+
+        def _print_ic_summary(it: int, fp: str, sc: dict[str, Any]) -> None:
+            if not verbose:
+                return
+            print(
+                f"[MH chain {chain_idx}] iter={it} fit summary fingerprint={fp} "
+                f"waic={_fmt_ic(sc.get('waic'))} loo={_fmt_ic(sc.get('loo'))} "
+                f"waic_warning={bool(sc.get('waic_warning_flag', False))}",
+                flush=True,
+            )
 
         score_cache: dict[str, dict[str, Any]] = {}
         trace_cache: dict[str, Any] = {}
         model_cache: dict[str, Any] = {}
         group_data_cache: dict[str, dict] = {}
+        config_cache: dict[str, dict[str, Any]] = {}
         rem_data_cache: dict[str, np.ndarray] = {}
 
         def ensure_data_for_config(cfg: dict) -> np.ndarray:
             """Return data_norm aligned with cfg['rem_profile_params'], with per-REM caching."""
             nonlocal data_norm
+            if precompute_features:
+                return data_norm
             rpp = cfg.get("rem_profile_params")
             if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
                 return data_norm
@@ -2395,13 +3330,23 @@ def metropolis_hastings_model_search(
             tau_lower=tau_lower,
             tau_upper=tau_upper,
             ic_criterion=ic_criterion,
+            sampler_progressbar=False,
+            precomputed_features=precomputed_features,
         )
+        _print_ic_summary(0, fp0, sp0)
         score_cache[fp0] = sp0
+        config_cache[fp0] = _clone_config(current)
         if cache_fits:
             trace_cache[fp0] = tr0
             model_cache[fp0] = m0
             group_data_cache[fp0] = gd0
+        current_score = sp0
         log_cur = changepoint_log_target(sp0, **tw)
+        log_prior_cur = _model_log_prior_from_score(
+            sp0,
+            model_prior_type=model_prior_type,
+            model_prior_lambda=model_prior_lambda,
+        )
 
         rec0: dict[str, Any] = {
             "iteration": 0,
@@ -2409,6 +3354,8 @@ def metropolis_hastings_model_search(
             "config": _clone_config(current),
             "accepted": True,
             "log_target": log_cur,
+            "log_prior": log_prior_cur,
+            "log_posterior_target": log_cur + log_prior_cur,
             "score": sp0,
         }
         chain_records.append(rec0)
@@ -2416,15 +3363,29 @@ def metropolis_hastings_model_search(
         chain_records[-1].update(
             {"log_target_q10": q10, "log_target_q50": q50, "log_target_q90": q90}
         )
+        if pbar is not None:
+            pbar.update(1)
+        if verbose:
+            print(
+                f"[MH chain {chain_idx}] iter=0 initial fit done "
+                f"log_target={log_cur:.3f} fingerprint={fp0}",
+                flush=True,
+            )
 
         n_accept = 0
-        for it in range(1, n_iterations + 1):
+        stopping_reason: str | None = None
+        for it in range(1, max_iterations_cfg + 1):
             proposed = propose_changepoint_model_config(current, proposal_options, rng)
             proposed.setdefault("tau_threshold", current.get("tau_threshold", 7.0))
             fp = changepoint_model_config_fingerprint(proposed)
             if cache_fits and fp in score_cache:
                 sp_star = score_cache[fp]
                 log_star = changepoint_log_target(sp_star, **tw)
+                log_prior_star = _model_log_prior_from_score(
+                    sp_star,
+                    model_prior_type=model_prior_type,
+                    model_prior_lambda=model_prior_lambda,
+                )
             else:
                 try:
                     dnorm = ensure_data_for_config(proposed)
@@ -2440,9 +3401,13 @@ def metropolis_hastings_model_search(
                         tau_lower=tau_lower,
                         tau_upper=tau_upper,
                         ic_criterion=ic_criterion,
+                        sampler_progressbar=False,
+                        precomputed_features=precomputed_features,
                     )
+                    _print_ic_summary(it, fp, sp_star)
+                    score_cache[fp] = sp_star
+                    config_cache[fp] = _clone_config(proposed)
                     if cache_fits:
-                        score_cache[fp] = sp_star
                         trace_cache[fp] = tr_star
                         model_cache[fp] = m_star
                         group_data_cache[fp] = gd_star
@@ -2456,6 +3421,8 @@ def metropolis_hastings_model_search(
                             "config": _clone_config(proposed),
                             "accepted": False,
                             "log_target": float("-inf"),
+                            "log_prior": float("nan"),
+                            "log_posterior_target": float("-inf"),
                             "score": None,
                             "error": str(exc),
                         }
@@ -2464,13 +3431,32 @@ def metropolis_hastings_model_search(
                     chain_records[-1].update(
                         {"log_target_q10": q10, "log_target_q50": q50, "log_target_q90": q90}
                     )
+                    if pbar is not None:
+                        pbar.update(1)
+                    if early_stopping_enabled and it >= min_iterations_cfg:
+                        should_stop, reason = check_mh_convergence(chain_records, stop_config)
+                        if should_stop:
+                            stopping_reason = reason
+                            if verbose:
+                                print(
+                                    f"[MH chain {chain_idx}] stopping at iter={it}: {reason}",
+                                    flush=True,
+                                )
+                            break
                     continue
                 log_star = changepoint_log_target(sp_star, **tw)
+                log_prior_star = _model_log_prior_from_score(
+                    sp_star,
+                    model_prior_type=model_prior_type,
+                    model_prior_lambda=model_prior_lambda,
+                )
 
-            log_alpha = log_star - log_cur
-            if math.log(rng.random()) < log_alpha:
+            log_accept = (log_star - log_cur) + (log_prior_star - log_prior_cur)
+            if math.log(rng.random()) < log_accept:
                 current = _clone_config(proposed)
                 log_cur = log_star
+                log_prior_cur = log_prior_star
+                current_score = sp_star
                 n_accept += 1
                 acc = True
             else:
@@ -2484,33 +3470,61 @@ def metropolis_hastings_model_search(
                     "config": _clone_config(current),
                     "accepted": acc,
                     "log_target": log_cur,
-                    "score": score_cache.get(cur_fp),
+                    "log_prior": log_prior_cur,
+                    "log_posterior_target": log_cur + log_prior_cur,
+                    "score": current_score,
                 }
             )
             q10, q50, q90 = _running_log_target_quantiles(chain_records, quantile_window)
             chain_records[-1].update(
                 {"log_target_q10": q10, "log_target_q50": q50, "log_target_q90": q90}
             )
-            if verbose and it % 10 == 0:
+            if pbar is not None:
+                pbar.update(1)
+            if verbose and it % ve == 0:
                 print(
-                    f"[MH] iter={it} accept_rate~{n_accept / it:.3f} log_target={log_cur:.3f} "
-                    f"log_target_q10/50/90={q10:.3f}/{q50:.3f}/{q90:.3f}"
+                    f"[MH chain {chain_idx}] iter={it} accept_rate~{n_accept / it:.3f} "
+                    f"log_target={log_cur:.3f} log_target_q10/50/90={q10:.3f}/{q50:.3f}/{q90:.3f}",
+                    flush=True,
                 )
+            if early_stopping_enabled and it >= min_iterations_cfg:
+                should_stop, reason = check_mh_convergence(chain_records, stop_config)
+                if should_stop:
+                    stopping_reason = reason
+                    if verbose:
+                        print(
+                            f"[MH chain {chain_idx}] stopping at iter={it}: {reason}",
+                            flush=True,
+                        )
+                    break
 
+        if stopping_reason is None:
+            stopping_reason = "max_iterations_reached"
+        n_iterations_run = max(0, len(chain_records) - 1)
+        if pbar is not None:
+            pbar.close()
+
+        sampling_seconds = time.perf_counter() - t_sampling0
         return {
             "chain": chain_records,
-            "acceptance_rate": n_accept / max(n_iterations, 1),
+            "acceptance_rate": n_accept / max(n_iterations_run, 1),
             "score_cache": score_cache,
             "trace_cache": trace_cache if cache_fits else {},
             "model_cache": model_cache if cache_fits else {},
             "group_data_cache": group_data_cache if cache_fits else {},
+            "config_cache": config_cache,
             "final_config": _clone_config(current),
+            "stopping_reason": stopping_reason,
+            "n_iterations_run": n_iterations_run,
+            "sampling_seconds": sampling_seconds,
         }
 
     chain_results: List[dict[str, Any]] = []
     for ci in range(n_mh_chains):
         seed_c = None if seed is None else int(seed) + ci
-        chain_results.append(run_one_chain(seed_c))
+        if verbose and n_mh_chains > 1:
+            print(f"[MH] starting outer chain {ci + 1}/{n_mh_chains}", flush=True)
+        chain_results.append(run_one_chain(seed_c, ci))
 
     best = max(chain_results, key=_final_log_target)
     out = dict(best)
@@ -2518,9 +3532,27 @@ def metropolis_hastings_model_search(
     out["best_fingerprint"] = best_fp
     out["best_elpd"] = best_elpd
 
+    total_sampling_seconds = float(
+        sum(float(cr.get("sampling_seconds", 0.0)) for cr in chain_results)
+    )
+    out["precompute_seconds"] = precompute_seconds
+    out["sampling_seconds"] = total_sampling_seconds
+    if precomputed_features is not None:
+        out["precomputed_features"] = precomputed_features
+    if verbose and precompute_features:
+        total_s = precompute_seconds + total_sampling_seconds
+        pct_pre = 100.0 * precompute_seconds / total_s if total_s > 0 else 0.0
+        pct_samp = 100.0 * total_sampling_seconds / total_s if total_s > 0 else 0.0
+        print(
+            f"[MH] timing: precompute={precompute_seconds:.2f}s ({pct_pre:.1f}%), "
+            f"sampling={total_sampling_seconds:.2f}s ({pct_samp:.1f}%)",
+            flush=True,
+        )
+
     if n_mh_chains > 1:
         finals = [_final_log_target(cr) for cr in chain_results]
         out["mh_chain_results"] = chain_results
+        out["mh_chain_stopping_reasons"] = [str(cr.get("stopping_reason", "")) for cr in chain_results]
         out["final_log_targets"] = finals
         fa = np.asarray([x for x in finals if math.isfinite(x)], dtype=float)
         out["final_log_target_std"] = float(np.std(fa)) if fa.size > 1 else 0.0
@@ -2532,10 +3564,14 @@ def metropolis_hastings_model_search(
             best_trace = (out.get("trace_cache") or {}).get(best_fp)
             best_model = (out.get("model_cache") or {}).get(best_fp)
         if best_trace is not None and best_model is not None:
+            best_gd = (out.get("group_data_cache") or {}).get(best_fp)
+            best_cfg = (out.get("config_cache") or {}).get(best_fp)
             out["best_model_ppc"] = plot_posterior_predictive_check(
                 best_trace,
                 best_model,
                 observed_data=ppc_observed_data,
+                group_data=best_gd,
+                parameter_selection=best_cfg.get("parameter_selection") if best_cfg else None,
                 num_pp_samples=ppc_num_pp_samples,
                 random_seed=ppc_random_seed,
             )
@@ -2550,16 +3586,24 @@ def metropolis_hastings_model_search(
 
 
 def summarize_model_search(search_result: dict) -> dict[str, Any]:
-    """Aggregate MH chain: model visit counts, best log-target seen, feature/likelihood visit frequencies."""
+    """Aggregate MH chain: model visit counts and visit frequencies for metrics/groups/n_chunks."""
     chain = list(search_result.get("chain") or [])
     if not chain:
         return {
             "model_visit_counts": {},
             "top_fingerprints_by_log_target": [],
             "feature_visit_freq": {},
+            "group_visit_freq": {},
+            "n_chunks_visit_freq": {},
             "likelihood_visit_freq": {},
             "top_fingerprints_by_elpd": [],
             "elpd_by_fingerprint": {},
+            "stopping_reason": search_result.get("stopping_reason"),
+            "n_iterations_run": int(search_result.get("n_iterations_run", 0)),
+            "final_log_target": float("nan"),
+            "unique_visited_models": 0,
+            "accepted_proposals": 0,
+            "acceptance_rate": float(search_result.get("acceptance_rate", 0.0)),
             "final_log_target_std": float("nan"),
             "final_log_targets": [],
         }
@@ -2568,6 +3612,8 @@ def summarize_model_search(search_result: dict) -> dict[str, Any]:
 
     visit_fp: List[str] = []
     w_feat: dict[str, float] = {}
+    w_group: dict[str, float] = {}
+    w_n_chunks: dict[str, float] = {}
     w_like: dict[str, dict[str, float]] = {}
     log_targets: dict[str, float] = {}
     elpd_by_fp: dict[str, float] = {}
@@ -2588,6 +3634,22 @@ def summarize_model_search(search_result: dict) -> dict[str, Any]:
             elpd_by_fp[fp] = max(elpd_by_fp.get(fp, float("-inf")), efv)
         for feat in sc.get("active_features") or []:
             w_feat[feat] = w_feat.get(feat, 0.0) + 1.0
+        cfg = rec.get("config") or {}
+        fs_cfg = cfg.get("feature_selection")
+        if isinstance(fs_cfg, dict):
+            for group_name, feats in fs_cfg.items():
+                if not feats:
+                    continue
+                gk = str(group_name)
+                w_group[gk] = w_group.get(gk, 0.0) + 1.0
+        n_chunks_val = cfg.get("n_chunks")
+        if n_chunks_val is not None:
+            try:
+                nk = int(n_chunks_val)
+                n_key = str(nk)
+                w_n_chunks[n_key] = w_n_chunks.get(n_key, 0.0) + 1.0
+            except Exception:
+                pass
         likes = sc.get("likelihoods") or {}
         for feat, lk in likes.items():
             w_like.setdefault(feat, {})
@@ -2612,18 +3674,39 @@ def summarize_model_search(search_result: dict) -> dict[str, Any]:
         s = sum(d.values()) or 1.0
         return {k: v / s for k, v in sorted(d.items(), key=lambda kv: -kv[1])}
 
+    def _renorm_n_chunks(d: dict[str, float]) -> dict[str, float]:
+        s = sum(d.values()) or 1.0
+        return {
+            k: v / s
+            for k, v in sorted(
+                d.items(),
+                key=lambda kv: int(kv[0]) if str(kv[0]).isdigit() else 10**9,
+            )
+        }
+
     like_renorm = {feat: _renorm(vs) for feat, vs in w_like.items()}
+    accepted_proposals = int(sum(1 for r in chain[1:] if bool(r.get("accepted", False))))
+    n_steps = max(0, len(chain) - 1)
+    acceptance_rate = float(search_result.get("acceptance_rate", accepted_proposals / max(n_steps, 1)))
     out: dict[str, Any] = {
         "model_visit_counts": dict(counts.most_common(25)),
         "top_fingerprints_by_log_target": top,
         "log_target_by_fingerprint": log_targets,
         "feature_visit_freq": _renorm(w_feat),
+        "group_visit_freq": _renorm(w_group),
+        "n_chunks_visit_freq": _renorm_n_chunks(w_n_chunks),
         "likelihood_visit_freq": like_renorm,
         "mean_acceptance_indicator": float(np.mean([1.0 if r.get("accepted") else 0.0 for r in chain[1:]]))
         if len(chain) > 1
         else 0.0,
         "top_fingerprints_by_elpd": top_elpd,
         "elpd_by_fingerprint": elpd_by_fp,
+        "stopping_reason": search_result.get("stopping_reason"),
+        "n_iterations_run": int(search_result.get("n_iterations_run", n_steps)),
+        "final_log_target": float(chain[-1].get("log_target", float("nan"))),
+        "unique_visited_models": len(set(visit_fp)),
+        "accepted_proposals": accepted_proposals,
+        "acceptance_rate": acceptance_rate,
         "final_log_target_std": float(search_result.get("final_log_target_std", float("nan"))),
         "final_log_targets": list(search_result.get("final_log_targets") or []),
     }
@@ -2636,7 +3719,7 @@ def plot_model_search_results(
     *,
     title: str = "Metropolis-Hastings model search",
 ) -> None:
-    """Plot MH chain: log-target, running acceptance, P(tau>thr) / MAP tau, feature and likelihood visit shares."""
+    """Plot MH chain and visit shares for features, groups, n_chunks, and likelihood families."""
     chain = list(search_result.get("chain") or [])
     if not chain:
         print("No MH chain to plot.")
@@ -2781,6 +3864,36 @@ def plot_model_search_results(
         axf.set_title("Feature metrics in model (visit share)")
         axf.set_xlim(0, 1.05)
         axf.grid(axis="x", alpha=0.3)
+        plt.tight_layout()
+        plt.show()
+
+    grp = summary.get("group_visit_freq") or {}
+    if grp:
+        names = list(grp.keys())
+        vals = [float(grp[k]) for k in names]
+        y_pos = np.arange(len(names))
+        fig_grp, axg = plt.subplots(figsize=(6.5, max(2.3, 0.35 * len(names))))
+        axg.barh(y_pos, vals, color="#348ABD", height=0.65)
+        axg.set_yticks(y_pos)
+        axg.set_yticklabels(names)
+        axg.set_xlabel("visit share")
+        axg.set_title("Feature groups in model (visit share)")
+        axg.set_xlim(0, 1.05)
+        axg.grid(axis="x", alpha=0.3)
+        plt.tight_layout()
+        plt.show()
+
+    n_chunks_freq = summary.get("n_chunks_visit_freq") or {}
+    if n_chunks_freq:
+        labels = list(n_chunks_freq.keys())
+        vals = [float(n_chunks_freq[k]) for k in labels]
+        fig_nc, axn = plt.subplots(figsize=(max(5.0, 0.9 * len(labels)), 3.1))
+        axn.bar(labels, vals, color="#2ca02c", edgecolor="black", linewidth=0.6)
+        axn.set_xlabel("n_chunks")
+        axn.set_ylabel("visit share")
+        axn.set_title("n_chunks in model (visit share)")
+        axn.set_ylim(0, 1.05)
+        axn.grid(axis="y", alpha=0.3)
         plt.tight_layout()
         plt.show()
 
@@ -2988,88 +4101,320 @@ def run_variant(
     return trace, summary
 
 
+def _posterior_stack_chains_draws(trace, var_name: str) -> np.ndarray:
+    """Stack posterior samples as (chain, draw, ...)."""
+    if _is_inferencedata(trace):
+        return np.asarray(trace.posterior[var_name])
+    return np.stack(trace.get_values(var_name, combine=False), axis=0)
+
+
+def _marginalized_changepoint_ppc_first_feature(
+    trace,
+    group_data: dict,
+    parameter_selection: dict | None,
+    *,
+    rng: np.random.Generator,
+    num_pp_samples: int,
+) -> tuple[np.ndarray, np.ndarray, str]:
+    """Simulate replicated data for marginalized-tau changepoint models (no PyMC observed RVs).
+
+    Resamples ``tau`` each posterior draw from ``tau_probs`` and draws iid replicates per chunk,
+    matching the discrete-tau likelihood. Uses the lexicographically first (group, feature) block
+    for the time-series PPC plot.
+
+    Returns (y_pp, y_obs, label) with ``y_pp`` shape (S, n_rows, n_chunks).
+    """
+    if "tau_probs" not in _available_varnames(trace):
+        raise KeyError("tau_probs")
+    active_features = {feat for feats in group_data.values() for feat in feats.keys()}
+    param_cfg = _parse_parameter_selection(parameter_selection, active_features)
+
+    first_group = next(iter(group_data.keys()))
+    first_feat = next(iter(group_data[first_group].keys()))
+    label = f"obs_{first_group}_{first_feat}"
+    y_obs = np.asarray(group_data[first_group][first_feat].to_numpy(), dtype=float)
+    n_rows, n_chunks = y_obs.shape
+    spec = param_cfg[first_feat]
+    likelihood = str(spec.get("likelihood", "normal")).strip().lower()
+
+    tau_probs = _posterior_stack_chains_draws(trace, "tau_probs")
+    tau_support = _posterior_stack_chains_draws(trace, "tau_support")
+    c, d, k_tau = tau_probs.shape
+    if tau_support.shape != tau_probs.shape:
+        raise ValueError("tau_support and tau_probs must have the same shape in the trace.")
+    ts0 = np.asarray(tau_support[0, 0, :], dtype=np.int64)
+
+    tp = tau_probs.reshape(-1, k_tau)
+    tp = np.clip(tp, 1e-15, np.inf)
+    tp /= tp.sum(axis=1, keepdims=True)
+    n_flat = c * d
+    idx_flat = np.arange(n_flat)
+    if n_flat > int(num_pp_samples):
+        idx_flat = rng.choice(n_flat, size=int(num_pp_samples), replace=False)
+    s = int(idx_flat.size)
+
+    y_pp = np.empty((s, n_rows, n_chunks), dtype=float)
+
+    def _scalar_at(ci: int, di: int, name: str) -> float:
+        return float(_posterior_stack_chains_draws(trace, name)[ci, di])
+
+    for ii, flat_i in enumerate(idx_flat):
+        ci, di = divmod(int(flat_i), d)
+        probs = tp[int(flat_i)]
+        k = int(rng.choice(k_tau, p=probs))
+        tau_val = int(ts0[k])
+
+        mu1 = _scalar_at(ci, di, f"mu_{first_group}_{first_feat}_1")
+        mu2 = _scalar_at(ci, di, f"mu_{first_group}_{first_feat}_2")
+        s1 = _scalar_at(ci, di, f"sigma_{first_group}_{first_feat}_1")
+        s2 = _scalar_at(ci, di, f"sigma_{first_group}_{first_feat}_2")
+
+        for j in range(n_chunks):
+            use_r1 = tau_val > (j + 1)
+            if likelihood == "normal":
+                mu, sig = (mu1, s1) if use_r1 else (mu2, s2)
+                y_pp[ii, :, j] = rng.normal(mu, sig, size=n_rows)
+            elif likelihood == "student_t":
+                nu = _scalar_at(ci, di, f"nu_{first_group}_{first_feat}")
+                mu, sig = (mu1, s1) if use_r1 else (mu2, s2)
+                y_pp[ii, :, j] = mu + sig * rng.standard_t(df=nu, size=n_rows)
+            elif likelihood == "lognormal":
+                mu, sig = (mu1, s1) if use_r1 else (mu2, s2)
+                y_pp[ii, :, j] = rng.lognormal(mean=mu, sigma=sig, size=n_rows)
+            elif likelihood == "gamma":
+                a1 = _scalar_at(ci, di, f"alpha_{first_group}_{first_feat}_1")
+                a2 = _scalar_at(ci, di, f"alpha_{first_group}_{first_feat}_2")
+                b1 = _scalar_at(ci, di, f"beta_{first_group}_{first_feat}_1")
+                b2 = _scalar_at(ci, di, f"beta_{first_group}_{first_feat}_2")
+                alpha, beta = ((a1, b1) if use_r1 else (a2, b2))
+                y_pp[ii, :, j] = rng.gamma(shape=alpha, scale=1.0 / beta, size=n_rows)
+            elif likelihood == "beta":
+                a1 = _scalar_at(ci, di, f"alpha_{first_group}_{first_feat}_1")
+                a2 = _scalar_at(ci, di, f"alpha_{first_group}_{first_feat}_2")
+                b1 = _scalar_at(ci, di, f"beta_{first_group}_{first_feat}_1")
+                b2 = _scalar_at(ci, di, f"beta_{first_group}_{first_feat}_2")
+                alpha, beta = ((a1, b1) if use_r1 else (a2, b2))
+                y_pp[ii, :, j] = rng.beta(alpha, beta, size=n_rows)
+            else:
+                raise ValueError(
+                    f"Unsupported likelihood '{likelihood}' for marginalized PPC "
+                    f"(feature '{first_feat}')."
+                )
+
+    return y_pp, y_obs, label
+
+
+def _ppc_sample_ndim(y_pp: np.ndarray, y_obs: np.ndarray | None = None) -> int:
+    """Number of leading posterior-sample axes in ``y_pp`` (draws, or chain+draw)."""
+    y_pp = np.asarray(y_pp)
+    if y_obs is not None:
+        y_obs_arr = np.asarray(y_obs)
+        n_obs = int(np.prod(y_obs_arr.shape)) if y_obs_arr.size else 0
+        if n_obs > 0:
+            for sample_ndim in range(1, y_pp.ndim):
+                if int(np.prod(y_pp.shape[sample_ndim:])) == n_obs:
+                    return sample_ndim
+    return 2 if y_pp.ndim >= 4 else 1
+
+
+def _flatten_ppc_draws_and_obs(
+    y_pp: np.ndarray,
+    y_obs: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray | None]:
+    """Collapse chain/draw dims and flatten observation axes to 1D.
+
+    Returns ``(y_samples, pred_mean, y_obs_flat)`` with ``y_samples`` shape
+    ``(n_draws, n_obs)`` and ``pred_mean`` / ``y_obs_flat`` length ``n_obs``.
+    """
+    y_pp = np.asarray(y_pp, dtype=float)
+    if y_pp.ndim < 2:
+        y_pp = y_pp.reshape(-1, 1)
+    sample_ndim = _ppc_sample_ndim(y_pp, y_obs)
+    y_samples = y_pp.reshape((-1,) + y_pp.shape[sample_ndim:])
+    n_draws = y_samples.shape[0]
+    y_flat = y_samples.reshape(n_draws, -1)
+    pred_mean = np.asarray(y_pp, dtype=float).mean(axis=tuple(range(sample_ndim))).reshape(-1)
+    y_obs_flat = None
+    if y_obs is not None:
+        y_obs_flat = np.asarray(y_obs, dtype=float).reshape(-1)
+        if y_obs_flat.size != pred_mean.size:
+            y_obs_flat = None
+    return y_flat, pred_mean, y_obs_flat
+
+
+def _observed_for_ppc_var(
+    observed_data: np.ndarray | dict[str, np.ndarray] | None,
+    obs_rvs,
+    var_name: str,
+    index: int,
+) -> np.ndarray | None:
+    if isinstance(observed_data, dict):
+        if var_name in observed_data:
+            return np.asarray(observed_data[var_name], dtype=float)
+        return None
+    if observed_data is not None and index == 0:
+        return np.asarray(observed_data, dtype=float)
+    if obs_rvs and index < len(obs_rvs):
+        try:
+            return np.asarray(obs_rvs[index].eval(), dtype=float)
+        except Exception:
+            return None
+    return None
+
+
+def _plot_ppc_flattened_on_ax(
+    ax,
+    y_pp: np.ndarray,
+    y_obs: np.ndarray | None = None,
+    *,
+    title: str | None = None,
+) -> None:
+    y_flat, _pred_mean, y_obs_flat = _flatten_ppc_draws_and_obs(y_pp, y_obs)
+    q05 = np.quantile(y_flat, 0.05, axis=0)
+    q50 = np.quantile(y_flat, 0.50, axis=0)
+    q95 = np.quantile(y_flat, 0.95, axis=0)
+    x = np.arange(q50.shape[0], dtype=int)
+    ax.fill_between(x, q05, q95, color="#1f77b4", alpha=0.22, label="posterior predictive 90% band")
+    ax.plot(x, q50, color="#1f77b4", lw=1.6, label="posterior predictive median")
+    if y_obs_flat is not None:
+        ax.plot(x, y_obs_flat, color="#E24A33", lw=1.4, alpha=0.9, label="observed")
+    ax.set_xlabel("observation index")
+    ax.set_ylabel("value")
+    if title:
+        ax.set_title(title)
+    ax.grid(alpha=0.3)
+    ax.legend(loc="best")
+
+
 def plot_posterior_predictive_check(
     trace,
     model,
     observed_data: np.ndarray | dict[str, np.ndarray] | None = None,
     *,
+    group_data: dict | None = None,
+    parameter_selection: dict | None = None,
     num_pp_samples: int = 300,
     random_seed: int | None = None,
 ) -> Any:
     """Posterior predictive check for changepoint models.
 
     Draws posterior predictive samples and overlays predictive bands with observed values.
+    For ``tau_mode='marginalized'`` the model has no observed PyMC RVs; pass ``group_data``
+    (and optionally ``parameter_selection``) so replicate data can be simulated from ``tau_probs``.
+
     Falls back to ``az.plot_ppc`` when observed data shape cannot be inferred robustly.
     """
-    with model:
-        ppc = pm.sample_posterior_predictive(
-            trace,
-            var_names=["y_like"],
-            random_seed=random_seed,
-            return_inferencedata=True,
-            extend_inferencedata=False,
-            predictions=False,
-        )
+    rng = np.random.default_rng(random_seed)
+    obs_rvs = getattr(model, "observed_RVs", None) or []
+    obs_var_names = [rv.name for rv in obs_rvs]
 
-    y_pp = None
-    try:
-        y_pp = np.asarray(ppc.posterior_predictive["y_like"], dtype=float)
-    except Exception:
+    if obs_var_names:
+        with model:
+            ppc = pm.sample_posterior_predictive(
+                trace,
+                var_names=obs_var_names,
+                random_seed=random_seed,
+                return_inferencedata=True,
+                extend_inferencedata=False,
+                predictions=False,
+            )
+
         y_pp = None
-
-    y_obs = observed_data
-    if y_obs is None and hasattr(model, "observed_RVs") and model.observed_RVs:
         try:
-            y_obs = np.asarray(model.observed_RVs[0].eval(), dtype=float)
+            first_obs = obs_var_names[0]
+            y_pp = np.asarray(ppc.posterior_predictive[first_obs], dtype=float)
         except Exception:
-            y_obs = None
+            y_pp = None
 
-    if y_pp is None:
-        az.plot_ppc(ppc, num_pp_samples=int(max(20, num_pp_samples)))
-        plt.tight_layout()
-        plt.show()
-        return ppc
+        y_obs = observed_data
+        if y_obs is None and obs_rvs:
+            try:
+                y_obs = np.asarray(obs_rvs[0].eval(), dtype=float)
+            except Exception:
+                y_obs = None
 
-    # y_pp dims are typically (chain, draw, *obs_shape). Collapse chain/draw and avg over features.
-    y_samples = y_pp.reshape((-1,) + y_pp.shape[2:])
-    if y_samples.ndim == 1:
-        y_samples = y_samples[:, np.newaxis]
-    if y_samples.ndim >= 3:
-        y_samples = y_samples.mean(axis=tuple(range(2, y_samples.ndim)))
-    if y_samples.ndim == 1:
-        y_samples = y_samples[:, np.newaxis]
-
-    q05 = np.quantile(y_samples, 0.05, axis=0)
-    q50 = np.quantile(y_samples, 0.50, axis=0)
-    q95 = np.quantile(y_samples, 0.95, axis=0)
-    x = np.arange(q50.shape[0], dtype=int)
-
-    fig, ax = plt.subplots(figsize=(9, 4))
-    ax.fill_between(x, q05, q95, color="#1f77b4", alpha=0.22, label="posterior predictive 90% band")
-    ax.plot(x, q50, color="#1f77b4", lw=1.6, label="posterior predictive median")
-
-    if y_obs is not None:
-        y_obs_arr = np.asarray(y_obs, dtype=float)
-        if y_obs_arr.ndim > 1:
-            y_obs_arr = y_obs_arr.mean(axis=tuple(range(1, y_obs_arr.ndim)))
-        if y_obs_arr.shape[0] == q50.shape[0]:
-            ax.plot(x, y_obs_arr, color="#E24A33", lw=1.4, alpha=0.9, label="observed")
-        else:
+        if y_pp is None:
+            az.plot_ppc(ppc, num_pp_samples=int(max(20, num_pp_samples)))
+            plt.tight_layout()
+            plt.show()
+            return ppc
+    elif "tau_probs" in _available_varnames(trace) and group_data is not None:
+        try:
+            y_pp, y_obs_default, _label = _marginalized_changepoint_ppc_first_feature(
+                trace,
+                group_data,
+                parameter_selection,
+                rng=rng,
+                num_pp_samples=num_pp_samples,
+            )
+        except Exception as exc:
             warnings.warn(
-                "plot_posterior_predictive_check: observed_data length does not match predictive shape; "
-                "showing predictive envelope only.",
+                "plot_posterior_predictive_check: marginalized tau model but PPC simulation failed "
+                f"({exc}).",
                 UserWarning,
                 stacklevel=2,
             )
+            return None
+        y_obs = observed_data if observed_data is not None else y_obs_default
+        ppc = None
+    else:
+        if not obs_var_names:
+            warnings.warn(
+                "plot_posterior_predictive_check: no PyMC observed RVs (e.g. marginalized tau). "
+                "Pass group_data from prepare_model_data / MH cache to enable PPC, or use "
+                "tau_mode='discrete'.",
+                UserWarning,
+                stacklevel=2,
+            )
+        return None
 
-    ax.set_xlabel("observation index")
-    ax.set_ylabel("value")
-    ax.set_title("Posterior predictive check")
-    ax.grid(alpha=0.3)
-    ax.legend(loc="best")
+    panels: list[tuple[str, np.ndarray, np.ndarray | None]] = []
+    if ppc is not None and len(obs_var_names) > 1:
+        for i, var_name in enumerate(obs_var_names):
+            try:
+                y_pp_i = np.asarray(ppc.posterior_predictive[var_name], dtype=float)
+            except Exception:
+                continue
+            panels.append(
+                (
+                    var_name,
+                    y_pp_i,
+                    _observed_for_ppc_var(y_obs, obs_rvs, var_name, i),
+                )
+            )
+    elif isinstance(y_obs, dict):
+        for feat_name, y_obs_i in y_obs.items():
+            y_pp_i = y_pp[feat_name] if isinstance(y_pp, dict) else y_pp
+            panels.append((feat_name, np.asarray(y_pp_i, dtype=float), np.asarray(y_obs_i, dtype=float)))
+    else:
+        panels.append(("", np.asarray(y_pp, dtype=float), y_obs))
+
+    if not panels:
+        panels.append(("", np.asarray(y_pp, dtype=float), y_obs))
+
+    n_panels = len(panels)
+    if n_panels == 1:
+        fig, ax = plt.subplots(figsize=(9, 4))
+        axes = [ax]
+    else:
+        fig, axes = plt.subplots(n_panels, 1, figsize=(9, 3.5 * n_panels), sharex=True)
+        axes = np.atleast_1d(axes)
+
+    for ax, (panel_name, y_pp_panel, y_obs_panel) in zip(axes, panels, strict=True):
+        title = "Posterior predictive check"
+        if panel_name:
+            title = f"{title}: {panel_name}"
+        _plot_ppc_flattened_on_ax(ax, y_pp_panel, y_obs_panel, title=title)
+
     plt.tight_layout()
     plt.show()
-    return ppc
+    if ppc is not None:
+        return ppc
+    return {
+        "kind": "marginalized_simulated",
+        "posterior_predictive": y_pp,
+        "observed": y_obs,
+    }
 
 
 __all__ = [
@@ -3083,6 +4428,8 @@ __all__ = [
     "compute_chunk_features",
     "prepare_variant_data",
     "build_group_data",
+    "precompute_all_features",
+    "group_data_from_precomputed",
     "prepare_model_data",
     "set_runtime_data_norm",
     "FEATURE_SELECTION_PRESETS",
@@ -3098,7 +4445,13 @@ __all__ = [
     "score_changepoint_trace",
     "changepoint_log_target",
     "propose_changepoint_model_config",
+    "check_mh_convergence",
     "metropolis_hastings_model_search",
+    "exhaustive_model_search",
+    "model_config_hamming_distance",
+    "compute_model_distance_matrix",
+    "summarize_exhaustive_search",
+    "plot_exhaustive_search_results",
     "summarize_model_search",
     "plot_model_search_results",
     "plot_posterior_predictive_check",
