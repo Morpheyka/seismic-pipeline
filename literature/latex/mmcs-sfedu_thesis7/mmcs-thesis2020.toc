@@ -6,5 +6,6 @@
 \contentsline {section}{\numberline {3.\relax }Программная реализация}{24}{}%
 \contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{24}{}%
 \contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{28}{}%
-\contentsline {section}{Литература}{33}{}%
-\contentsline {section}{Приложение}{34}{}%
+\contentsline {section}{\numberline {4.\relax }Exhaustive search по метрике LOO-ELPD}{32}{}%
+\contentsline {section}{Литература}{39}{}%
+\contentsline {section}{Приложение}{40}{}%
