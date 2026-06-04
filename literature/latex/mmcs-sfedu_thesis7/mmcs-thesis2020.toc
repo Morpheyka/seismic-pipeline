@@ -1,12 +1,12 @@
 \babel@toc {russian}{}\relax 
 \contentsline {section}{Постановка задачи}{3}{}%
 \contentsline {section}{Введение}{4}{}%
-\contentsline {section}{\numberline {1.\relax }Материалы и методы}{10}{}%
-\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{16}{}%
-\contentsline {section}{\numberline {3.\relax }Программная реализация}{24}{}%
-\contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{24}{}%
-\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{28}{}%
-\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{32}{}%
-\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{41}{}%
-\contentsline {section}{Литература}{46}{}%
-\contentsline {section}{Приложение}{47}{}%
+\contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}%
+\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}%
+\contentsline {section}{\numberline {3.\relax }Программная реализация}{23}{}%
+\contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{23}{}%
+\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{27}{}%
+\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{31}{}%
+\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{40}{}%
+\contentsline {section}{Литература}{45}{}%
+\contentsline {section}{Приложение}{51}{}%

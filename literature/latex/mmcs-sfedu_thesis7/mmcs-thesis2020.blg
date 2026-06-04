@@ -1,47 +1,47 @@
-This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: mmcs-thesis2020.aux
 A level-1 auxiliary file: TitulBak.aux
-The style file: plainnat.bst
+The style file: unsrtnat.bst
 Database file #1: mmcs-thesis2020.bib
-You've used 8 entries,
-            2773 wiz_defined-function locations,
-            654 strings with 6613 characters,
-and the built_in function-call counts, 3747 in all, are:
-= -- 325
-> -- 245
-< -- 4
-+ -- 83
-- -- 75
-* -- 314
-:= -- 599
-add.period$ -- 30
-call.type$ -- 8
-change.case$ -- 48
-chr.to.int$ -- 8
-cite$ -- 16
-duplicate$ -- 154
-empty$ -- 287
-format.name$ -- 87
-if$ -- 766
+You've used 48 entries,
+            2481 wiz_defined-function locations,
+            929 strings with 15454 characters,
+and the built_in function-call counts, 19328 in all, are:
+= -- 1695
+> -- 1016
+< -- 25
++ -- 394
+- -- 298
+* -- 1583
+:= -- 3150
+add.period$ -- 191
+call.type$ -- 48
+change.case$ -- 93
+chr.to.int$ -- 48
+cite$ -- 48
+duplicate$ -- 894
+empty$ -- 1702
+format.name$ -- 368
+if$ -- 4047
 int.to.chr$ -- 1
-int.to.str$ -- 1
-missing$ -- 8
-newline$ -- 54
-num.names$ -- 32
-pop$ -- 96
+int.to.str$ -- 49
+missing$ -- 45
+newline$ -- 295
+num.names$ -- 144
+pop$ -- 339
 preamble$ -- 1
-purify$ -- 41
+purify$ -- 48
 quote$ -- 0
-skip$ -- 126
+skip$ -- 527
 stack$ -- 0
-substring$ -- 100
-swap$ -- 8
-text.length$ -- 0
+substring$ -- 960
+swap$ -- 111
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 78
+type$ -- 324
 warning$ -- 0
-while$ -- 31
+while$ -- 164
 width$ -- 0
-write$ -- 121
+write$ -- 718
