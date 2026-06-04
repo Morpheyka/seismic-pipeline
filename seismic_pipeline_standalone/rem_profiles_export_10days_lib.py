@@ -1364,22 +1364,22 @@ def build_changepoint_model(
                 if likelihood == "beta":
                     alpha_1 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_1",
-                        spec.get("alpha_prior", {"dist": "exponential", "lam": 1.0}),
+                        spec.get("alpha_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
                         positive_only=True,
                     )
                     alpha_2 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_2",
-                        spec.get("alpha_prior", {"dist": "exponential", "lam": 1.0}),
+                        spec.get("alpha_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
                         positive_only=True,
                     )
                     beta_1 = _build_prior(
                         f"beta_{group_name}_{feat_name}_1",
-                        spec.get("beta_prior", {"dist": "exponential", "lam": 1.0}),
+                        spec.get("beta_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
                         positive_only=True,
                     )
                     beta_2 = _build_prior(
                         f"beta_{group_name}_{feat_name}_2",
-                        spec.get("beta_prior", {"dist": "exponential", "lam": 1.0}),
+                        spec.get("beta_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
                         positive_only=True,
                     )
                     # Beta support is (0, 1), so clip normalized data slightly
@@ -1564,6 +1564,37 @@ def tau_probabilities(trace):
         return support, probs
 
     raise ValueError("Neither 'tau' nor ('tau_probs' and 'tau_support') found in trace.")
+
+
+def _tau_map_from_trace(trace) -> int:
+    """MAP estimate of tau (chunk changepoint index)."""
+    support, probs = tau_probabilities(trace)
+    return int(support[int(np.argmax(probs))])
+
+
+def _observed_split_by_tau(
+    observed: np.ndarray,
+    tau_map: int,
+    *,
+    likelihood: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Split flattened observations into before/after tau regimes by chunk column."""
+    obs_2d = np.asarray(observed, dtype=float)
+    if obs_2d.ndim == 1:
+        obs_2d = obs_2d.reshape(1, -1)
+    n_chunks = obs_2d.shape[1]
+    chunk_idx = np.arange(n_chunks)
+    before_cols = chunk_idx < (int(tau_map) - 1)
+    after_cols = ~before_cols
+    obs_before = obs_2d[:, before_cols].ravel()
+    obs_after = obs_2d[:, after_cols].ravel()
+    if likelihood in {"lognormal", "gamma"}:
+        obs_before = _positive_feature_values(obs_before)
+        obs_after = _positive_feature_values(obs_after)
+    else:
+        obs_before = obs_before[np.isfinite(obs_before)]
+        obs_after = obs_after[np.isfinite(obs_after)]
+    return obs_before, obs_after
 
 
 def p_tau_gt_from_trace(trace, threshold: float = 6.0) -> float:
@@ -1756,7 +1787,8 @@ def feature_likelihood_profiles(
         profiles[group_name] = {}
         for feat_name, observed_df in features.items():
             likelihood = str(parameter_cfg[feat_name].get("likelihood", "normal")).strip().lower()
-            observed = observed_df.to_numpy(dtype=float).reshape(-1)
+            observed_2d = observed_df.to_numpy(dtype=float)
+            observed = observed_2d.reshape(-1)
 
             x = _profile_x_grid(observed, likelihood=likelihood, grid_size=grid_size)
             params_1: dict[str, float] = {}
@@ -1795,19 +1827,30 @@ def feature_likelihood_profiles(
                     log_density_y, group_name, feat_name
                 )
                 plt.figure(figsize=(7, 4))
-                if likelihood in {"lognormal", "gamma"}:
-                    obs_plot = _positive_feature_values(observed)
-                else:
-                    obs_plot = np.asarray(observed, dtype=float)
-                    obs_plot = obs_plot[np.isfinite(obs_plot)]
-                if obs_plot.size > 0:
+                tau_map = _tau_map_from_trace(trace)
+                obs_before, obs_after = _observed_split_by_tau(
+                    observed_2d,
+                    tau_map,
+                    likelihood=likelihood,
+                )
+                color_before, color_after = "#A60628", "#7A68A6"
+                if obs_before.size > 0:
                     plt.hist(
-                        obs_plot,
-                        bins=30,
+                        obs_before,
+                        bins=15,
                         density=True,
                         alpha=0.25,
-                        color="green",
-                        label="observed",
+                        color=color_before,
+                        label="наблюдения до tau",
+                    )
+                if obs_after.size > 0:
+                    plt.hist(
+                        obs_after,
+                        bins=15,
+                        density=True,
+                        alpha=0.25,
+                        color=color_after,
+                        label="наблюдения после tau",
                     )
                 y_plot_before = np.maximum(y_before, 1e-300) if use_log_y else y_before
                 y_plot_after = np.maximum(y_after, 1e-300) if use_log_y else y_after
@@ -2003,6 +2046,9 @@ def score_changepoint_trace(
     probs = np.asarray(probs, dtype=float)
     probs = probs / probs.sum()
     p_gt = float(probs[support > float(tau_threshold)].sum())
+    e_tau = float(np.sum(support * probs))
+    e_tau2 = float(np.sum((support ** 2) * probs))
+    tau_std = float(np.sqrt(max(e_tau2 - e_tau**2, 0.0)))
     map_idx = int(np.argmax(probs))
     map_tau = int(support[map_idx])
     map_p = float(probs[map_idx])
@@ -2131,6 +2177,8 @@ def score_changepoint_trace(
 
     out: dict[str, Any] = {
         "p_tau_gt_threshold": p_gt,
+        "e_tau": e_tau,
+        "tau_std": tau_std,
         "map_tau": map_tau,
         "map_tau_prob": map_p,
         "tau_entropy": ent,
@@ -2578,20 +2626,26 @@ def _collect_pareto_k_stats(
     model,
     *,
     pareto_threshold: float = 0.7,
-) -> tuple[float, int]:
+) -> tuple[float, int, list[int], int | None]:
     try:
         idata_ic = _idata_for_waic_from_trace(trace, model)
         loo_obj = az.loo(idata_ic, scale="log", pointwise=True)
         pareto = getattr(loo_obj, "pareto_k", None)
         if pareto is None:
-            return float("nan"), 0
-        pareto_vals = np.asarray(pareto, dtype=float).reshape(-1)
-        pareto_vals = pareto_vals[np.isfinite(pareto_vals)]
-        if pareto_vals.size == 0:
-            return float("nan"), 0
-        return float(np.max(pareto_vals)), int(np.sum(pareto_vals > float(pareto_threshold)))
+            return float("nan"), 0, [], None
+        pareto_raw = np.asarray(pareto, dtype=float).reshape(-1)
+        if pareto_raw.size == 0:
+            return float("nan"), 0, [], None
+        finite_mask = np.isfinite(pareto_raw)
+        if not bool(np.any(finite_mask)):
+            return float("nan"), 0, [], None
+        pareto_vals = pareto_raw[finite_mask]
+        over_mask = finite_mask & (pareto_raw > float(pareto_threshold))
+        over_indices = np.flatnonzero(over_mask).astype(int).tolist()
+        worst_local_idx = int(np.argmax(np.where(finite_mask, pareto_raw, float("-inf"))))
+        return float(np.max(pareto_vals)), int(len(over_indices)), over_indices, worst_local_idx
     except Exception:
-        return float("nan"), 0
+        return float("nan"), 0, [], None
 
 
 def _generate_exhaustive_configs(
@@ -2718,6 +2772,7 @@ def exhaustive_model_search(
     _ = np.random.default_rng(int(seed))
     tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
     pareto_threshold = float(proposal_options.get("pareto_threshold", 0.7))
+    max_pareto_retries = 3
 
     use_rem_profile_recalc = False
     if configs is not None:
@@ -2757,6 +2812,7 @@ def exhaustive_model_search(
     rem_data_cache: dict[str, np.ndarray] = {}
     results: list[dict[str, Any]] = []
     n_fit_errors = 0
+    n_pareto_skipped = 0
 
     def rem_output_dir_for_config(cfg: dict) -> str | None:
         rpp = cfg.get("rem_profile_params")
@@ -2825,57 +2881,107 @@ def exhaustive_model_search(
     for idx, config in iterator:
         fp = changepoint_model_config_fingerprint(config)
         t_model0 = time.perf_counter()
+        data_work_base = np.asarray(ensure_data_for_config(config))
+        active_event_indices = np.arange(int(data_work_base.shape[0]), dtype=int)
+        removed_event_indices: list[int] = []
+        pareto_retry_count = 0
+        skipped_due_to_pareto = False
         try:
-            if cache_fits and fp in score_cache:
-                score_parts = score_cache[fp]
-                trace = trace_cache[fp]
-                model = model_cache[fp]
-            else:
-                data_work = ensure_data_for_config(config)
-                group_data = build_group_data(
-                    data_work,
-                    n_chunks=int(config["n_chunks"]),
-                    feature_selection=config["feature_selection"],
-                )
-                tu = int(tau_upper) if tau_upper is not None else None
-                model = build_changepoint_model(
-                    group_data,
-                    tau_lower=int(tau_lower),
-                    tau_upper=tu,
-                    parameter_selection=config["parameter_selection"],
-                    tau_mode=tau_mode,
-                )
-                trace = sample_model(
-                    model,
-                    draws=draws,
-                    tune=tune,
-                    nuts_backend=nuts_backend,
-                    chains=chains,
-                    cores=cores,
-                    progressbar=False,
-                )
-                summary_vars = _build_summary_var_names(group_data, trace)
-                score_parts = score_changepoint_trace(
-                    trace,
-                    group_data=group_data,
-                    parameter_selection=config["parameter_selection"],
-                    tau_threshold=float(config.get("tau_threshold", tau_threshold)),
-                    summary_var_names=summary_vars if summary_vars else None,
-                    model=model,
-                    criterion="loo",
-                    warn_on_fallback=False,
-                    loo_report="elpd",
-                )
-                if cache_fits:
-                    score_cache[fp] = score_parts
-                    trace_cache[fp] = trace
-                    model_cache[fp] = model
+            while True:
+                if int(active_event_indices.size) == 0:
+                    raise ValueError("No events left after Pareto-k filtering.")
+                data_work = data_work_base[active_event_indices]
+                if int(active_event_indices.size) == int(data_work_base.shape[0]):
+                    cache_key = fp
+                else:
+                    kept_sig = ",".join(str(int(i)) for i in active_event_indices.tolist())
+                    cache_key = f"{fp}::events={kept_sig}"
 
-            loo_k_max, loo_n_over = _collect_pareto_k_stats(
-                trace,
-                model,
-                pareto_threshold=pareto_threshold,
-            )
+                if cache_fits and cache_key in score_cache:
+                    score_parts = score_cache[cache_key]
+                    trace = trace_cache[cache_key]
+                    model = model_cache[cache_key]
+                else:
+                    group_data = build_group_data(
+                        data_work,
+                        n_chunks=int(config["n_chunks"]),
+                        feature_selection=config["feature_selection"],
+                    )
+                    tu = int(tau_upper) if tau_upper is not None else None
+                    model = build_changepoint_model(
+                        group_data,
+                        tau_lower=int(tau_lower),
+                        tau_upper=tu,
+                        parameter_selection=config["parameter_selection"],
+                        tau_mode=tau_mode,
+                    )
+                    trace = sample_model(
+                        model,
+                        draws=draws,
+                        tune=tune,
+                        nuts_backend=nuts_backend,
+                        chains=chains,
+                        cores=cores,
+                        progressbar=False,
+                    )
+                    summary_vars = _build_summary_var_names(group_data, trace)
+                    score_parts = score_changepoint_trace(
+                        trace,
+                        group_data=group_data,
+                        parameter_selection=config["parameter_selection"],
+                        tau_threshold=float(config.get("tau_threshold", tau_threshold)),
+                        summary_var_names=summary_vars if summary_vars else None,
+                        model=model,
+                        criterion="loo",
+                        warn_on_fallback=False,
+                        loo_report="elpd",
+                    )
+                    if cache_fits:
+                        score_cache[cache_key] = score_parts
+                        trace_cache[cache_key] = trace
+                        model_cache[cache_key] = model
+
+                loo_k_max, loo_n_over, _, worst_local_idx = _collect_pareto_k_stats(
+                    trace,
+                    model,
+                    pareto_threshold=pareto_threshold,
+                )
+                if (
+                    loo_n_over > 0
+                    and math.isfinite(loo_k_max)
+                    and loo_k_max > pareto_threshold
+                ):
+                    if (
+                        pareto_retry_count >= max_pareto_retries
+                        or worst_local_idx is None
+                        or int(active_event_indices.size) <= 1
+                    ):
+                        skipped_due_to_pareto = True
+                        break
+                    dropped_event = int(active_event_indices[int(worst_local_idx)])
+                    removed_event_indices.append(dropped_event)
+                    active_event_indices = np.delete(active_event_indices, int(worst_local_idx))
+                    pareto_retry_count += 1
+                    if verbose:
+                        print(
+                            f"[exhaustive] model {idx}/{len(unique_configs)} config fp={fp} "
+                            f"Pareto-k={loo_k_max:.3f} > {pareto_threshold:.3f}; "
+                            f"dropped event_idx={dropped_event}, retry={pareto_retry_count}",
+                            flush=True,
+                        )
+                    continue
+                break
+            if skipped_due_to_pareto:
+                n_pareto_skipped += 1
+                if verbose:
+                    print(
+                        f"[exhaustive] model {idx}/{len(unique_configs)} config fp={fp} "
+                        f"skipped after {pareto_retry_count} Pareto retries; "
+                        f"Pareto-k={loo_k_max:.3f} > {pareto_threshold:.3f}; "
+                        f"removed_event_indices={removed_event_indices}",
+                        flush=True,
+                    )
+                continue
             elapsed = time.perf_counter() - t_model0
             record = {
                 "config": _clone_config(config),
@@ -2896,14 +3002,35 @@ def exhaustive_model_search(
                 "bfmi": float(score_parts.get("bfmi", score_parts.get("bfmi_approx", float("nan")))),
                 "n_divergences": int(score_parts.get("n_divergences", 0)),
                 "p_tau_gt_threshold": float(score_parts.get("p_tau_gt_threshold", float("nan"))),
+                "e_tau": float(score_parts.get("e_tau", float("nan"))),
+                "tau_std": float(score_parts.get("tau_std", float("nan"))),
                 "p_tau_gt_6": float(p_tau_gt_from_trace(trace, 6.0)),
                 "tau_map": int(score_parts.get("map_tau", -1)),
                 "tau_map_concentration": float(score_parts.get("tau_concentration", float("nan"))),
                 "n_feature_blocks": int(score_parts.get("n_feature_blocks", 0)),
+                "n_model_events": int(active_event_indices.size),
+                "pareto_retry_count": int(pareto_retry_count),
+                "removed_event_indices": [int(x) for x in removed_event_indices],
                 "elapsed_time": float(elapsed),
                 "status": "ok",
                 "error": None,
             }
+            n_active_features = int(
+                sum(len(metrics or []) for metrics in (config.get("feature_selection") or {}).values())
+            )
+            n_model_events = int(active_event_indices.size)
+            record["n_active_features"] = n_active_features
+            if n_model_events > 0 and "elpd_loo" in record:
+                record["elpd_loo_per_event"] = float(record["elpd_loo"]) / float(n_model_events)
+            else:
+                record["elpd_loo_per_event"] = float("nan")
+            if n_active_features > 0 and n_model_events > 0 and "elpd_loo" in record:
+                norm = float(record["elpd_loo"]) / float(n_active_features * n_model_events)
+                record["elpd_loo_per_feature"] = norm
+                record["elpd_loo_per_feature_event"] = norm
+            else:
+                record["elpd_loo_per_feature"] = float("nan")
+                record["elpd_loo_per_feature_event"] = float("nan")
             results.append(record)
             if verbose:
                 print(
@@ -2933,13 +3060,25 @@ def exhaustive_model_search(
                 "bfmi": float("nan"),
                 "n_divergences": 0,
                 "p_tau_gt_threshold": float("nan"),
+                "e_tau": float("nan"),
+                "tau_std": float("nan"),
                 "tau_map": -1,
                 "tau_map_concentration": float("nan"),
                 "n_feature_blocks": 0,
+                "n_model_events": int(active_event_indices.size),
+                "pareto_retry_count": int(pareto_retry_count),
+                "removed_event_indices": [int(x) for x in removed_event_indices],
                 "elapsed_time": float(elapsed),
                 "status": "error",
                 "error": str(exc),
             }
+            n_active_features = int(
+                sum(len(metrics or []) for metrics in (config.get("feature_selection") or {}).values())
+            )
+            err_record["n_active_features"] = n_active_features
+            err_record["elpd_loo_per_event"] = float("nan")
+            err_record["elpd_loo_per_feature"] = float("nan")
+            err_record["elpd_loo_per_feature_event"] = float("nan")
             results.append(err_record)
             if verbose:
                 print(
@@ -2949,7 +3088,7 @@ def exhaustive_model_search(
                 )
 
     def _loo_sort_key(rec: dict[str, Any]) -> float:
-        v = float(rec.get("loo", float("nan")))
+        v = float(rec.get("elpd_loo_per_feature", float("nan")))
         return v if math.isfinite(v) else float("-inf")
 
     results_sorted = sorted(results, key=_loo_sort_key, reverse=True)
@@ -2957,7 +3096,7 @@ def exhaustive_model_search(
         rec for rec in results_sorted if rec.get("status") == "ok"
     ][:20]
     n_fitted = int(sum(1 for r in results if r.get("status") == "ok"))
-    n_filtered = int(n_filtered_degenerate + n_fit_errors)
+    n_filtered = int(n_filtered_degenerate + n_fit_errors + n_pareto_skipped)
 
     return {
         "results": results_sorted,
@@ -3325,6 +3464,9 @@ def export_exhaustive_search_results_to_csv(
                 "rem_stage": rem.get("rem_stage"),
                 "loo": rec.get("loo"),
                 "elpd_loo": rec.get("elpd_loo", rec.get("loo")),
+                "elpd_loo_per_event": rec.get("elpd_loo_per_event"),
+                "elpd_loo_per_feature": rec.get("elpd_loo_per_feature"),
+                "elpd_loo_per_feature_event": rec.get("elpd_loo_per_feature_event"),
                 "waic": rec.get("waic"),
                 "r_hat_max": rec.get("r_hat_max"),
                 "ess_min_bulk": rec.get("ess_min_bulk"),
@@ -3335,11 +3477,13 @@ def export_exhaustive_search_results_to_csv(
                 "tau_map_concentration": rec.get("tau_map_concentration"),
                 "p_tau_gt_threshold": rec.get("p_tau_gt_threshold"),
                 "e_tau": rec.get("e_tau"),
+                "tau_std": rec.get("tau_std"),
                 "p_tau_gt_6": rec.get("p_tau_gt_6"),
                 "loo_pareto_k_max": rec.get("loo_pareto_k_max"),
                 "loo_n_over_threshold": rec.get("loo_n_over_threshold"),
                 "waic_warning_flag": rec.get("waic_warning_flag"),
                 "n_feature_blocks": rec.get("n_feature_blocks"),
+                "n_active_features": rec.get("n_active_features"),
                 "elapsed_time": rec.get("elapsed_time"),
                 "data_shape": str(rec.get("data_shape")),
                 "data_output_dir": rec.get("data_output_dir"),
@@ -3388,32 +3532,54 @@ def plot_exhaustive_search_results(
     """Plot diagnostics for exhaustive model search outputs."""
     ok = [
         r for r in results
-        if r.get("status") == "ok" and math.isfinite(float(r.get("loo", float("nan"))))
+        if r.get("status") == "ok"
+        and math.isfinite(float(r.get("elpd_loo_per_feature", float("nan"))))
     ]
     if not ok:
         print("No successful exhaustive-search records to plot.")
         return
 
-    sorted_res = sorted(ok, key=lambda x: float(x.get("loo", float("-inf"))), reverse=True)
+    sorted_res = sorted(
+        ok,
+        key=lambda x: float(x.get("elpd_loo_per_feature", float("-inf"))),
+        reverse=True,
+    )
     top = sorted_res[: max(1, int(top_n))]
 
-    loo_vals = np.asarray([float(r.get("loo", float("nan"))) for r in sorted_res], dtype=float)
-    waic_vals = np.asarray([float(r.get("waic", float("nan"))) for r in sorted_res], dtype=float)
-    p_tau_vals = np.asarray([float(r.get("p_tau_gt_threshold", float("nan"))) for r in sorted_res], dtype=float)
+    loo_vals = np.asarray(
+        [float(r.get("elpd_loo_per_feature", float("nan"))) for r in sorted_res],
+        dtype=float,
+    )
+    e_tau_vals = np.asarray([float(r.get("e_tau", float("nan"))) for r in sorted_res], dtype=float)
+    tau_std_vals = np.asarray([float(r.get("tau_std", float("nan"))) for r in sorted_res], dtype=float)
     n_blocks = np.asarray([int(r.get("n_feature_blocks", 0)) for r in sorted_res], dtype=float)
-    rhat_vals = np.asarray([float(r.get("r_hat_max", float("nan"))) for r in sorted_res], dtype=float)
     ess_vals = np.asarray([float(r.get("ess_min_bulk", float("nan"))) for r in sorted_res], dtype=float)
+    pareto_k_vals = np.asarray([float(r.get("loo_pareto_k_max", float("nan"))) for r in sorted_res], dtype=float)
     idx = np.arange(1, len(sorted_res) + 1, dtype=float)
 
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     ax = axes[0, 0]
-    ax.plot(idx, loo_vals, "o-", ms=4, lw=1.1, color="#1f77b4", label="elpd_loo")
-    ax.scatter(idx, waic_vals, s=18, alpha=0.4, color="#7f7f7f", label="WAIC")
-    ax.axhline(float(np.nanmax(loo_vals)), color="#2ca02c", ls="--", lw=1.0, label="best elpd_loo")
-    ax.set_xlabel("Model rank (by elpd_loo)")
-    ax.set_ylabel("Score (log scale)")
-    ax.set_title("elpd_loo vs model rank (WAIC overlay)")
+    ax.plot(
+        idx,
+        loo_vals,
+        "o-",
+        ms=4,
+        lw=1.1,
+        color="#1f77b4",
+        label="elpd_loo / (n_features * n_events)",
+    )
+    ax.axhline(
+        float(np.nanmax(loo_vals)),
+        color="#2ca02c",
+        ls="--",
+        lw=1.0,
+        label="best elpd_loo / (n_features * n_events)",
+    )
+    ax.invert_xaxis()
+    ax.set_xlabel("Model rank (by elpd_loo / (n_features * n_events), 1 = best)")
+    ax.set_ylabel("elpd_loo / (n_features * n_events)")
+    ax.set_title("Normalized elpd_loo vs model rank")
     ax.grid(alpha=0.3)
     ax.legend(loc="best", fontsize=8)
 
@@ -3430,38 +3596,93 @@ def plot_exhaustive_search_results(
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
     ax = axes[1, 0]
-    sc = ax.scatter(
-        loo_vals,
-        p_tau_vals,
-        c=n_blocks,
-        cmap="plasma",
-        s=36,
-        alpha=0.85,
-        edgecolors="none",
-    )
-    ax.set_xlabel("elpd_loo")
-    ax.set_ylabel("E(tau)")
-    ax.set_title("elpd_loo vs tau signal (color=n_feature_blocks)")
+    valid_tau = np.isfinite(loo_vals) & np.isfinite(e_tau_vals) & np.isfinite(tau_std_vals)
+    n_skipped_tau = int(np.size(valid_tau) - int(np.count_nonzero(valid_tau)))
+    if n_skipped_tau > 0:
+        warnings.warn(
+            f"plot_exhaustive_search_results: skipped {n_skipped_tau} models with missing e_tau/tau_std.",
+            UserWarning,
+            stacklevel=2,
+        )
+    sc = None
+    if np.any(valid_tau):
+        ax.errorbar(
+            loo_vals[valid_tau],
+            e_tau_vals[valid_tau],
+            yerr=tau_std_vals[valid_tau],
+            fmt="none",
+            ecolor="gray",
+            alpha=0.4,
+            capsize=2,
+            linewidth=0.5,
+        )
+        sc = ax.scatter(
+            loo_vals[valid_tau],
+            e_tau_vals[valid_tau],
+            c=n_blocks[valid_tau],
+            cmap="plasma",
+            s=36,
+            alpha=0.85,
+            edgecolors="none",
+        )
+    ax.set_xlabel("elpd_loo per feature")
+    ax.set_ylabel("E[tau] (days)")
+    ax.set_title("elpd_loo per feature vs E[tau] (bars = +/-1 std)")
     ax.grid(alpha=0.3)
-    cbar = fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label("n_feature_blocks")
+    if sc is not None:
+        cbar = fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
+        cbar.set_label("n_feature_blocks")
 
-    ax = axes[1, 1]
-    finite_rhat = rhat_vals[np.isfinite(rhat_vals)]
+    parent_ax = axes[1, 1]
+    parent_spec = parent_ax.get_subplotspec()
+    parent_ax.remove()
+    sub_axes = parent_spec.subgridspec(1, 2, wspace=0.4)
+    ax_ess = fig.add_subplot(sub_axes[0, 0])
+    ax_pk = fig.add_subplot(sub_axes[0, 1])
+
     finite_ess = ess_vals[np.isfinite(ess_vals)]
-    if finite_rhat.size:
-        ax.hist(finite_rhat, bins=min(20, max(5, finite_rhat.size // 2)), alpha=0.55, label="r_hat_max")
     if finite_ess.size:
-        ax.hist(finite_ess, bins=min(20, max(5, finite_ess.size // 2)), alpha=0.55, label="ess_min_bulk")
-    ax.axvline(1.05, color="#d62728", ls="--", lw=1.0, label="r_hat threshold")
-    ax.axvline(100.0, color="#2ca02c", ls="--", lw=1.0, label="ESS threshold")
-    ax.set_title("Sampler diagnostics distribution")
-    ax.set_xlabel("Value")
-    ax.set_ylabel("Count")
-    ax.grid(alpha=0.3)
-    ax.legend(loc="best", fontsize=8)
+        ax_ess.hist(
+            finite_ess,
+            bins=min(20, max(5, finite_ess.size // 2)),
+            alpha=0.55,
+            label="ess_min_bulk",
+            color="#1f77b4",
+        )
+    ax_ess.axvline(100.0, color="#2ca02c", ls="--", lw=1.0, label="ESS threshold")
+    ax_ess.set_title("ESS distribution")
+    ax_ess.set_xlabel("Value")
+    ax_ess.set_ylabel("Count")
+    ax_ess.grid(alpha=0.3)
+    ax_ess.legend(loc="best", fontsize=8)
 
-    n_bad_pareto = int(sum(int(r.get("loo_n_over_threshold", 0)) > 0 for r in sorted_res))
+    finite_pareto = pareto_k_vals[np.isfinite(pareto_k_vals)]
+    if finite_pareto.size:
+        ax_pk.hist(
+            finite_pareto,
+            bins=20,
+            color="orange",
+            edgecolor="black",
+            alpha=0.7,
+        )
+    ax_pk.axvline(0.5, color="red", ls="--", lw=1.0, label="k=0.5 (reliable)")
+    ax_pk.axvline(0.7, color="darkred", ls=":", lw=1.0, label="k=0.7 (unreliable)")
+    n_bad_pareto = int(np.count_nonzero(finite_pareto >= pareto_threshold))
+    ax_pk.text(
+        0.95,
+        0.95,
+        f"k >= {pareto_threshold:g}: {n_bad_pareto} models",
+        transform=ax_pk.transAxes,
+        ha="right",
+        va="top",
+        fontsize=8,
+    )
+    ax_pk.set_xlabel("max Pareto k")
+    ax_pk.set_ylabel("N models")
+    ax_pk.set_title("Pareto-k distribution")
+    ax_pk.grid(alpha=0.3)
+    ax_pk.legend(loc="best", fontsize=7)
+
     plt.suptitle(
         f"Exhaustive search diagnostics (models with Pareto-k > {pareto_threshold:g}: {n_bad_pareto})",
         y=1.02,
