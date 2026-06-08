@@ -1,4 +1,5 @@
 \relax 
+\providecommand{\transparent@use}[1]{}
 \providecommand\babel@aux[2]{}
 \@nameuse{bbl@beforestart}
 \catcode `"\active 
@@ -34,17 +35,13 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}\protected@file@percent }
 \citation{Saevskiy2025}
 \citation{Fang2010}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 5-секундная эпоха регистрируемого сигнала ЭЭГ крысы.}}{10}{}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:iEEG}{{1}{10}{}{}{}}
 \citation{Vyazovskiy2005}
 \citation{GOST2017}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Выборка сейсмических событий}}{12}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{tab:events}{{1}{12}{}{}{}}
 \citation{Gmurman2003}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Профиль парадоксального сна крысы.}}{13}{}\protected@file@percent }
-\newlabel{fig:profile}{{2}{13}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{14}{}\protected@file@percent }
 \citation{scikit-learn}
 \citation{DavidPil2015,carlin1992hierarchical}
 \citation{bayes_on_R}
@@ -59,8 +56,8 @@
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
 \newlabel{eq:tau_prior}{{4}{20}{}{}{}}
 \newlabel{eq:loglik_k}{{5}{20}{}{}{}}
+\newlabel{eq:marginal_loglik}{{6}{20}{}{}{}}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
-\newlabel{eq:marginal_loglik}{{6}{21}{}{}{}}
 \newlabel{eq:cond_tau_probs}{{7}{21}{}{}{}}
 \newlabel{eq:marginal_tau}{{8}{21}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.\relax }Программная реализация модели}{22}{}\protected@file@percent }
@@ -72,24 +69,24 @@
 \citation{HoffmanGelman2014}
 \newlabel{stud-lst:bayes-prior-builder}{{2}{27}{}{}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2}{\ignorespaces Создание априорной случайной величины по текстовой спецификации (\texttt  {\_build\_prior})}}{27}{}\protected@file@percent }
+\newlabel{marginalization}{{3.2}{27}{}{}{}}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
-\newlabel{marginalization}{{3.2}{28}{}{}{}}
-\newlabel{stud-lst:bayes-tau-marginal}{{3}{29}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решётке}}{29}{}\protected@file@percent }
+\newlabel{stud-lst:bayes-tau-marginal}{{3}{28}{}{}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решётке}}{28}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{30}{}\protected@file@percent }
 \citation{Bergmeir2012}
 \citation{Vehtari2017}
 \citation{Vehtari2017}
+\newlabel{eq:naive_elpd}{{13}{32}{}{}{}}
 \citation{Vehtari2017}
 \citation{Kumar2019}
 \citation{Vehtari2017}
-\newlabel{eq:naive_elpd}{{13}{33}{}{}{}}
 \newlabel{eq:psis_elpd}{{14}{33}{}{}{}}
 \citation{Vehtari2017,Vehtari2024}
 \newlabel{eq:elpd_per_feature}{{17}{35}{}{}{}}
 \newlabel{eq:elpd_per_event}{{18}{36}{}{}{}}
+\newlabel{eq:elpd_fully_normalized}{{19}{36}{}{}{}}
 \citation{Vehtari2017}
-\newlabel{eq:elpd_fully_normalized}{{19}{37}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{39}{}\protected@file@percent }
 \bibstyle{ugost2008-local}
 \bibdata{mmcs-thesis2020}
@@ -150,9 +147,22 @@
 \babel@aux{russian}{}
 \babel@aux{russian}{}
 \@writefile{toc}{\contentsline {section}{Приложение}{50}{}\protected@file@percent }
-\newlabel{app-lst:bayes-build-prior-full}{{4}{50}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{50}{}\protected@file@percent }
-\newlabel{app-lst:bayes-changepoint}{{5}{50}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{50}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Схема регистрации полиграфической активности крыс в свободном поведении. \textit  {1 – пластиковый бокс; 2 – крыса с имплантированными электродами; 3 – регистрирующий кабель; 4 – электрический круговой контакт; 5 – подвижное соединение вертикальной планки; 6 – регулируемый груз на горизонтальной планке; 7 - усилитель биологических сигналов и аналогово-цифровой преобразователь; 8 – компьютер}}}{50}{}\protected@file@percent }
+\newlabel{fig:biohybrid}{{1}{50}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 5-секундная эпоха регистрируемого сигнала ЭЭГ крысы.}}{51}{}\protected@file@percent }
+\newlabel{fig:iEEG}{{2}{51}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Блок-схема, иллюстрирующая основные шаги алгоритма стадирования; перед действиями, отмеченными красными звездочками возможен подбор оптимальных частотных диапазонов для используемых данных}}{51}{}\protected@file@percent }
+\newlabel{fig:stadir}{{3}{51}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Гипнограмма крысы R1 от 26.06.2025.}}{52}{}\protected@file@percent }
+\newlabel{fig:hypno}{{4}{52}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Пример суточного профиля ПС (окно 6 часов, шаг 1 час); серой заливкой показано темное время суток.}}{52}{}\protected@file@percent }
+\newlabel{fig:profile}{{5}{52}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Схема модели поиска точки разладки с приорными значениями параметров правдоподобия; в конкретном примере для среднего используется распределение Стьюдента, а для размаха -- логарифмически-нормальное.}}{53}{}\protected@file@percent }
+\newlabel{fig:tau_model}{{6}{53}{}{}{}}
+\newlabel{app-lst:bayes-build-prior-full}{{4}{53}{}{}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{53}{}\protected@file@percent }
+\newlabel{app-lst:bayes-changepoint}{{5}{54}{}{}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{54}{}\protected@file@percent }
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\gdef \@abspage@last{52}
+\gdef\svg@ink@ver@settings{{\m@ne }{inkscape}{1}}
+\gdef \@abspage@last{55}

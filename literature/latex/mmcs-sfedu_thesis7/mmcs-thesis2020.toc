@@ -2,7 +2,7 @@
 \contentsline {section}{Постановка задачи}{3}{}%
 \contentsline {section}{Введение}{4}{}%
 \contentsline {section}{\numberline {1.\relax }Материалы и методы}{9}{}%
-\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}%
+\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{14}{}%
 \contentsline {section}{\numberline {3.\relax }Программная реализация модели}{22}{}%
 \contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{22}{}%
 \contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{26}{}%
