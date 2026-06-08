@@ -1,373 +1,498 @@
-\begin{thebibliography}{48}
-\providecommand{\natexlab}[1]{#1}
-\providecommand{\url}[1]{\texttt{#1}}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi: #1}\else
-  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+\begin{thebibliography}{10}
+\def\selectlanguageifdefined#1{
+\expandafter\ifx\csname date#1\endcsname\relax
+\else\selectlanguage{#1}\fi}
+\providecommand*{\href}[2]{#2}
+\providecommand*{\url}[1]{#1}
+\providecommand*{\BibUrl}[1]{\url{#1}}
+\providecommand{\BibAnnote}[1]{}
+\providecommand*{\BibEmph}[1]{#1}
+\ProvideTextCommandDefault{\cyrdash}{\iflanguage{russian}{\hbox
+  to.8em{--\hss--}}{\textemdash}}
+\providecommand*{\BibDash}{\ifdim\lastskip>0pt\unskip\nobreak\hskip.2em plus
+  0.1em\fi
+\cyrdash\hskip.2em plus 0.1em\ignorespaces}
+\renewcommand{\newblock}{\ignorespaces}
 
-\bibitem[Родкин(2011)]{Rodkin2011}
-М.~В. Родкин.
-\newblock Модель сейсмического режима как
-  совокупности эпизодов лавинообразной
+\bibitem{Rodkin2011}
+\selectlanguageifdefined{russian}
+Родкин~М.~В. Модель сейсмического режима
+  как совокупности эпизодов лавинообразной
   релаксации, возникающих на множестве
-  метастабильных состояний.
-\newblock \emph{Физика Земли}, 10:\penalty0 18--26, 2011.
-\newblock \doi{10.1134/S1069351311100107}.
+  метастабильных состояний~// \BibEmph{Физика
+  Земли}. \BibDash
+\newblock 2011. \BibDash
+\newblock {^^e2^^84^^96}~10. \BibDash
+\newblock {^^d0^^a1.}~18--26. \BibDash
 \newblock Английский перевод: Alternative to SOC concept-model
   of seismic regime as a set of episodes of random avalanche-like releases
-  occurring on a set of metastable subsystems.
+  occurring on a set of metastable subsystems, Izvestiya, Physics of the Solid
+  Earth, 47(11), 966--973, doi: 10.1134/S1069351311100107.
 
-\bibitem[Cicerone et~al.(2009)Cicerone, Ebel, and Britton]{Cicerone2009}
-R.~D. Cicerone, J.~E. Ebel, and J.~Britton.
-\newblock A systematic compilation of earthquake precursors.
-\newblock \emph{Tectonophysics}, 476\penalty0 (3–4):\penalty0 371--396, 2009.
-\newblock \doi{10.1016/j.tecto.2009.06.008}.
+\bibitem{Cicerone2009}
+\selectlanguageifdefined{english}
+Cicerone~R.~D., Ebel~J.~E., Britton~J. A systematic compilation of earthquake
+  precursors~//
+  \href{https://doi.org/10.1016/j.tecto.2009.06.008}{\BibEmph{Tectonophysics}}.
+  \BibDash
+\newblock 2009. \BibDash
+\newblock Vol. 476, no. 3--4. \BibDash
+\newblock P.~371--396.
 
-\bibitem[Geller(1997)]{Geller2007}
-Robert~J. Geller.
-\newblock Earthquake prediction: a critical review.
-\newblock \emph{Geophysical Journal International}, 131\penalty0 (3):\penalty0
-  425--450, 1997.
-\newblock \doi{10.1111/j.1365-246X.1997.tb06588.x}.
+\bibitem{Geller1997}
+\selectlanguageifdefined{english}
+Geller~Robert~J. Earthquake prediction: a critical review~//
+  \href{https://doi.org/10.1111/j.1365-246X.1997.tb06588.x}{\BibEmph{Geophysical
+  Journal International}}. \BibDash
+\newblock 1997. \BibDash
+\newblock Vol. 131, no.~3. \BibDash
+\newblock P.~425--450.
 
-\bibitem[Conti et~al.(2021)Conti, Picozza, and Sotgiu]{Conti2021}
-Livio Conti, Piergiorgio Picozza, and Alessandro Sotgiu.
-\newblock A critical review of ground based observations of earthquake
-  precursors.
-\newblock \emph{Frontiers in Earth Science}, 9:\penalty0 676766, 2021.
-\newblock \doi{10.3389/feart.2021.676766}.
+\bibitem{Conti2021}
+\selectlanguageifdefined{english}
+Conti~Livio, Picozza~Piergiorgio, Sotgiu~Alessandro. A Critical Review of
+  Ground Based Observations of Earthquake Precursors~//
+  \href{https://doi.org/10.3389/feart.2021.676766}{\BibEmph{Frontiers in Earth
+  Science}}. \BibDash
+\newblock 2021. \BibDash
+\newblock Vol.~9. \BibDash
+\newblock P.~676766.
 
-\bibitem[Chiodini et~al.(2020)Chiodini, Cardellini, Luccio, Selva, Frondini,
-  Caliro, Rosiello, Beddini, and Ventura]{Chiodini2020}
-G.~Chiodini, C.~Cardellini, F.~Di Luccio, J.~Selva, F.~Frondini, S.~Caliro,
-  A.~Rosiello, G.~Beddini, and G.~Ventura.
-\newblock Correlation between tectonic {CO}$_2$ earth degassing and seismicity
-  is revealed by a 10-year record in the apennines, italy.
-\newblock \emph{Science Advances}, 6\penalty0 (35):\penalty0 eabc2938, 2020.
-\newblock \doi{10.1126/sciadv.abc2938}.
+\bibitem{Chiodini2020}
+\selectlanguageifdefined{english}
+Correlation between tectonic {CO}$_2$ Earth degassing and seismicity is
+  revealed by a 10-year record in the Apennines, Italy~/ Chiodini~G.,
+  Cardellini~C., Luccio~F.~Di, Selva~J., Frondini~F., Caliro~S., Rosiello~A.,
+  Beddini~G., and Ventura~G.~//
+  \href{https://doi.org/10.1126/sciadv.abc2938}{\BibEmph{Science Advances}}.
+  \BibDash
+\newblock 2020. \BibDash
+\newblock Vol.~6, no.~35. \BibDash
+\newblock P.~eabc2938.
 
-\bibitem[Kirschvink(2000)]{Kirschvink2000}
-Joseph~L. Kirschvink.
-\newblock Earthquake prediction by animals: Evolution and sensory perception.
-\newblock \emph{Bulletin of the Seismological Society of America}, 90\penalty0
-  (2):\penalty0 312--323, 2000.
-\newblock \doi{10.1785/0119980114}.
+\bibitem{Kirschvink2000}
+\selectlanguageifdefined{english}
+Kirschvink~Joseph~L. Earthquake prediction by animals: Evolution and sensory
+  perception~// \href{https://doi.org/10.1785/0119980114}{\BibEmph{Bulletin of
+  the Seismological Society of America}}. \BibDash
+\newblock 2000. \BibDash
+\newblock Vol.~90, no.~2. \BibDash
+\newblock P.~312--323.
 
-\bibitem[Grant et~al.(2011)Grant, Halliday, Balderer, Leuenberger, Newcomer,
-  Cyr, and Freund]{Grant2011}
-Rachel~A. Grant, Tim Halliday, Werner~P. Balderer, Florian Leuenberger,
-  Michelle Newcomer, Gary Cyr, and Friedemann~T. Freund.
-\newblock Ground water chemistry changes before major earthquakes and possible
-  effects on animals.
-\newblock \emph{International Journal of Environmental Research and Public
-  Health}, 8\penalty0 (6):\penalty0 1936--1956, 2011.
-\newblock \doi{10.3390/ijerph8061936}.
+\bibitem{Grant2011}
+\selectlanguageifdefined{english}
+Ground water chemistry changes before major earthquakes and possible effects on
+  animals~/ Grant~Rachel~A., Halliday~Tim, Balderer~Werner~P.,
+  Leuenberger~Fanny, Newcomer~Michelle, Cyr~Gary, and Freund~Friedemann~T.~//
+  \href{https://doi.org/10.3390/ijerph8061936}{\BibEmph{International Journal
+  of Environmental Research and Public Health}}. \BibDash
+\newblock 2011. \BibDash
+\newblock Vol.~8, no.~6. \BibDash
+\newblock P.~1936--1956.
 
-\bibitem[Yokoi et~al.(2003)Yokoi, Ikeya, Yagi, and Nagai]{Yokoi2003}
-Sayoko Yokoi, Motoji Ikeya, Takeshi Yagi, and Katsuya Nagai.
-\newblock Mouse circadian rhythm before the {K}obe earthquake in 1995.
-\newblock \emph{Bioelectromagnetics}, 24\penalty0 (4):\penalty0 289--291, 2003.
-\newblock \doi{10.1002/bem.10108}.
+\bibitem{Yokoi2003}
+\selectlanguageifdefined{english}
+Mouse circadian rhythm before the {K}obe earthquake in 1995~/ Yokoi~Sayoko,
+  Ikeya~Motoji, Yagi~Takeshi, and Nagai~Katsuya~//
+  \href{https://doi.org/10.1002/bem.10108}{\BibEmph{Bioelectromagnetics}}.
+  \BibDash
+\newblock 2003. \BibDash
+\newblock Vol.~24, no.~4. \BibDash
+\newblock P.~289--291.
 
-\bibitem[Rampin et~al.(1991)Rampin, Cespuglio, Chastrette, and
-  Jouvet]{Rampin1991}
-C.~Rampin, R.~Cespuglio, N.~Chastrette, and M.~Jouvet.
-\newblock Immobilisation stress induces a paradoxical sleep rebound in rat.
-\newblock \emph{Neuroscience Letters}, 126:\penalty0 113--118, 1991.
-\newblock \doi{10.1016/0304-3940(91)90532-X}.
+\bibitem{Rampin1991}
+\selectlanguageifdefined{english}
+Immobilisation stress induces a paradoxical sleep rebound in rat~/ Rampin~C.,
+  Cespuglio~R., Chastrette~N., and Jouvet~M.~//
+  \href{https://doi.org/10.1016/0304-3940(91)90532-X}{\BibEmph{Neuroscience
+  Letters}}. \BibDash
+\newblock 1991. \BibDash
+\newblock Vol. 126. \BibDash
+\newblock P.~113--118.
 
-\bibitem[Meerlo et~al.(1997)Meerlo, Pragt, and Daan]{Meerlo1997}
-Peter Meerlo, Bertrand~J. Pragt, and Serge Daan.
-\newblock Social stress induces high intensity sleep in rats.
-\newblock \emph{Neuroscience Letters}, 225\penalty0 (1):\penalty0 41--44, 1997.
-\newblock \doi{10.1016/S0304-3940(97)00180-8}.
+\bibitem{Meerlo1997}
+\selectlanguageifdefined{english}
+Meerlo~Peter, Pragt~Bertrand~J., Daan~Serge. Social stress induces high
+  intensity sleep in rats~//
+  \href{https://doi.org/10.1016/S0304-3940(97)00180-8}{\BibEmph{Neuroscience
+  Letters}}. \BibDash
+\newblock 1997. \BibDash
+\newblock Vol. 225, no.~1. \BibDash
+\newblock P.~41--44.
 
-\bibitem[Palma et~al.(2000)Palma, Suchecki, and Tufik]{Palma2000}
-Beatriz~Duarte Palma, Deborah Suchecki, and Sergio Tufik.
-\newblock Differential effects of acute cold and footshock on the sleep of
-  rats.
-\newblock \emph{Brain Research}, 861\penalty0 (1):\penalty0 97--104, 2000.
-\newblock \doi{10.1016/S0006-8993(00)02024-2}.
+\bibitem{Palma2000}
+\selectlanguageifdefined{english}
+Palma~Beatriz~Duarte, Suchecki~Deborah, Tufik~Sergio. Differential effects of
+  acute cold and footshock on the sleep of rats~//
+  \href{https://doi.org/10.1016/S0006-8993(00)02024-2}{\BibEmph{Brain
+  Research}}. \BibDash
+\newblock 2000. \BibDash
+\newblock Vol. 861, no.~1. \BibDash
+\newblock P.~97--104.
 
-\bibitem[Adrien et~al.(1991)Adrien, Dugovic, and Martin]{Adrien1991}
-J.~Adrien, C.~Dugovic, and P.~Martin.
-\newblock Sleep-wakefulness patterns in the helpless rat.
-\newblock \emph{Physiology \& Behavior}, 49:\penalty0 257--262, 1991.
-\newblock \doi{10.1016/0031-9384(91)90041-L}.
+\bibitem{Adrien1991}
+\selectlanguageifdefined{english}
+Adrien~J., Dugovic~C., Martin~P. Sleep-wakefulness patterns in the helpless
+  rat~//
+  \href{https://doi.org/10.1016/0031-9384(91)90041-L}{\BibEmph{Physiology \&
+  Behavior}}. \BibDash
+\newblock 1991. \BibDash
+\newblock Vol.~49. \BibDash
+\newblock P.~257--262.
 
-\bibitem[Selye(1950)]{Selye1950}
-Hans Selye.
-\newblock Stress and the general adaptation syndrome.
-\newblock \emph{British Medical Journal}, 1:\penalty0 1383--1392, 1950.
-\newblock \doi{10.1136/bmj.1.4667.1383}.
+\bibitem{Selye1950}
+\selectlanguageifdefined{english}
+Selye~Hans. Stress and the general adaptation syndrome~//
+  \href{https://doi.org/10.1136/bmj.1.4667.1383}{\BibEmph{British Medical
+  Journal}}. \BibDash
+\newblock 1950. \BibDash
+\newblock Vol.~1. \BibDash
+\newblock P.~1383--1392.
 
-\bibitem[Herman et~al.(2016)]{Herman2016}
-James~P. Herman et~al.
-\newblock Regulation of the hypothalamic-pituitary-adrenocortical stress
-  response.
-\newblock \emph{Comprehensive Physiology}, 6:\penalty0 603--621, 2016.
-\newblock \doi{10.1002/cphy.c150015}.
+\bibitem{Herman2016}
+\selectlanguageifdefined{english}
+Regulation of the hypothalamic-pituitary-adrenocortical stress response~/
+  Herman~James~P., McKlveen~Jessica~M., Ghosal~Sriparna, Kopp~Brittany,
+  Wulsin~Aynara, Makinson~Ryan, Scheimann~Jessie, and Myers~Brent~//
+  \href{https://doi.org/10.1002/cphy.c150015}{\BibEmph{Comprehensive
+  Physiology}}. \BibDash
+\newblock 2016. \BibDash
+\newblock Vol.~6, no.~2. \BibDash
+\newblock P.~603--621.
 
-\bibitem[Kalsbeek et~al.(2012)]{Kalsbeek2012}
-A.~Kalsbeek et~al.
-\newblock Circadian rhythms in the hypothalamo-pituitary-adrenal {(HPA)} axis.
-\newblock \emph{Molecular and Cellular Endocrinology}, 349:\penalty0 20--29,
-  2012.
-\newblock \doi{10.1016/j.mce.2011.06.042}.
+\bibitem{Kalsbeek2012}
+\selectlanguageifdefined{english}
+Circadian rhythms in the hypothalamo-pituitary-adrenal {(HPA)} axis~/
+  Kalsbeek~A., van~der Spek~R., Lei~J., Endert~E., Buijs~R.~M., and
+  Fliers~E.~//
+  \href{https://doi.org/10.1016/j.mce.2011.06.042}{\BibEmph{Molecular and
+  Cellular Endocrinology}}. \BibDash
+\newblock 2012. \BibDash
+\newblock Vol. 349, no.~1. \BibDash
+\newblock P.~20--29.
 
-\bibitem[Bradbury et~al.(1994)Bradbury, Akana, and Dallman]{Bradbury1998}
-M.~J. Bradbury, S.~F. Akana, and M.~F. Dallman.
-\newblock Roles of type {I} and {II} corticosteroid receptors in regulation of
-  basal activity in the hypothalamo-pituitary-adrenal axis during the diurnal
-  trough and the peak: evidence for a nonadditive effect of combined receptor
-  occupation.
-\newblock \emph{Endocrinology}, 134\penalty0 (3):\penalty0 1286--1296, 1994.
-\newblock \doi{10.1210/endo.134.3.8119168}.
+\bibitem{Bradbury1998}
+\selectlanguageifdefined{english}
+Bradbury~M.~J., Akana~S.~F., Dallman~M.~F. Roles of type {I} and {II}
+  corticosteroid receptors in regulation of basal activity in the
+  hypothalamo-pituitary-adrenal axis during the diurnal trough and the peak:
+  evidence for a nonadditive effect of combined receptor occupation~//
+  \href{https://doi.org/10.1210/endo.134.3.8119168}{\BibEmph{Endocrinology}}.
+  \BibDash
+\newblock 1994. \BibDash
+\newblock Vol. 134, no.~3. \BibDash
+\newblock P.~1286--1296.
 
-\bibitem[Sanford et~al.(2003)Sanford, Tang, Ross, and Morrison]{Sanford2010}
-Larry~D. Sanford, Xiangdong Tang, Richard~J. Ross, and Adrian~R. Morrison.
-\newblock Influence of shock training and explicit fear-conditioned cues on
-  sleep architecture in mice: Strain comparison.
-\newblock \emph{Behavior Genetics}, 33\penalty0 (1):\penalty0 43--58, 2003.
-\newblock \doi{10.1023/A:1021051516829}.
+\bibitem{Sanford2010}
+\selectlanguageifdefined{english}
+Influence of Shock Training and Explicit Fear-Conditioned Cues on Sleep
+  Architecture in Mice: Strain Comparison~/ Sanford~Larry~D., Tang~Xiangdong,
+  Ross~Richard~J., and Morrison~Adrian~R.~//
+  \href{https://doi.org/10.1023/A:1021051516829}{\BibEmph{Behavior Genetics}}.
+  \BibDash
+\newblock 2003. \BibDash
+\newblock Vol.~33, no.~1. \BibDash
+\newblock P.~43--58.
 
-\bibitem[Rytkönen et~al.(2011)Rytkönen, Zitting, and
-  Porkka-Heiskanen]{Rytkonen2011}
-Kirsi-Marja Rytkönen, Jukka Zitting, and Tarja Porkka-Heiskanen.
-\newblock Automated sleep scoring in rats and mice using the naive {B}ayes
-  classifier.
-\newblock \emph{Journal of Neuroscience Methods}, 202\penalty0 (1):\penalty0
-  60--64, 2011.
-\newblock \doi{10.1016/j.jneumeth.2011.08.023}.
+\bibitem{Rytkonen2011}
+\selectlanguageifdefined{english}
+Rytkönen~Kirsi-Marja, Zitting~Jukka, Porkka-Heiskanen~Tarja. Automated sleep
+  scoring in rats and mice using the naive {B}ayes classifier~//
+  \href{https://doi.org/10.1016/j.jneumeth.2011.08.023}{\BibEmph{Journal of
+  Neuroscience Methods}}. \BibDash
+\newblock 2011. \BibDash
+\newblock Vol. 202, no.~1. \BibDash
+\newblock P.~60--64.
 
-\bibitem[Saevskiy et~al.(2025)Saevskiy, Suntsova, Kosenko, Alam, and
-  Kostin]{Saevskiy2025}
-Anton Saevskiy, Natalia Suntsova, Peter Kosenko, Md~Noor Alam, and Andrey
-  Kostin.
-\newblock Open-source algorithm for automated vigilance state classification
-  using single-channel electroencephalogram in rodents.
-\newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 921, 2025.
-\newblock \doi{10.3390/s25030921}.
+\bibitem{Saevskiy2025}
+\selectlanguageifdefined{english}
+Open-Source Algorithm for Automated Vigilance State Classification Using
+  Single-Channel Electroencephalogram in Rodents~/ Saevskiy~Anton,
+  Suntsova~Natalia, Kosenko~Peter, Alam~Md~Noor, and Kostin~Andrey~//
+  \href{https://doi.org/10.3390/s25030921}{\BibEmph{Sensors}}. \BibDash
+\newblock 2025. \BibDash
+\newblock Vol.~25, no.~3. \BibDash
+\newblock P.~921.
 
-\bibitem[Kostin et~al.(2019)Kostin, Alam, McGinty, Szymusiak, and
-  Alam]{Kostin2019}
-Andrey Kostin, Md~Aftab Alam, Dennis McGinty, Ronald Szymusiak, and Md~Noor
-  Alam.
-\newblock Chronic suppression of hypothalamic cell proliferation and
-  neurogenesis induces aging-like changes in sleep-wake organization in young
-  mice.
-\newblock \emph{Neuroscience}, 404:\penalty0 541--556, 2019.
-\newblock \doi{10.1016/j.neuroscience.2019.01.053}.
+\bibitem{Kostin2019}
+\selectlanguageifdefined{english}
+Chronic Suppression of Hypothalamic Cell Proliferation and Neurogenesis Induces
+  Aging-Like Changes in Sleep-Wake Organization in Young Mice~/ Kostin~Andrey,
+  Alam~Md~Aftab, McGinty~Dennis, Szymusiak~Ronald, and Alam~Md~Noor~//
+  \href{https://doi.org/10.1016/j.neuroscience.2019.01.053}{\BibEmph{Neuroscience}}.
+  \BibDash
+\newblock 2019. \BibDash
+\newblock Vol. 404. \BibDash
+\newblock P.~541--556.
 
-\bibitem[Vyazovskiy and Tobler(2005)]{Vyazovskiy2005}
-Vladyslav~V. Vyazovskiy and Irene Tobler.
-\newblock Theta activity in the waking {EEG} is a marker of sleep propensity in
-  the rat.
-\newblock \emph{Brain Research}, 1050\penalty0 (1--2):\penalty0 64--71, 2005.
-\newblock \doi{10.1016/j.brainres.2005.05.022}.
+\bibitem{Vyazovskiy2005}
+\selectlanguageifdefined{english}
+Vyazovskiy~Vladyslav~V., Tobler~Irene. Theta activity in the waking {EEG} is a
+  marker of sleep propensity in the rat~//
+  \href{https://doi.org/10.1016/j.brainres.2005.05.022}{\BibEmph{Brain
+  Research}}. \BibDash
+\newblock 2005. \BibDash
+\newblock Vol. 1050, no. 1--2. \BibDash
+\newblock P.~64--71.
 
-\bibitem[Lyamin et~al.(2008)Lyamin, Manger, Ridgway, Mukhametov, and
-  Siegel]{Lyamin2008}
-Oleg~I. Lyamin, Paul~R. Manger, Sam~H. Ridgway, Lev~M. Mukhametov, and
-  Jerome~M. Siegel.
-\newblock Cetacean sleep: An unusual form of mammalian sleep.
-\newblock \emph{Neuroscience and Biobehavioral Reviews}, 32\penalty0
-  (8):\penalty0 1451--1484, 2008.
-\newblock \doi{10.1016/j.neubiorev.2008.05.023}.
+\bibitem{Lyamin2008}
+\selectlanguageifdefined{english}
+Cetacean sleep: An unusual form of mammalian sleep~/ Lyamin~Oleg~I.,
+  Manger~Paul~R., Ridgway~Sam~H., Mukhametov~Lev~M., and Siegel~Jerome~M.~//
+  \href{https://doi.org/10.1016/j.neubiorev.2008.05.023}{\BibEmph{Neuroscience
+  and Biobehavioral Reviews}}. \BibDash
+\newblock 2008. \BibDash
+\newblock Vol.~32, no.~8. \BibDash
+\newblock P.~1451--1484.
 
-\bibitem[Franken et~al.(1991)Franken, Tobler, and Borbély]{Franken1991}
-Paul Franken, Irene Tobler, and Alexander~A. Borbély.
-\newblock Sleep homeostasis in the rat: simulation of the time course of {EEG}
-  slow-wave activity.
-\newblock \emph{Neuroscience Letters}, 130\penalty0 (2):\penalty0 141--144,
-  1991.
-\newblock \doi{10.1016/0304-3940(91)90382-4}.
+\bibitem{Franken1991}
+\selectlanguageifdefined{english}
+Franken~Paul, Tobler~Irene, Borbély~Alexander~A. Sleep homeostasis in the rat:
+  simulation of the time course of {EEG} slow-wave activity~//
+  \href{https://doi.org/10.1016/0304-3940(91)90382-4}{\BibEmph{Neuroscience
+  Letters}}. \BibDash
+\newblock 1991. \BibDash
+\newblock Vol. 130, no.~2. \BibDash
+\newblock P.~141--144.
 
-\bibitem[Weber and Dan(2016)]{WeberDan2016}
-Franz Weber and Yang Dan.
-\newblock Circuit-based interrogation of sleep control.
-\newblock \emph{Nature}, 538:\penalty0 51--59, 2016.
-\newblock \doi{10.1038/nature19773}.
+\bibitem{WeberDan2016}
+\selectlanguageifdefined{english}
+Weber~Franz, Dan~Yang. Circuit-based interrogation of sleep control~//
+  \href{https://doi.org/10.1038/nature19773}{\BibEmph{Nature}}. \BibDash
+\newblock 2016. \BibDash
+\newblock Vol. 538. \BibDash
+\newblock P.~51--59.
 
-\bibitem[{The Alan Turing Institute}(2024)]{AlanTuringInstitute}
-{The Alan Turing Institute}.
-\newblock {AI} explainability in practice: Appendix {A} -- algorithmic
-  techniques.
-\newblock
-  \url{https://www.turing.ac.uk/sites/default/files/2024-06/aieg-ati-7-explainabilityv1.2.pdf},
-  2024.
-\newblock Документ, определяющий
-  интерпретируемые и «чёрный ящик» модели.
+\bibitem{AlanTuringInstitute}
+\selectlanguageifdefined{english}
+{AI} Explainability in Practice. \BibDash
+\newblock 2024. \BibDash
+\newblock URL:
+  \BibUrl{https://www.turing.ac.uk/sites/default/files/2024-06/aieg-ati-7-explainabilityv1.2.pdf}
+  ({дата обращения}: 05.06.2026). Appendix A: Algorithmic
+  Techniques.
 
-\bibitem[Šinkovec(2022)]{Sinkovec2022}
-H.~Šinkovec.
-\newblock \emph{Predicting rare events more accurately}.
-\newblock PhD thesis, Medical University of Vienna, 2022.
+\bibitem{Sinkovec2022}
+\selectlanguageifdefined{english}
+Šinkovec~H. Predicting rare events more accurately~: Ph.\,D. thesis~; Medical
+  University of Vienna. \BibDash
+\newblock 2022.
 
-\bibitem[Hyndman and Athanasopoulos(2018)]{Hyndman2018}
-Rob~J. Hyndman and George Athanasopoulos.
-\newblock Forecasting: principles and practice.
-\newblock \emph{OTexts}, 2018.
-\newblock URL \url{https://otexts.com/fpp2/}.
-\newblock 2nd edition.
+\bibitem{Hyndman2018}
+\selectlanguageifdefined{english}
+Hyndman~Rob~J., Athanasopoulos~George. Forecasting: principles and practice.
+  \BibDash
+\newblock 2 ed. \BibDash
+\newblock Melbourne, Australia~: OTexts, 2018. \BibDash
+\newblock URL: \BibUrl{https://otexts.com/fpp2/} ({дата
+  обращения}: 05.06.2026).
 
-\bibitem[Wen and Prendergast(2007)]{Prendergast2002}
-Jarvi~C. Wen and Brian~J. Prendergast.
-\newblock Photoperiodic regulation of behavioral responsiveness to
-  proinflammatory cytokines.
-\newblock \emph{Physiology \& Behavior}, 90\penalty0 (5):\penalty0 717--725,
-  2007.
-\newblock \doi{10.1016/j.physbeh.2006.12.011}.
+\bibitem{Prendergast2002}
+\selectlanguageifdefined{english}
+Wen~Jarvi~C., Prendergast~Brian~J. Photoperiodic regulation of behavioral
+  responsiveness to proinflammatory cytokines~//
+  \href{https://doi.org/10.1016/j.physbeh.2006.12.011}{\BibEmph{Physiology \&
+  Behavior}}. \BibDash
+\newblock 2007. \BibDash
+\newblock Vol.~90, no.~5. \BibDash
+\newblock P.~717--725.
 
-\bibitem[Mendelson and Bergmann(2000)]{Mendelson2000}
-Wallace~B. Mendelson and Bernard~M. Bergmann.
-\newblock Age-dependent changes in recovery sleep after 48 hours of sleep
-  deprivation in rats.
-\newblock \emph{Neurobiology of Aging}, 21\penalty0 (5):\penalty0 689--693,
-  2000.
-\newblock \doi{10.1016/S0197-4580(00)00154-8}.
+\bibitem{Mendelson2000}
+\selectlanguageifdefined{english}
+Mendelson~Wallace~B., Bergmann~Bernard~M. Age-dependent changes in recovery
+  sleep after 48 hours of sleep deprivation in rats~//
+  \href{https://doi.org/10.1016/S0197-4580(00)00154-8}{\BibEmph{Neurobiology of
+  Aging}}. \BibDash
+\newblock 2000. \BibDash
+\newblock Vol.~21, no.~5. \BibDash
+\newblock P.~689--693.
 
-\bibitem[Sun and Zheng(2023)]{SunZheng2023}
-Y.~Sun and Y.~Zheng.
-\newblock A method of gas sensor drift compensation based on intrinsic
-  characteristics of response curve.
-\newblock \emph{Scientific Reports}, 13:\penalty0 11971, 2023.
-\newblock \doi{10.1038/s41598-023-39246-8}.
+\bibitem{SunZheng2023}
+\selectlanguageifdefined{english}
+Sun~Y., Zheng~Y. A method of gas sensor drift compensation based on intrinsic
+  characteristics of response curve~//
+  \href{https://doi.org/10.1038/s41598-023-39246-8}{\BibEmph{Scientific
+  Reports}}. \BibDash
+\newblock 2023. \BibDash
+\newblock Vol.~13. \BibDash
+\newblock P.~11971.
 
-\bibitem[Sugiyama and Kawanabe(2012)]{Sugiyama2012}
-Masashi Sugiyama and Motoaki Kawanabe.
-\newblock \emph{Machine Learning in Non-Stationary Environments: Introduction
-  to Covariate Shift Adaptation}.
+\bibitem{Sugiyama2012}
+\selectlanguageifdefined{english}
+Sugiyama~Masashi, Kawanabe~Motoaki.
+  \href{https://doi.org/10.7551/mitpress/9780262017091.001.0001}{Machine
+  Learning in Non-Stationary Environments: Introduction to Covariate Shift
+  Adaptation}. \BibDash
 \newblock The MIT Press, 2012.
-\newblock \doi{10.7551/mitpress/9780262017091.001.0001}.
 
-\bibitem[Gelman and Hill(2006)]{Gelman2006}
-Andrew Gelman and Jennifer Hill.
-\newblock \emph{Data Analysis Using Regression and Multilevel/Hierarchical
-  Models}.
-\newblock Cambridge University Press, 2006.
+\bibitem{Gelman2006}
+\selectlanguageifdefined{english}
+Gelman~Andrew, Hill~Jennifer. Data Analysis Using Regression and
+  Multilevel/Hierarchical Models. \BibDash
+\newblock Cambridge~: Cambridge University Press, 2007.
 
-\bibitem[Bergmeir and Benítez(2012)]{Bergmeir2012}
-Christoph Bergmeir and José~M. Benítez.
-\newblock On the use of cross-validation for time series predictor evaluation.
-\newblock \emph{Information Sciences}, 191:\penalty0 192--213, 2012.
-\newblock \doi{10.1016/j.ins.2011.12.028}.
+\bibitem{Bergmeir2012}
+\selectlanguageifdefined{english}
+Bergmeir~Christoph, Benítez~José~M. On the use of cross-validation for time
+  series predictor evaluation~//
+  \href{https://doi.org/10.1016/j.ins.2011.12.028}{\BibEmph{Information
+  Sciences}}. \BibDash
+\newblock 2012. \BibDash
+\newblock Vol. 191. \BibDash
+\newblock P.~192--213.
 
-\bibitem[{scikit-learn Developers}(2023)]{ScikitLearnDevelopers}
-{scikit-learn Developers}.
-\newblock Cross-validation: evaluating estimator performance.
-\newblock \url{https://scikit-learn.org/stable/modules/cross_validation.html},
-  2023.
-\newblock Section: Non i.i.d. data.
+\bibitem{ScikitLearnDevelopers}
+\selectlanguageifdefined{english}
+{scikit-learn Developers}. Cross-validation: evaluating estimator performance.
+  \BibDash
+\newblock 2026. \BibDash
+\newblock URL:
+  \BibUrl{https://scikit-learn.org/stable/modules/cross_validation.html}
+  ({дата обращения}: 05.06.2026). Section: Non i.i.d. data.
 
-\bibitem[{RemNote Study Deck}(2023)]{RemNoteStudyDeck}
-{RemNote Study Deck}.
-\newblock Cross-validation (statistics) study guide.
-\newblock
-  \url{https://www.remnote.com/learn/math/statistics-and-discrete-math/statistics/cross-validation-statistics/cross-validation-statistics-study-guide},
-  2023.
-\newblock Section: Validation for Special Data Structures.
+\bibitem{RemNoteStudyDeck}
+\selectlanguageifdefined{english}
+Cross-validation strategies for data with temporal, spatial, hierarchical, or
+  phylogenetic structure~/ Roberts~David~R., Bahn~Volker, Ciuti~Simone,
+  Boyce~Mark~S., Elith~Jane, Guillera-Arroita~Gurutzeta, Hauenstein~Severin,
+  Lahoz-Monfort~José~J., Schröder~Boris, Thuiller~Wilfried, Warton~David~I.,
+  Wintle~Brendan~A., Hartig~Florian, and Dormann~Carsten~F.~//
+  \href{https://doi.org/10.1111/ecog.02881}{\BibEmph{Ecography}}. \BibDash
+\newblock 2017. \BibDash
+\newblock Vol.~40, no.~8. \BibDash
+\newblock P.~913--929.
 
-\bibitem[Denti et~al.(2021)Denti, Azevedo, Lo, Wheeler, Gandhi, Guindani, and
-  Shahbaba]{Denti2021}
-Francesco Denti, Ricardo Azevedo, Chelsie Lo, Damian Wheeler, Sunil~P. Gandhi,
-  Michele Guindani, and Babak Shahbaba.
-\newblock A horseshoe mixture model for {B}ayesian screening with an
-  application to light sheet fluorescence microscopy in brain imaging, 2021.
-\newblock URL \url{https://arxiv.org/abs/2106.08281}.
+\bibitem{Denti2021}
+\selectlanguageifdefined{english}
+A Horseshoe mixture model for {B}ayesian screening with an application to light
+  sheet fluorescence microscopy in brain imaging. \BibDash
+\newblock 2021. \BibDash
+\newblock arXiv~: stat.ME/\href{https://arxiv.org/abs/2106.08281}{2106.08281}.
 
-\bibitem[Fang et~al.(2010)Fang, Xia, Zhang, Liu, and Yao]{Fang2010}
-Guangzhan Fang, Yiwen Xia, Chunguang Zhang, Tiejun Liu, and Dezhong Yao.
-\newblock Optimized single electroencephalogram channel sleep staging in rats.
-\newblock \emph{Laboratory Animals}, 44:\penalty0 312--322, 2010.
-\newblock \doi{10.1258/la.2010.009081}.
+\bibitem{Fang2010}
+\selectlanguageifdefined{english}
+Optimized single electroencephalogram channel sleep staging in rats~/
+  Fang~Guangzhan, Xia~Yang, Zhang~Chunpeng, Liu~Tiejun, and Yao~Dezhong~//
+  \href{https://doi.org/10.1258/la.2010.009081}{\BibEmph{Laboratory Animals}}.
+  \BibDash
+\newblock 2010. \BibDash
+\newblock Vol.~44. \BibDash
+\newblock P.~312--322.
 
-\bibitem[{ГОСТ Р 57546--2017}(2017)]{GOST2017}
-{ГОСТ Р 57546--2017}.
-\newblock Землетрясения. Шкала сейсмической
-  интенсивности.
-\newblock Technical report, Стандартинформ, 2017.
+\bibitem{GOST2017}
+\selectlanguageifdefined{russian}
+Землетрясения. Шкала сейсмической
+  интенсивности~: {^^d0^^9e^^d1^^82^^d1^^87^^d0^^b5^^d1^^82}~/
+  Стандартинформ~;
+  {^^d0^^b8^^d1^^81^^d0^^bf^^d0^^be^^d0^^bb^^d0^^bd.}: {ГОСТ Р
+  57546--2017}. \BibDash
+\newblock М.~: 2017. \BibDash
 \newblock Инструментальная интенсивность по
   пиковым значениям акселерометров.
 
-\bibitem[Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel, Thirion,
-  Grisel, Blondel, Prettenhofer, Weiss, Dubourg, et~al.]{scikit-learn}
-Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand
-  Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron Weiss,
-  Vincent Dubourg, et~al.
-\newblock Scikit-learn: Machine learning in {P}ython.
-\newblock \emph{Journal of Machine Learning Research}, 12:\penalty0 2825--2830,
-  2011.
-\newblock URL \url{https://www.jmlr.org/papers/v12/pedregosa11a.html}.
+\bibitem{Gmurman2003}
+\selectlanguageifdefined{russian}
+Гмурман~В.~Е. Теория вероятностей и
+  математическая статистика. \BibDash
+\newblock М.~: Высшая школа, 2003.
 
-\bibitem[Davidson-Pilon(2015)]{DavidPil2015}
-Cameron Davidson-Pilon.
-\newblock \emph{Bayesian Methods for Hackers: Probabilistic Programming and
-  {B}ayesian Inference}.
-\newblock Addison-Wesley, 2015.
-\newblock URL
-  \url{https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers}.
-\newblock Includes the text-message change-point example.
+\bibitem{scikit-learn}
+\selectlanguageifdefined{english}
+Scikit-learn: Machine Learning in {P}ython~/ Pedregosa~Fabian, Varoquaux~Gaël,
+  Gramfort~Alexandre, Michel~Vincent, Thirion~Bertrand, Grisel~Olivier,
+  Blondel~Mathieu, Prettenhofer~Peter, Weiss~Ron, Dubourg~Vincent, et~al.~//
+  \BibEmph{Journal of Machine Learning Research}. \BibDash
+\newblock 2011. \BibDash
+\newblock Vol.~12. \BibDash
+\newblock P.~2825--2830. \BibDash
+\newblock URL: \BibUrl{https://www.jmlr.org/papers/v12/pedregosa11a.html}
+  ({дата обращения}: 05.06.2026).
 
-\bibitem[Carlin et~al.(1992)Carlin, Gelfand, and Smith]{carlin1992hierarchical}
-Bradley~P. Carlin, Alan~E. Gelfand, and Adrian F.~M. Smith.
-\newblock Hierarchical {B}ayesian analysis of changepoint problems.
-\newblock \emph{Journal of the Royal Statistical Society: Series C (Applied
-  Statistics)}, 41\penalty0 (2):\penalty0 389--405, 1992.
-\newblock \doi{10.2307/2347570}.
+\bibitem{DavidPil2015}
+\selectlanguageifdefined{english}
+Davidson-Pilon~Cameron. Bayesian Methods for Hackers: Probabilistic Programming
+  and {B}ayesian Inference. \BibDash
+\newblock Addison-Wesley Professional, 2015. \BibDash
+\newblock Includes the text-message change-point example. URL:
+  \BibUrl{https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers}
+  ({дата обращения}: 05.06.2026).
 
-\bibitem[Albert(2009)]{bayes_on_R}
-Jim Albert.
-\newblock \emph{Bayesian Computation with {R}}.
-\newblock Springer, New York, NY, 2 edition, 2009.
-\newblock \doi{10.1007/978-0-387-92298-0}.
+\bibitem{carlin1992hierarchical}
+\selectlanguageifdefined{english}
+Carlin~Bradley~P., Gelfand~Alan~E., Smith~Adrian F.~M. Hierarchical {B}ayesian
+  analysis of changepoint problems~//
+  \href{https://doi.org/10.2307/2347570}{\BibEmph{Journal of the Royal
+  Statistical Society: Series C (Applied Statistics)}}. \BibDash
+\newblock 1992. \BibDash
+\newblock Vol.~41, no.~2. \BibDash
+\newblock P.~389--405.
 
-\bibitem[Hoffman and Gelman(2014)]{HoffmanGelman2014}
-Matthew~D. Hoffman and Andrew Gelman.
-\newblock The no-{U}-turn sampler: Adaptively setting path lengths in
-  {H}amiltonian {M}onte {C}arlo.
-\newblock \emph{Journal of Machine Learning Research}, 15\penalty0
-  (47):\penalty0 1593--1623, 2014.
-\newblock URL \url{https://www.jmlr.org/papers/v15/hoffman14a.html}.
+\bibitem{bayes_on_R}
+\selectlanguageifdefined{english}
+Albert~Jim. \href{https://doi.org/10.1007/978-0-387-92298-0}{Bayesian
+  Computation with {R}}. \BibDash
+\newblock 2 ed. \BibDash
+\newblock New York, NY~: Springer, 2009.
 
-\bibitem[Durmus et~al.(2023)Durmus, Gruffaz, Kailas, Saksman, and
-  Vihola]{Durmus2023}
-Alain Durmus, Samuel Gruffaz, Miika Kailas, Eero Saksman, and Matti Vihola.
-\newblock On the convergence of dynamic implementations of {H}amiltonian
-  {M}onte {C}arlo and {N}o {U}-turn samplers, 2023.
-\newblock URL \url{https://arxiv.org/abs/2307.03460}.
+\bibitem{HoffmanGelman2014}
+\selectlanguageifdefined{english}
+Hoffman~Matthew~D., Gelman~Andrew. The No-{U}-Turn Sampler: Adaptively Setting
+  Path Lengths in {H}amiltonian {M}onte {C}arlo~// \BibEmph{Journal of Machine
+  Learning Research}. \BibDash
+\newblock 2014. \BibDash
+\newblock Vol.~15, no.~47. \BibDash
+\newblock P.~1593--1623. \BibDash
+\newblock URL: \BibUrl{https://www.jmlr.org/papers/v15/hoffman14a.html}
+  ({дата обращения}: 05.06.2026).
 
-\bibitem[Lai et~al.(2023)Lai, Burroni, Guan, and
-  Sheldon]{lai2023automaticallymarginalizedmcmcprobabilistic}
-Jinlin Lai, Javier Burroni, Hui Guan, and Daniel Sheldon.
-\newblock Automatically marginalized {MCMC} in probabilistic programming.
-\newblock In \emph{Proceedings of the 40th International Conference on Machine
-  Learning}, volume 202 of \emph{Proceedings of Machine Learning Research},
-  pages 18301--18318, 2023.
-\newblock URL \url{https://proceedings.mlr.press/v202/lai23a.html}.
+\bibitem{Durmus2023}
+\selectlanguageifdefined{english}
+On the convergence of dynamic implementations of {H}amiltonian {M}onte {C}arlo
+  and {N}o {U}-turn samplers. \BibDash
+\newblock 2024. \BibDash
+\newblock arXiv~: stat.CO/\href{https://arxiv.org/abs/2307.03460}{2307.03460}.
 
-\bibitem[Vehtari et~al.(2017)Vehtari, Gelman, and Gabry]{Vehtari2017}
-Aki Vehtari, Andrew Gelman, and Jonah Gabry.
-\newblock Practical {B}ayesian model evaluation using leave-one-out
-  cross-validation and {WAIC}.
-\newblock \emph{Statistics and Computing}, 27\penalty0 (5):\penalty0
-  1413--1432, 2017.
-\newblock \doi{10.1007/s11222-016-9696-4}.
+\bibitem{lai2023automaticallymarginalizedmcmcprobabilistic}
+\selectlanguageifdefined{english}
+Automatically Marginalized {MCMC} in Probabilistic Programming~/ Lai~Jinlin,
+  Burroni~Javier, Guan~Hui, and Sheldon~Daniel~// Proceedings of the 40th
+  International Conference on Machine Learning. \BibDash
+\newblock 2023. \BibDash
+\newblock Vol.~202 of \BibEmph{Proceedings of Machine Learning Research}.
+  \BibDash
+\newblock P.~18301--18318. \BibDash
+\newblock URL: \BibUrl{https://proceedings.mlr.press/v202/lai23a.html}
+  ({дата обращения}: 05.06.2026).
 
-\bibitem[Kumar et~al.(2019)Kumar, Carroll, Hartikainen, and Martin]{Kumar2019}
-Ravin Kumar, Colin Carroll, Ari Hartikainen, and Osvaldo Martin.
-\newblock {A}rvi{Z} a unified library for exploratory analysis of {B}ayesian
-  models in {P}ython.
-\newblock \emph{Journal of Open Source Software}, 4\penalty0 (33):\penalty0
-  1143, 2019.
-\newblock \doi{10.21105/joss.01143}.
+\bibitem{Vehtari2017}
+\selectlanguageifdefined{english}
+Vehtari~Aki, Gelman~Andrew, Gabry~Jonah. Practical {B}ayesian model evaluation
+  using leave-one-out cross-validation and {WAIC}~//
+  \href{https://doi.org/10.1007/s11222-016-9696-4}{\BibEmph{Statistics and
+  Computing}}. \BibDash
+\newblock 2017. \BibDash
+\newblock Vol.~27, no.~5. \BibDash
+\newblock P.~1413--1432.
 
-\bibitem[Vehtari et~al.(2024)Vehtari, Simpson, Gelman, Yao, and
-  Gabry]{Vehtari2024}
-Aki Vehtari, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah Gabry.
-\newblock Pareto smoothed importance sampling.
-\newblock \emph{Journal of Machine Learning Research}, 25\penalty0
-  (72):\penalty0 1--58, 2024.
-\newblock URL \url{https://www.jmlr.org/papers/v25/19-556.html}.
+\bibitem{Kumar2019}
+\selectlanguageifdefined{english}
+{A}rvi{Z} a unified library for exploratory analysis of {B}ayesian models in
+  {P}ython~/ Kumar~Ravin, Carroll~Colin, Hartikainen~Ari, and Martin~Osvaldo~//
+  \href{https://doi.org/10.21105/joss.01143}{\BibEmph{Journal of Open Source
+  Software}}. \BibDash
+\newblock 2019. \BibDash
+\newblock Vol.~4, no.~33. \BibDash
+\newblock P.~1143.
+
+\bibitem{Vehtari2024}
+\selectlanguageifdefined{english}
+Pareto smoothed importance sampling~/ Vehtari~Aki, Simpson~Daniel,
+  Gelman~Andrew, Yao~Yuling, and Gabry~Jonah~// \BibEmph{Journal of Machine
+  Learning Research}. \BibDash
+\newblock 2024. \BibDash
+\newblock Vol.~25, no.~72. \BibDash
+\newblock P.~1--58. \BibDash
+\newblock URL: \BibUrl{https://www.jmlr.org/papers/v25/19-556.html} ({дата
+  обращения}: 05.06.2026).
 
 \end{thebibliography}

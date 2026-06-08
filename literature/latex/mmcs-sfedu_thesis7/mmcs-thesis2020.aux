@@ -6,7 +6,7 @@
 \babel@aux{russian}{}
 \@writefile{toc}{\contentsline {section}{Постановка задачи}{3}{}\protected@file@percent }
 \citation{Rodkin2011}
-\citation{Cicerone2009,Geller2007,Conti2021,Chiodini2020}
+\citation{Cicerone2009,Geller1997,Conti2021,Chiodini2020}
 \citation{Kirschvink2000}
 \citation{Grant2011}
 \citation{Yokoi2003}
@@ -41,6 +41,7 @@
 \citation{GOST2017}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Выборка сейсмических событий}}{12}{}\protected@file@percent }
 \newlabel{tab:events}{{1}{12}{}{table.1}{}}
+\citation{Gmurman2003}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Профиль парадоксального сна крысы.}}{13}{}\protected@file@percent }
 \newlabel{fig:profile}{{2}{13}{}{figure.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{15}{}\protected@file@percent }
@@ -56,90 +57,100 @@
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
-\newlabel{eq:tau_prior}{{6}{21}{}{equation.6}{}}
-\newlabel{eq:loglik_k}{{7}{21}{}{equation.7}{}}
+\newlabel{eq:tau_prior}{{4}{20}{}{equation.4}{}}
+\newlabel{eq:loglik_k}{{5}{20}{}{equation.5}{}}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
-\newlabel{eq:marginal_loglik}{{8}{22}{}{equation.8}{}}
-\newlabel{eq:cond_tau_probs}{{9}{22}{}{equation.9}{}}
-\newlabel{eq:marginal_tau}{{10}{22}{}{equation.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.\relax }Программная реализация}{23}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{23}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{27}{}\protected@file@percent }
-\newlabel{stud-lst:bayes-priors}{{1}{27}{}{lstlisting.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}{\ignorespaces Фрагмент задания семейств правдоподобий и априоров в ноутбуке эксперимента}}{27}{}\protected@file@percent }
+\newlabel{eq:marginal_loglik}{{6}{21}{}{equation.6}{}}
+\newlabel{eq:cond_tau_probs}{{7}{21}{}{equation.7}{}}
+\newlabel{eq:marginal_tau}{{8}{21}{}{equation.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.\relax }Программная реализация модели}{22}{}\protected@file@percent }
+\newlabel{progmod}{{3}{22}{}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{22}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{26}{}\protected@file@percent }
+\newlabel{stud-lst:bayes-priors}{{1}{26}{}{lstlisting.1}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}{\ignorespaces Фрагмент задания семейств правдоподобий и априоров в ноутбуке эксперимента}}{26}{}\protected@file@percent }
 \citation{HoffmanGelman2014}
-\newlabel{stud-lst:bayes-prior-builder}{{2}{28}{}{lstlisting.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}{\ignorespaces Создание априорной случайной величины по текстовой спецификации (\texttt  {\_build\_prior})}}{28}{}\protected@file@percent }
+\newlabel{stud-lst:bayes-prior-builder}{{2}{27}{}{lstlisting.2}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}{\ignorespaces Создание априорной случайной величины по текстовой спецификации (\texttt  {\_build\_prior})}}{27}{}\protected@file@percent }
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
-\newlabel{stud-lst:bayes-tau-marginal}{{3}{30}{}{lstlisting.3}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решётке}}{30}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{31}{}\protected@file@percent }
+\newlabel{marginalization}{{3.2}{28}{}{lstnumber.2.16}{}}
+\newlabel{stud-lst:bayes-tau-marginal}{{3}{29}{}{lstlisting.3}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решётке}}{29}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{30}{}\protected@file@percent }
 \citation{Bergmeir2012}
-\newlabel{eq:naive_elpd}{{15}{33}{}{equation.15}{}}
+\newlabel{eq:naive_elpd}{{13}{32}{}{equation.13}{}}
 \citation{Vehtari2017}
 \citation{Kumar2019}
 \citation{Vehtari2017}
-\newlabel{eq:psis_elpd}{{16}{34}{}{equation.16}{}}
+\newlabel{eq:psis_elpd}{{14}{33}{}{equation.14}{}}
 \citation{Vehtari2017,Vehtari2024}
-\newlabel{eq:elpd_per_feature}{{19}{36}{}{equation.19}{}}
-\newlabel{eq:elpd_per_event}{{20}{37}{}{equation.20}{}}
-\newlabel{eq:elpd_fully_normalized}{{21}{37}{}{equation.21}{}}
+\newlabel{eq:elpd_per_feature}{{17}{35}{}{equation.17}{}}
+\newlabel{eq:elpd_per_event}{{18}{36}{}{equation.18}{}}
+\newlabel{eq:elpd_fully_normalized}{{19}{36}{}{equation.19}{}}
 \citation{Vehtari2017}
-\@writefile{toc}{\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{40}{}\protected@file@percent }
-\bibstyle{unsrtnat}
+\@writefile{toc}{\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{38}{}\protected@file@percent }
+\bibstyle{ugost2008-local}
 \bibdata{mmcs-thesis2020}
-\bibcite{Rodkin2011}{{1}{2011}{{Родкин}}{{}}}
-\bibcite{Cicerone2009}{{2}{2009}{{Cicerone et~al.}}{{Cicerone, Ebel, and Britton}}}
-\bibcite{Geller2007}{{3}{1997}{{Geller}}{{}}}
-\bibcite{Conti2021}{{4}{2021}{{Conti et~al.}}{{Conti, Picozza, and Sotgiu}}}
-\bibcite{Chiodini2020}{{5}{2020}{{Chiodini et~al.}}{{Chiodini, Cardellini, Luccio, Selva, Frondini, Caliro, Rosiello, Beddini, and Ventura}}}
-\bibcite{Kirschvink2000}{{6}{2000}{{Kirschvink}}{{}}}
-\bibcite{Grant2011}{{7}{2011}{{Grant et~al.}}{{Grant, Halliday, Balderer, Leuenberger, Newcomer, Cyr, and Freund}}}
-\bibcite{Yokoi2003}{{8}{2003}{{Yokoi et~al.}}{{Yokoi, Ikeya, Yagi, and Nagai}}}
-\@writefile{toc}{\contentsline {section}{Литература}{45}{}\protected@file@percent }
-\bibcite{Rampin1991}{{9}{1991}{{Rampin et~al.}}{{Rampin, Cespuglio, Chastrette, and Jouvet}}}
-\bibcite{Meerlo1997}{{10}{1997}{{Meerlo et~al.}}{{Meerlo, Pragt, and Daan}}}
-\bibcite{Palma2000}{{11}{2000}{{Palma et~al.}}{{Palma, Suchecki, and Tufik}}}
-\bibcite{Adrien1991}{{12}{1991}{{Adrien et~al.}}{{Adrien, Dugovic, and Martin}}}
-\bibcite{Selye1950}{{13}{1950}{{Selye}}{{}}}
-\bibcite{Herman2016}{{14}{2016}{{Herman et~al.}}{{}}}
-\bibcite{Kalsbeek2012}{{15}{2012}{{Kalsbeek et~al.}}{{}}}
-\bibcite{Bradbury1998}{{16}{1994}{{Bradbury et~al.}}{{Bradbury, Akana, and Dallman}}}
-\bibcite{Sanford2010}{{17}{2003}{{Sanford et~al.}}{{Sanford, Tang, Ross, and Morrison}}}
-\bibcite{Rytkonen2011}{{18}{2011}{{Rytkönen et~al.}}{{Rytkönen, Zitting, and Porkka-Heiskanen}}}
-\bibcite{Saevskiy2025}{{19}{2025}{{Saevskiy et~al.}}{{Saevskiy, Suntsova, Kosenko, Alam, and Kostin}}}
-\bibcite{Kostin2019}{{20}{2019}{{Kostin et~al.}}{{Kostin, Alam, McGinty, Szymusiak, and Alam}}}
-\bibcite{Vyazovskiy2005}{{21}{2005}{{Vyazovskiy and Tobler}}{{}}}
-\bibcite{Lyamin2008}{{22}{2008}{{Lyamin et~al.}}{{Lyamin, Manger, Ridgway, Mukhametov, and Siegel}}}
-\bibcite{Franken1991}{{23}{1991}{{Franken et~al.}}{{Franken, Tobler, and Borbély}}}
-\bibcite{WeberDan2016}{{24}{2016}{{Weber and Dan}}{{}}}
-\bibcite{AlanTuringInstitute}{{25}{2024}{{The Alan Turing Institute}}{{}}}
-\bibcite{Sinkovec2022}{{26}{2022}{{Šinkovec}}{{}}}
-\bibcite{Hyndman2018}{{27}{2018}{{Hyndman and Athanasopoulos}}{{}}}
-\bibcite{Prendergast2002}{{28}{2007}{{Wen and Prendergast}}{{}}}
-\bibcite{Mendelson2000}{{29}{2000}{{Mendelson and Bergmann}}{{}}}
-\bibcite{SunZheng2023}{{30}{2023}{{Sun and Zheng}}{{}}}
-\bibcite{Sugiyama2012}{{31}{2012}{{Sugiyama and Kawanabe}}{{}}}
-\bibcite{Gelman2006}{{32}{2006}{{Gelman and Hill}}{{}}}
-\bibcite{Bergmeir2012}{{33}{2012}{{Bergmeir and Benítez}}{{}}}
-\bibcite{ScikitLearnDevelopers}{{34}{2023}{{scikit-learn Developers}}{{}}}
-\bibcite{RemNoteStudyDeck}{{35}{2023}{{RemNote Study Deck}}{{}}}
-\bibcite{Denti2021}{{36}{2021}{{Denti et~al.}}{{Denti, Azevedo, Lo, Wheeler, Gandhi, Guindani, and Shahbaba}}}
-\bibcite{Fang2010}{{37}{2010}{{Fang et~al.}}{{Fang, Xia, Zhang, Liu, and Yao}}}
-\bibcite{GOST2017}{{38}{2017}{{ГОСТ Р 57546--2017}}{{}}}
-\bibcite{scikit-learn}{{39}{2011}{{Pedregosa et~al.}}{{Pedregosa, Varoquaux, Gramfort, Michel, Thirion, Grisel, Blondel, Prettenhofer, Weiss, Dubourg, et~al.}}}
-\bibcite{DavidPil2015}{{40}{2015}{{Davidson-Pilon}}{{}}}
-\bibcite{carlin1992hierarchical}{{41}{1992}{{Carlin et~al.}}{{Carlin, Gelfand, and Smith}}}
-\bibcite{bayes_on_R}{{42}{2009}{{Albert}}{{}}}
-\bibcite{HoffmanGelman2014}{{43}{2014}{{Hoffman and Gelman}}{{}}}
-\bibcite{Durmus2023}{{44}{2023}{{Durmus et~al.}}{{Durmus, Gruffaz, Kailas, Saksman, and Vihola}}}
-\bibcite{lai2023automaticallymarginalizedmcmcprobabilistic}{{45}{2023}{{Lai et~al.}}{{Lai, Burroni, Guan, and Sheldon}}}
-\bibcite{Vehtari2017}{{46}{2017}{{Vehtari et~al.}}{{Vehtari, Gelman, and Gabry}}}
-\bibcite{Kumar2019}{{47}{2019}{{Kumar et~al.}}{{Kumar, Carroll, Hartikainen, and Martin}}}
-\bibcite{Vehtari2024}{{48}{2024}{{Vehtari et~al.}}{{Vehtari, Simpson, Gelman, Yao, and Gabry}}}
-\@writefile{toc}{\contentsline {section}{Приложение}{51}{}\protected@file@percent }
-\newlabel{app-lst:bayes-build-prior-full}{{4}{51}{}{lstlisting.4}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{51}{}\protected@file@percent }
-\newlabel{app-lst:bayes-changepoint}{{5}{51}{}{lstlisting.5}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{51}{}\protected@file@percent }
-\gdef \@abspage@last{53}
+\bibcite{Rodkin2011}{{1}{}{{}}{{}}}
+\bibcite{Cicerone2009}{{2}{}{{}}{{}}}
+\bibcite{Geller1997}{{3}{}{{}}{{}}}
+\bibcite{Conti2021}{{4}{}{{}}{{}}}
+\bibcite{Chiodini2020}{{5}{}{{}}{{}}}
+\bibcite{Kirschvink2000}{{6}{}{{}}{{}}}
+\bibcite{Grant2011}{{7}{}{{}}{{}}}
+\bibcite{Yokoi2003}{{8}{}{{}}{{}}}
+\bibcite{Rampin1991}{{9}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {section}{Литература}{44}{}\protected@file@percent }
+\babel@aux{russian}{}
+\bibcite{Meerlo1997}{{10}{}{{}}{{}}}
+\bibcite{Palma2000}{{11}{}{{}}{{}}}
+\bibcite{Adrien1991}{{12}{}{{}}{{}}}
+\bibcite{Selye1950}{{13}{}{{}}{{}}}
+\bibcite{Herman2016}{{14}{}{{}}{{}}}
+\bibcite{Kalsbeek2012}{{15}{}{{}}{{}}}
+\bibcite{Bradbury1998}{{16}{}{{}}{{}}}
+\bibcite{Sanford2010}{{17}{}{{}}{{}}}
+\bibcite{Rytkonen2011}{{18}{}{{}}{{}}}
+\bibcite{Saevskiy2025}{{19}{}{{}}{{}}}
+\bibcite{Kostin2019}{{20}{}{{}}{{}}}
+\bibcite{Vyazovskiy2005}{{21}{}{{}}{{}}}
+\bibcite{Lyamin2008}{{22}{}{{}}{{}}}
+\bibcite{Franken1991}{{23}{}{{}}{{}}}
+\bibcite{WeberDan2016}{{24}{}{{}}{{}}}
+\bibcite{AlanTuringInstitute}{{25}{}{{}}{{}}}
+\bibcite{Sinkovec2022}{{26}{}{{}}{{}}}
+\bibcite{Hyndman2018}{{27}{}{{}}{{}}}
+\bibcite{Prendergast2002}{{28}{}{{}}{{}}}
+\bibcite{Mendelson2000}{{29}{}{{}}{{}}}
+\bibcite{SunZheng2023}{{30}{}{{}}{{}}}
+\bibcite{Sugiyama2012}{{31}{}{{}}{{}}}
+\bibcite{Gelman2006}{{32}{}{{}}{{}}}
+\bibcite{Bergmeir2012}{{33}{}{{}}{{}}}
+\bibcite{ScikitLearnDevelopers}{{34}{}{{}}{{}}}
+\bibcite{RemNoteStudyDeck}{{35}{}{{}}{{}}}
+\bibcite{Denti2021}{{36}{}{{}}{{}}}
+\bibcite{Fang2010}{{37}{}{{}}{{}}}
+\bibcite{GOST2017}{{38}{}{{}}{{}}}
+\bibcite{Gmurman2003}{{39}{}{{}}{{}}}
+\bibcite{scikit-learn}{{40}{}{{}}{{}}}
+\bibcite{DavidPil2015}{{41}{}{{}}{{}}}
+\bibcite{carlin1992hierarchical}{{42}{}{{}}{{}}}
+\bibcite{bayes_on_R}{{43}{}{{}}{{}}}
+\bibcite{HoffmanGelman2014}{{44}{}{{}}{{}}}
+\bibcite{Durmus2023}{{45}{}{{}}{{}}}
+\bibcite{lai2023automaticallymarginalizedmcmcprobabilistic}{{46}{}{{}}{{}}}
+\babel@aux{russian}{}
+\babel@aux{russian}{}
+\bibcite{Vehtari2017}{{47}{}{{}}{{}}}
+\bibcite{Kumar2019}{{48}{}{{}}{{}}}
+\bibcite{Vehtari2024}{{49}{}{{}}{{}}}
+\babel@aux{russian}{}
+\babel@aux{russian}{}
+\babel@aux{russian}{}
+\@writefile{toc}{\contentsline {section}{Приложение}{50}{}\protected@file@percent }
+\newlabel{app-lst:bayes-build-prior-full}{{4}{50}{}{lstlisting.4}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{50}{}\protected@file@percent }
+\newlabel{app-lst:bayes-changepoint}{{5}{50}{}{lstlisting.5}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{50}{}\protected@file@percent }
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\gdef \@abspage@last{52}

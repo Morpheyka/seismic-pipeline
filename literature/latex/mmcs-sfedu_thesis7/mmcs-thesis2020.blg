@@ -2,46 +2,49 @@ This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: mmcs-thesis2020.aux
 A level-1 auxiliary file: TitulBak.aux
-The style file: unsrtnat.bst
+The style file: ugost2008-local.bst
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: mmcs-thesis2020.bib
-You've used 48 entries,
-            2481 wiz_defined-function locations,
-            929 strings with 15454 characters,
-and the built_in function-call counts, 19328 in all, are:
-= -- 1695
-> -- 1016
-< -- 25
-+ -- 394
-- -- 298
-* -- 1583
-:= -- 3150
-add.period$ -- 191
-call.type$ -- 48
-change.case$ -- 93
-chr.to.int$ -- 48
-cite$ -- 48
-duplicate$ -- 894
-empty$ -- 1702
-format.name$ -- 368
-if$ -- 4047
-int.to.chr$ -- 1
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 49 entries,
+            5635 wiz_defined-function locations,
+            1967 strings with 27369 characters,
+and the built_in function-call counts, 21906 in all, are:
+= -- 2732
+> -- 619
+< -- 109
++ -- 209
+- -- 160
+* -- 1475
+:= -- 2193
+add.period$ -- 218
+call.type$ -- 49
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 49
+duplicate$ -- 1112
+empty$ -- 2225
+format.name$ -- 160
+if$ -- 5832
+int.to.chr$ -- 0
 int.to.str$ -- 49
-missing$ -- 45
-newline$ -- 295
-num.names$ -- 144
-pop$ -- 339
+missing$ -- 0
+newline$ -- 348
+num.names$ -- 138
+pop$ -- 245
 preamble$ -- 1
-purify$ -- 48
+purify$ -- 0
 quote$ -- 0
-skip$ -- 527
+skip$ -- 963
 stack$ -- 0
-substring$ -- 960
-swap$ -- 111
-text.length$ -- 2
+substring$ -- 1074
+swap$ -- 891
+text.length$ -- 61
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 324
+type$ -- 0
 warning$ -- 0
-while$ -- 164
-width$ -- 0
-write$ -- 718
+while$ -- 147
+width$ -- 51
+write$ -- 796

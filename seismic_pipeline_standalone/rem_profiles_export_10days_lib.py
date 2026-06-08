@@ -2762,6 +2762,8 @@ def exhaustive_model_search(
     seed: int = 42,
     verbose: bool = True,
     progressbar: bool = True,
+    progress_desc: str = "exhaustive models",
+    progress_position: int | None = None,
 ) -> dict:
     """Evaluate all changepoint model configurations from a proposal grid.
 
@@ -2770,6 +2772,12 @@ def exhaustive_model_search(
     """
     t0 = time.perf_counter()
     _ = np.random.default_rng(int(seed))
+    runtime_export_cfg_base = dict(_RUNTIME_LAST_EXPORT_CFG) if _RUNTIME_LAST_EXPORT_CFG is not None else None
+    base_export_output_dir = (
+        str(runtime_export_cfg_base.get("output_dir", "."))
+        if runtime_export_cfg_base is not None
+        else None
+    )
     tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
     pareto_threshold = float(proposal_options.get("pareto_threshold", 0.7))
     max_pareto_retries = 3
@@ -2816,11 +2824,10 @@ def exhaustive_model_search(
 
     def rem_output_dir_for_config(cfg: dict) -> str | None:
         rpp = cfg.get("rem_profile_params")
-        if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
+        if not rpp or runtime_export_cfg_base is None or base_export_output_dir is None:
             return None
-        base_output_dir = str(_RUNTIME_LAST_EXPORT_CFG.get("output_dir", "."))
         return os.path.join(
-            base_output_dir,
+            base_export_output_dir,
             (
                 f"rem_w{int(rpp['window_size_hours'])}"
                 f"_s{int(rpp['step_size_hours'])}"
@@ -2832,7 +2839,7 @@ def exhaustive_model_search(
         if not use_rem_profile_recalc:
             return data_norm
         rpp = cfg.get("rem_profile_params")
-        if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
+        if not rpp or runtime_export_cfg_base is None:
             return data_norm
         rem_key = json.dumps(
             {
@@ -2844,7 +2851,7 @@ def exhaustive_model_search(
         )
         if rem_key in rem_data_cache:
             return rem_data_cache[rem_key]
-        export_cfg = dict(_RUNTIME_LAST_EXPORT_CFG)
+        export_cfg = dict(runtime_export_cfg_base)
         rem_output_dir = rem_output_dir_for_config(cfg)
         export_cfg.update(
             {
@@ -2872,7 +2879,8 @@ def exhaustive_model_search(
             iterator = tqdm(
                 iterator,
                 total=len(unique_configs),
-                desc="exhaustive models",
+                desc=str(progress_desc),
+                position=progress_position,
                 leave=True,
             )
         except Exception:
@@ -3860,6 +3868,12 @@ def metropolis_hastings_model_search(
     in ``proposal_options`` are computed once up front; the MH loop uses cached lookups only.
     """
     tw = target_weights or {}
+    runtime_export_cfg_base = dict(_RUNTIME_LAST_EXPORT_CFG) if _RUNTIME_LAST_EXPORT_CFG is not None else None
+    base_export_output_dir = (
+        str(runtime_export_cfg_base.get("output_dir", "."))
+        if runtime_export_cfg_base is not None
+        else None
+    )
     precomputed_features: dict[tuple, np.ndarray] | None = None
     precompute_seconds = 0.0
     if precompute_features:
@@ -3950,7 +3964,7 @@ def metropolis_hastings_model_search(
             if precompute_features:
                 return data_norm
             rpp = cfg.get("rem_profile_params")
-            if not rpp or _RUNTIME_LAST_EXPORT_CFG is None:
+            if not rpp or runtime_export_cfg_base is None:
                 return data_norm
             rem_key = json.dumps(
                 {
@@ -3962,7 +3976,16 @@ def metropolis_hastings_model_search(
             )
             if rem_key in rem_data_cache:
                 return rem_data_cache[rem_key]
-            export_cfg = dict(_RUNTIME_LAST_EXPORT_CFG)
+            export_cfg = dict(runtime_export_cfg_base)
+            if base_export_output_dir is not None:
+                export_cfg["output_dir"] = os.path.join(
+                    base_export_output_dir,
+                    (
+                        f"rem_w{int(rpp['window_size_hours'])}"
+                        f"_s{int(rpp['step_size_hours'])}"
+                        f"_stage{int(rpp['rem_stage'])}"
+                    ),
+                )
             export_cfg.update(
                 {
                     "window_size_hours": int(rpp["window_size_hours"]),
