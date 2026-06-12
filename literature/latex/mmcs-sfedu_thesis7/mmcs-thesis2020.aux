@@ -72,7 +72,7 @@
 \newlabel{marginalization}{{3.2}{27}{}{}{}}
 \citation{lai2023automaticallymarginalizedmcmcprobabilistic}
 \newlabel{stud-lst:bayes-tau-marginal}{{3}{28}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решётке}}{28}{}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}{\ignorespaces Маргинализация $\tau $: потенциал с \texttt  {logsumexp} и восстановление вероятностей на решетке}}{28}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{30}{}\protected@file@percent }
 \citation{Bergmeir2012}
 \citation{Vehtari2017}
@@ -84,10 +84,10 @@
 \newlabel{eq:psis_elpd}{{14}{33}{}{}{}}
 \citation{Vehtari2017,Vehtari2024}
 \newlabel{eq:elpd_per_feature}{{17}{35}{}{}{}}
-\newlabel{eq:elpd_per_event}{{18}{36}{}{}{}}
-\newlabel{eq:elpd_fully_normalized}{{19}{36}{}{}{}}
-\citation{Vehtari2017}
-\@writefile{toc}{\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{39}{}\protected@file@percent }
+\newlabel{eq:elpd_fully_normalized}{{18}{37}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{38}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.\relax }Обсуждение результатов}{43}{}\protected@file@percent }
+\newlabel{sec:paired_ttest}{{6}{45}{}{}{}}
 \bibstyle{ugost2008-local}
 \bibdata{mmcs-thesis2020}
 \bibcite{Rodkin2011}{{1}{}{{}}{{}}}
@@ -99,7 +99,7 @@
 \bibcite{Grant2011}{{7}{}{{}}{{}}}
 \bibcite{Yokoi2003}{{8}{}{{}}{{}}}
 \bibcite{Rampin1991}{{9}{}{{}}{{}}}
-\@writefile{toc}{\contentsline {section}{Литература}{44}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Литература}{48}{}\protected@file@percent }
 \babel@aux{russian}{}
 \bibcite{Meerlo1997}{{10}{}{{}}{{}}}
 \bibcite{Palma2000}{{11}{}{{}}{{}}}
@@ -146,23 +146,25 @@
 \babel@aux{russian}{}
 \babel@aux{russian}{}
 \babel@aux{russian}{}
-\@writefile{toc}{\contentsline {section}{Приложение}{50}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Схема регистрации полиграфической активности крыс в свободном поведении. \textit  {1 – пластиковый бокс; 2 – крыса с имплантированными электродами; 3 – регистрирующий кабель; 4 – электрический круговой контакт; 5 – подвижное соединение вертикальной планки; 6 – регулируемый груз на горизонтальной планке; 7 - усилитель биологических сигналов и аналогово-цифровой преобразователь; 8 – компьютер}}}{50}{}\protected@file@percent }
-\newlabel{fig:biohybrid}{{1}{50}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 5-секундная эпоха регистрируемого сигнала ЭЭГ крысы.}}{51}{}\protected@file@percent }
-\newlabel{fig:iEEG}{{2}{51}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Блок-схема, иллюстрирующая основные шаги алгоритма стадирования; перед действиями, отмеченными красными звездочками возможен подбор оптимальных частотных диапазонов для используемых данных}}{51}{}\protected@file@percent }
-\newlabel{fig:stadir}{{3}{51}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Гипнограмма крысы R1 от 26.06.2025.}}{52}{}\protected@file@percent }
-\newlabel{fig:hypno}{{4}{52}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Пример суточного профиля ПС (окно 6 часов, шаг 1 час); серой заливкой показано темное время суток.}}{52}{}\protected@file@percent }
-\newlabel{fig:profile}{{5}{52}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Схема модели поиска точки разладки с приорными значениями параметров правдоподобия; в конкретном примере для среднего используется распределение Стьюдента, а для размаха -- логарифмически-нормальное.}}{53}{}\protected@file@percent }
-\newlabel{fig:tau_model}{{6}{53}{}{}{}}
-\newlabel{app-lst:bayes-build-prior-full}{{4}{53}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{53}{}\protected@file@percent }
-\newlabel{app-lst:bayes-changepoint}{{5}{54}{}{}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{54}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Приложение}{54}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Схема регистрации полиграфической активности крыс в свободном поведении. \textit  {1 – пластиковый бокс; 2 – крыса с имплантированными электродами; 3 – регистрирующий кабель; 4 – электрический круговой контакт; 5 – подвижное соединение вертикальной планки; 6 – регулируемый груз на горизонтальной планке; 7 - усилитель биологических сигналов и аналогово-цифровой преобразователь; 8 – компьютер}}}{54}{}\protected@file@percent }
+\newlabel{fig:biohybrid}{{1}{54}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 5-секундная эпоха регистрируемого сигнала ЭЭГ крысы.}}{55}{}\protected@file@percent }
+\newlabel{fig:iEEG}{{2}{55}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Блок-схема, иллюстрирующая основные шаги алгоритма стадирования; перед действиями, отмеченными красными звездочками возможен подбор оптимальных частотных диапазонов для используемых данных}}{55}{}\protected@file@percent }
+\newlabel{fig:stadir}{{3}{55}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Гипнограмма крысы R1 от 26.06.2025.}}{56}{}\protected@file@percent }
+\newlabel{fig:hypno}{{4}{56}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Пример суточного профиля ПС (окно 6 часов, шаг 1 час); серой заливкой показано темное время суток.}}{56}{}\protected@file@percent }
+\newlabel{fig:profile}{{5}{56}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Схема модели поиска точки разладки с приорными значениями параметров правдоподобия; в конкретном примере для среднего используется распределение Стьюдента, а для размаха -- логарифмически-нормальное.}}{57}{}\protected@file@percent }
+\newlabel{fig:tau_model}{{6}{57}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Схема регистрации полиграфической активности крыс в свободном поведении. \textit  {1 – пластиковый бокс; 2 – крыса с имплантированными электродами; 3 – регистрирующий кабель; 4 – электрический круговой контакт; 5 – подвижное соединение вертикальной планки; 6 – регулируемый груз на горизонтальной планке; 7 - усилитель биологических сигналов и аналогово-цифровой преобразователь; 8 – компьютер}}}{57}{}\protected@file@percent }
+\newlabel{fig:rank-vs-elpd}{{7}{57}{}{}{}}
+\newlabel{app-lst:bayes-build-prior-full}{{4}{58}{}{}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4}{\ignorespaces Полная реализация \texttt  {\_build\_prior}}}{58}{}\protected@file@percent }
+\newlabel{app-lst:bayes-changepoint}{{5}{58}{}{}{}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}{\ignorespaces Каркас \texttt  {build\_changepoint\_model}: режимы $\tau $ и маргинализация (прочие ветви правдоподобия опущены)}}{58}{}\protected@file@percent }
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
 \gdef\svg@ink@ver@settings{{\m@ne }{inkscape}{1}}
-\gdef \@abspage@last{55}
+\gdef \@abspage@last{60}

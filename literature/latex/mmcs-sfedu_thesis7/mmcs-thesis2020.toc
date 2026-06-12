@@ -7,12 +7,13 @@
 \contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{22}{}%
 \contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{26}{}%
 \contentsline {section}{\numberline {4.\relax }Полный перебор по метрике LOO-ELPD}{30}{}%
-\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{39}{}%
-\contentsline {section}{Литература}{44}{}%
+\contentsline {section}{\numberline {5.\relax }Программная реализация полного перебора}{38}{}%
+\contentsline {section}{\numberline {6.\relax }Обсуждение результатов}{43}{}%
+\contentsline {section}{Литература}{48}{}%
 \babel@toc {russian}{}\relax 
 \babel@toc {russian}{}\relax 
 \babel@toc {russian}{}\relax 
 \babel@toc {russian}{}\relax 
 \babel@toc {russian}{}\relax 
 \babel@toc {russian}{}\relax 
-\contentsline {section}{Приложение}{50}{}%
+\contentsline {section}{Приложение}{54}{}%
