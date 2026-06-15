@@ -394,7 +394,11 @@ Optimized single electroencephalogram channel sleep staging in rats~/
 \selectlanguageifdefined{russian}
 Гмурман~В.~Е. Теория вероятностей и
   математическая статистика. \BibDash
-\newblock М.~: Высшая школа, 2003.
+\newblock 9 {^^d0^^b8^^d0^^b7^^d0^^b4.} \BibDash
+\newblock М.~: Высшая школа, 2003. \BibDash
+\newblock Доверительные интервалы, проверка
+  статистических гипотез, тест
+  Шапиро--Уилка.
 
 \bibitem{scikit-learn}
 \selectlanguageifdefined{english}
@@ -463,6 +467,24 @@ Automatically Marginalized {MCMC} in Probabilistic Programming~/ Lai~Jinlin,
 \newblock P.~18301--18318. \BibDash
 \newblock URL: \BibUrl{https://proceedings.mlr.press/v202/lai23a.html}
   ({дата обращения}: 05.06.2026).
+
+\bibitem{patent}
+\selectlanguageifdefined{russian}
+Программа для построения конвейера
+  обработчиков циклических данных и поиска
+  оптимальных параметров прогнозных
+  моделей машинного обучения~: Св. о гос. рег.
+  программы для ЭВМ № 2026610377 Пономарев~М.~Б.,
+  Шепелев~И.~Е., Дрокин~А.~А. (RU)~; {федеральное
+  государственное автономное
+  образовательное учреждение высшего
+  образования <<Южный федеральный
+  университет>> (RU)}~;  \BibDash
+\newblock {^^e2^^84^^96} 2025697652~;
+  {^^d0^^b7^^d0^^b0^^d1^^8f^^d0^^b2^^d0^^bb.} 22.12.2025~;
+  {^^d0^^be^^d0^^bf^^d1^^83^^d0^^b1^^d0^^bb.} 13.01.2026, Бюл. № 1.
+  \BibDash
+\newblock Дата регистрации: 13.01.2026.
 
 \bibitem{Vehtari2017}
 \selectlanguageifdefined{english}
