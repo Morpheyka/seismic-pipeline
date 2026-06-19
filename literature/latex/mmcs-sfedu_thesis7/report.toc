@@ -1,9 +1,19 @@
 \babel@toc {russian}{}\relax 
-\contentsline {section}{Введение}{2}{}%
-\contentsline {section}{\numberline {1.\relax }Материалы и методы}{7}{}%
-\contentsline {section}{\numberline {2.\relax }Поиск ширины аномального окна}{13}{}%
-\contentsline {section}{\numberline {3.\relax }Программная реализация}{21}{}%
-\contentsline {subsection}{\numberline {3.1.\relax }Предобработка}{21}{}%
-\contentsline {subsection}{\numberline {3.2.\relax }Байесовский метод}{25}{}%
-\contentsline {section}{Литература}{30}{}%
-\contentsline {section}{Приложение}{32}{}%
+\contentsline {section}{\numberline {1.\relax }Введение}{3}{}%
+\contentsline {section}{\numberline {2.\relax }Полный перебор по метрике LOO-ELPD}{3}{}%
+\contentsline {section}{\numberline {3.\relax }Программная реализация полного перебора}{12}{}%
+\contentsline {section}{\numberline {4.\relax }Обсуждение результатов}{16}{}%
+\contentsline {subsection}{\numberline {4.1.\relax }Локализация точки разладки}{17}{}%
+\contentsline {subsection}{\numberline {4.2.\relax }Робастность к исключению влиятельных \linebreak событий}{19}{}%
+\contentsline {subsection}{\numberline {4.3.\relax }Статистическая значимость различий между моделями}{20}{}%
+\contentsline {subsection}{\numberline {4.4.\relax }Оптимальные параметры модели}{20}{}%
+\contentsline {section}{Литература}{29}{}%
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\babel@toc {russian}{}\relax 
+\contentsline {section}{Приложение}{35}{}%
