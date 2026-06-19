@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: report.aux
+The style file: ugost2008-local.bst
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: mmcs-thesis2020.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+`credits' is a missing field, not a string, for entry patent
+while executing---line 2602 of file ugost2008-local.bst
+You've used 50 entries,
+            5635 wiz_defined-function locations,
+            1978 strings with 28220 characters,
+and the built_in function-call counts, 22367 in all, are:
+= -- 2817
+> -- 631
+< -- 114
++ -- 213
+- -- 163
+* -- 1504
+:= -- 2237
+add.period$ -- 223
+call.type$ -- 50
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 50
+duplicate$ -- 1137
+empty$ -- 2258
+format.name$ -- 163
+if$ -- 5963
+int.to.chr$ -- 0
+int.to.str$ -- 50
+missing$ -- 0
+newline$ -- 356
+num.names$ -- 140
+pop$ -- 255
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 970
+stack$ -- 0
+substring$ -- 1074
+swap$ -- 912
+text.length$ -- 65
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 148
+width$ -- 52
+write$ -- 821
+(There was 1 error message)

@@ -11,12 +11,29 @@ with all 12 events including 2024 events that use S3 fallback.
 import os
 import sys
 
+WINDOW_DAYS = 3
+CONTROL_WINDOW_DAYS = 8
+STARTPOINT_DAYS = 4
+ENDPOINT_DAYS = -5
+
 MAX_CORES = 15  # Number of parallel jobs for GridSearchCV
 THREADS_PER_JOB = 1  # Each job uses 1 thread
 
 # Add the seismic_pipeline package to the path
 _script_dir = os.path.dirname(os.path.abspath(__file__))
+_workspace_root = os.path.dirname(_script_dir)
 sys.path.insert(0, _script_dir)
+DEFAULT_QUALITY_MODEL_PATH = os.path.join(
+    _workspace_root,
+    "Анализ моделей оценки качества сигналов и метод оценки из литературы",
+    "Сохраненный модели pickle",
+    "mlp_class_new.pickle",
+)
+DEFAULT_QUALITY_MODEL_MODULE_DIR = os.path.join(
+    _workspace_root,
+    "Анализ моделей оценки качества сигналов и метод оценки из литературы",
+    "скрипты",
+)
 
 # Configure threading BEFORE importing numpy (load threading_config directly to avoid loading full package)
 import importlib.util
@@ -37,7 +54,9 @@ from itertools import combinations
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, roc_auc_score, make_scorer, accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 import re
 import hashlib
 import gc
@@ -62,8 +81,11 @@ from seismic_pipeline import (
     REMProfileCleanerYt,
     REMProfileAdvancedCleanerYt,
     REMDailyExtractorYt,
+    REMDailyMultiStatExtractorYt,
     MetadataAdderYt,
     HypnogramCacheManagerYt,
+    HypnoCalculatorYt,
+    DatFileCacheManagerYt,
     save_step_data
 )
 from seismic_pipeline.mod.scoreryt import yt_accuracy_scorer
@@ -71,8 +93,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from seismic_pipeline.mod.grid_searchyt import GridSearchCVYt
 from seismic_pipeline.mod.sklearnbaseyt import TransformerMixinYt
-# Scaler and passthrough for param grid (with/without scaling)
-from seismic_pipeline.mod.scaleryt import StandardScalerYt, PassthroughYt
+# Scalers and passthrough for sample/profile scaling and param grids
+from seismic_pipeline.mod.scaleryt import (
+    StandardScalerYt,
+    MaxMinSampleScaler,
+    PassthroughYt,
+)
 
 from seismic_pipeline.mod.cross_validationyt import cross_val_predict_yt, StratifiedKFoldYt
 
@@ -118,7 +144,28 @@ def main():
                        help='Compile markdown report to PDF (requires pandoc)')
     parser.add_argument('--skip-missing-prompt', action='store_true', default=False,
                        help='Automatically continue even if some hypnograms are missing (non-interactive mode)')
+    parser.add_argument('--auto-hypnogram', action='store_true', default=False,
+                       help='Compute missing hypnograms from .dat files (local /mnt/wd/rat or S3 bucket "rat"); fallback to existing local/S3 hypnograms if quality insufficient')
+    parser.add_argument('--quality-model-path', default=DEFAULT_QUALITY_MODEL_PATH,
+                       help='Path to channel-quality model pickle/joblib used by auto hypnogram')
+    parser.add_argument('--quality-model-module-path', action='append', default=[],
+                       help='Extra module directory for unpickling quality model (can be passed multiple times)')
+    parser.add_argument('--quality-good-classes', default='4,5',
+                       help='Comma-separated quality classes considered high quality (default: 4,5)')
+    parser.add_argument('--quality-fallback-all-channels', action='store_true', default=False,
+                       help='If quality prediction fails, use all channels for compute instead of immediate fallback to existing local/S3 hypnograms')
+    parser.add_argument('--local-data-root', default='/mnt/wd/rat',
+                       help='Local path for .dat files and hypnograms (default: /mnt/wd/rat)')
+    parser.add_argument('--use-s3-dat', action='store_true', default=False,
+                       help='Prefer S3 bucket "rat" for .dat files; otherwise try local first, then S3 fallback')
     args = parser.parse_args()
+
+    quality_model_module_paths = args.quality_model_module_path[:] if args.quality_model_module_path else []
+    if DEFAULT_QUALITY_MODEL_MODULE_DIR not in quality_model_module_paths:
+        quality_model_module_paths.append(DEFAULT_QUALITY_MODEL_MODULE_DIR)
+    quality_good_classes = tuple(
+        int(v.strip()) for v in args.quality_good_classes.split(',') if v.strip()
+    )
     
     # Configure logging based on arguments
     if args.quiet:
@@ -161,11 +208,11 @@ def main():
     if args.dump_label_generator_output:
         print("=== Dumping CustomEventLabelGeneratorYt output ===")
         debug_label_kwargs = {
-            'window_days': args.window_days,
+            'window_days': WINDOW_DAYS,
             'window_step_days': args.window_step_days,
             'date_format': '%Y-%m-%d',
-            'use_fixed_control_window': args.use_fixed_control_window,
-            'fixed_control_start_days': args.fixed_control_start_days
+            'use_fixed_control_window': True,
+            'fixed_control_start_days': CONTROL_WINDOW_DAYS
         }
         label_generator_debug = CustomEventLabelGeneratorYt(**debug_label_kwargs)
         label_generator_debug.fit(X, y)
@@ -209,17 +256,44 @@ def main():
     #     print()
     
     # 2. Create cache manager with S3 fallback
+    local_data_root = args.local_data_root
+    s3_config = {
+        'service_name': 's3',
+        'endpoint_url': 'http://10.132.230.2:7770',
+        'aws_access_key_id': 'quantum',
+        'aws_secret_access_key': 's3password',
+    }
     cache_manager = HypnogramCacheManagerYt(
         local_cache_dir='./hypnogram_cache',
-        local_data_root='/home/ponomattik/mnt/wd/rat',
-        s3_config={
-            'service_name': 's3',
-            'endpoint_url': 'http://10.132.230.2:7770',
-            'aws_access_key_id': 'quantum',
-            'aws_secret_access_key': 's3password',
-        },
+        local_data_root=local_data_root,
+        s3_config=s3_config,
         s3_rat_bucket='rat',
         s3_temp_bucket='temp'
+    )
+
+    # .dat files: try local (mnt) first, then S3 bucket "rat" if not found (see use_s3_dat=False)
+    dat_cache_manager = DatFileCacheManagerYt(
+        local_cache_dir='./dat_file_cache',
+        local_data_root=local_data_root,
+        s3_config=s3_config,
+        s3_rat_bucket='rat'
+    )
+
+    auto_hypnogram_step = (
+        'hypno_calculator',
+        HypnoCalculatorYt(
+            cache_manager=cache_manager,
+            dat_cache_manager=dat_cache_manager,
+            use_s3_dat=args.use_s3_dat,
+            local_data_root=local_data_root,
+            s3_config=s3_config,
+            epoch_length_sec=5,
+            threshold='GMM',
+            quality_model_path=args.quality_model_path,
+            quality_model_module_paths=quality_model_module_paths,
+            quality_good_classes=quality_good_classes,
+            quality_fallback_to_all_channels=args.quality_fallback_all_channels,
+        ),
     )
     
     # 3. Create report generator and prepare output directories
@@ -246,8 +320,12 @@ def main():
             window_step_days=-2,
             date_format='%Y-%m-%d',
             use_fixed_control_window=True,
-            fixed_control_start_days=9  # Creates 3-day control window: days 9, 8, 7
+            fixed_control_start_days=CONTROL_WINDOW_DAYS  # Creates 3-day control window: days 9, 8, 7
         )),
+    ]
+    if args.auto_hypnogram:
+        template_steps.append(auto_hypnogram_step)
+    template_steps.extend([
         ('rem_calculator', REMProfileCalculatorYt(
             cache_manager=cache_manager,
             window_size_hours=6,
@@ -257,13 +335,14 @@ def main():
             sampling_rate=250,
             fail_on_missing_data=False  # Set to False for testing with missing data
         )),
-        ('feature_extractor', REMDailyExtractorYt(
+        ('sample_scaler', MaxMinSampleScaler()),
+        ('feature_extractor', REMDailyMultiStatExtractorYt(
             window_days=3,
             handle_empty_days='zero',
-            daily_statistic='max_min_diff'
+            daily_statistics=['mean', 'max_min_diff']
         )),
-        ('classifier', LogisticRegression(max_iter=1000, penalty='l2'))
-    ]
+        ('classifier', LogisticRegression(max_iter=10_000, penalty='l2', solver='lbfgs'))
+    ])
     template_pipe = PipelineYt(template_steps)
     
     # Define parameter grid for linear classifiers
@@ -279,11 +358,11 @@ def main():
 
     # Define parameter grid for linear classifiers
     base_params = {
-        'rem_calculator__window_size_hours': [1, 2, 3,],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        'rem_calculator__step_size_hours': [1, 2, 3,],# 4, 5, 6, 7, 8],
-        'feature_extractor__window_days': [3,  6, ],  # Match label_generator window_days
-        'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
-        #'feature_extractor__daily_statistic': ['max_min_diff', 'mean', 'max'],  # Different statistics to extract
+        'rem_calculator__window_size_hours': [ 2, 3, 6],# 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        #'rem_calculator__step_size_hours': [1, 2],# 4, 5, 6, 7, 8],
+        #'feature_extractor__window_days': [3, ],  # Match label_generator window_days
+        #'scaler': [StandardScalerYt(regression=False), PassthroughYt()],  # Test with and without scaling
+        'feature_extractor__daily_statistics': [['max_min_diff', 'mean'], ['max_min_diff'], ['mean']],  # Different statistics to extract
         #'feature_extractor__handle_empty_days': ['zero', 'mean'],  # How to handle missing days
     }
 
@@ -291,9 +370,9 @@ def main():
     lr_params_l2 = base_params.copy()
     lr_params_l2.update({
         #'classifier': [LogisticRegression(max_iter=1000, penalty='l2')],
-        'classifier__C': [0.1, 1],
-        'classifier__solver': ['liblinear', 'lbfgs'],
-        'classifier__tol': [1e-4, 1e-5],
+        'classifier__C': [0.001, 0.01, 0.05, 0.1, 0.5, 1.0],
+        #'classifier__solver': ['liblinear', 'lbfgs'],
+        'classifier__tol': [1e-5, 1e-4, 1e-3],
         #'classifier__fit_intercept': [True, False],
         #'classifier__max_iter': [1000],
     })
@@ -319,11 +398,30 @@ def main():
         'classifier__tol': [1e-4, 1e-5],
         #'classifier__max_iter': [1000],
     })
+
+    # KNN grid
+    knn_params = base_params.copy()
+    knn_params.update({
+        'classifier': [KNeighborsClassifier(n_neighbors=3)],
+        'classifier__n_neighbors': [ 5, 7, 9, 11, 13, ],
+        'classifier__weights': ['uniform', 'distance'],
+        'classifier__metric': ['euclidean', 'manhattan', 'chebyshev', 'minkowski'],
+    })
     
+    # Decision Tree grid
+    dt_params = base_params.copy()
+    dt_params.update({
+        'classifier': [DecisionTreeClassifier()],
+        'classifier__max_depth': [1, 2],
+        'classifier__min_samples_split': [9],
+    })
+
+
     # Combine parameter grids
     #param_grid = [lr_params_l2, lr_params_l1, svm_params]
 
-    param_grid = [lr_params_l2]#, lr_params_l1, svm_params]
+    param_grid = [dt_params]#, lr_params_l1, svm_params]
+
     
     
     # Add head section
@@ -336,26 +434,56 @@ def main():
     print("Head section added to report.")
     
     # 5. Pre-cache all hypnograms before experiments
-    window_positions = list(range(7, -9, -1))  # Window positions from 4 to -8
+    window_positions = list(range(STARTPOINT_DAYS, ENDPOINT_DAYS, -1))  # Window positions from 6 to 3
     cache_results = cache_manager.precache_for_experiment(
         events,
         window_positions,
-        window_days=3,
-        fixed_control_start_days=9,
+        window_days=WINDOW_DAYS,
+        fixed_control_start_days=CONTROL_WINDOW_DAYS,
         progress_callback=(lambda m: print(m)) if not args.quiet else None
     )
     
     if cache_results['missing'] > 0:
-        print("WARNING: Some hypnograms are missing. Experiments may fail for those dates.")
-        print(f"  Negative cache populated with {cache_results['missing']} known-missing entries.")
-        print(f"  Grid search will skip these instantly (no S3 timeouts).")
-        if args.skip_missing_prompt:
-            print("Auto-continuing (--skip-missing-prompt flag set)...")
-        else:
-            response = input("Continue with experiments anyway? (y/n): ")
-            if response.lower() != 'y':
-                print("Exiting...")
-                return
+        if args.auto_hypnogram:
+            # Compute missing hypnograms from .dat files (local /mnt/wd/rat or S3 bucket "rat")
+            print("Computing missing hypnograms from .dat files (local + S3 fallback)...")
+            missing_list = cache_results.get('missing_list', [])
+            X_precompute = [{'rat_id': r, 'window_dates': [d]} for r, d in missing_list]
+            hypno_calc = HypnoCalculatorYt(
+                cache_manager=cache_manager,
+                dat_cache_manager=dat_cache_manager,
+                use_s3_dat=args.use_s3_dat,
+                local_data_root=local_data_root,
+                s3_config=s3_config,
+                epoch_length_sec=5,
+                threshold='GMM',
+                quality_model_path=args.quality_model_path,
+                quality_model_module_paths=quality_model_module_paths,
+                quality_good_classes=quality_good_classes,
+                quality_fallback_to_all_channels=args.quality_fallback_all_channels,
+            )
+            hypno_calc.transform(X_precompute, None)
+            # Re-run precache to update cache status (newly computed hypnograms are now in local_data_root)
+            cache_results = cache_manager.precache_for_experiment(
+                events,
+                window_positions,
+                window_days=WINDOW_DAYS,
+                fixed_control_start_days=CONTROL_WINDOW_DAYS,
+                progress_callback=(lambda m: print(m)) if not args.quiet else None
+            )
+            print(f"After auto-hypnogram: {cache_results['cached']}/{cache_results['total']} cached, "
+                  f"{cache_results['missing']} still missing.")
+        if cache_results['missing'] > 0:
+            print("WARNING: Some hypnograms are still missing. Experiments may fail for those dates.")
+            print(f"  Negative cache populated with {cache_results['missing']} known-missing entries.")
+            print(f"  Grid search will skip these instantly (no S3 timeouts).")
+            if args.skip_missing_prompt:
+                print("Auto-continuing (--skip-missing-prompt flag set)...")
+            else:
+                response = input("Continue with experiments anyway? (y/n): ")
+                if response.lower() != 'y':
+                    print("Exiting...")
+                    return
     
     # 6. Run experiments for each window position (4 to -8, skipping 5 to avoid day 10)
     # Count total param grid combinations for timing estimate
@@ -405,8 +533,8 @@ def main():
         window_end = window_pos  # End day (closest to event)
         
         # Control window: 3 days starting at fixed_control_start_days (days 9, 8, 7 before event)
-        control_window_start = 9
-        control_window_end = 7  # 3 days: 9, 8, 7
+        control_window_start = CONTROL_WINDOW_DAYS # 7, 6, 5
+        control_window_end = CONTROL_WINDOW_DAYS-WINDOW_DAYS  # 1 day: 7
         
         # Format window range string (handle negative numbers)
         immediate_range = f"{window_start} to {window_end}" if window_end >= 0 else f"{window_start} to {window_end}"
@@ -424,30 +552,35 @@ def main():
         
         steps = [
             ('label_generator', CustomEventLabelGeneratorYt(
-                window_days=3,
+                window_days=WINDOW_DAYS,
                 window_step_days=window_step_days_for_gen,
                 date_format='%Y-%m-%d',
                 use_fixed_control_window=True,
-                fixed_control_start_days=9,  # Creates 3-day window: days 9, 8, 7 (fixed_control_window_days = window_days = 3)
+                fixed_control_start_days=CONTROL_WINDOW_DAYS,  # Creates 2-day window: days 7, 6 (fixed_control_window_days = window_days = 2)
                 original_position=window_pos  # Pass original position to distinguish positive from negative
             )),
+        ]
+        if args.auto_hypnogram:
+            steps.append(auto_hypnogram_step)
+        steps.extend([
             ('rem_calculator', REMProfileCalculatorYt(
                 cache_manager=cache_manager,
-                window_size_hours=6,
+                window_size_hours=2,
                 step_size_hours=1,
                 rem_stage=2,
                 epoch_length_sec=5,
                 sampling_rate=250,
                 fail_on_missing_data=False
             )),
-            ('feature_extractor', REMDailyExtractorYt(
-                window_days=3,
+            ('sample_scaler', MaxMinSampleScaler()),
+            ('feature_extractor', REMDailyMultiStatExtractorYt(
+                window_days=WINDOW_DAYS,
                 handle_empty_days='zero',
-                daily_statistic='max_min_diff'
+                daily_statistics=['mean', 'max_min_diff']
             )),
             ('scaler', StandardScalerYt(regression=False)),  # Will be controlled by hyperparameter
-            ('classifier', LogisticRegression())  # Placeholder, will be replaced by grid search
-        ]
+            ('classifier', LogisticRegression(max_iter=10_000, l1_ratio=0.0, solver='lbfgs', tol=1e-5))  # Placeholder, will be replaced by grid search
+        ])
         
         # Create pipeline
         pipe = PipelineYt(steps)
@@ -458,7 +591,7 @@ def main():
         grid_search = GridSearchCVYt(
             estimator=pipe,
             param_grid=param_grid,
-            cv=4,
+            cv=20,
             scoring=yt_accuracy_scorer,
             n_jobs=MAX_CORES,  # 13 parallel jobs
             verbose=1,

@@ -22,6 +22,9 @@ import shutil
 import tempfile
 
 
+
+
+
 class HypnogramCacheManagerYt:
     """
     Specialized cache manager for hypnogram files from multiple sources.
@@ -37,7 +40,8 @@ class HypnogramCacheManagerYt:
                  s3_rat_bucket: str = 'rat',
                  s3_temp_bucket: str = 'temp',
                  target_channels: List[str] = None,
-                 sampling_rate: int = 250):
+                 sampling_rate: int = 250,
+                 allow_local_root_fallback: bool = True):
         """
         Initialize the hypnogram cache manager.
         
@@ -65,6 +69,7 @@ class HypnogramCacheManagerYt:
         self.s3_temp_bucket = s3_temp_bucket
         self.target_channels = target_channels or ['cxf', 'cxb', 'htl', 'hcm']
         self.sampling_rate = sampling_rate
+        self.allow_local_root_fallback = bool(allow_local_root_fallback)
         
         # Create cache directory
         self.local_cache_dir.mkdir(parents=True, exist_ok=True)
@@ -294,7 +299,32 @@ class HypnogramCacheManagerYt:
     def _parse_date(self, date_str: str) -> str:
         """Parse date string to YYYY_MM_DD format."""
         return normalize_date_to_yyyymmdd(date_str)
-            
+
+    def _candidate_local_data_roots(self) -> List[Path]:
+        """
+        Ordered unique roots where hypnograms may live as ``{root}/{YYYY_MM_DD}/{rat}_hypno.pickle``.
+
+        When ``allow_local_root_fallback`` is False, only the configured ``local_data_root`` is used.
+        """
+        raw: List[Union[str, Path]] = [self.local_data_root]
+        if self.allow_local_root_fallback:
+            raw.extend([
+                Path.home() / "mnt" / "wd" / "rat",
+                Path("/mnt/wd/rat"),
+            ])
+        out: List[Path] = []
+        seen: set[str] = set()
+        for p in raw:
+            try:
+                resolved = Path(p).expanduser().resolve()
+            except Exception:
+                resolved = Path(p).expanduser()
+            key = str(resolved)
+            if key not in seen:
+                seen.add(key)
+                out.append(resolved)
+        return out
+
     def _get_rat_directories(self) -> List[str]:
         """Get list of available rat directories."""
         rat_dirs = []
@@ -309,13 +339,16 @@ class HypnogramCacheManagerYt:
         dates = []
         
         if source == 'local':
-            # Check all date directories directly under /rat/
-            if self.local_data_root.exists():
-                for item in self.local_data_root.iterdir():
+            # Date folders live directly under each candidate root: {root}/{YYYY_MM_DD}/{rat}_hypno.pickle
+            seen_dates: set[str] = set()
+            for root in self._candidate_local_data_roots():
+                if not root.exists():
+                    continue
+                for item in root.iterdir():
                     if item.is_dir() and len(item.name) == 10 and '_' in item.name:
-                        # Check if this date has data for the specific rat
                         hypno_file = item / f"{rat_id}_hypno.pickle"
-                        if hypno_file.exists():
+                        if hypno_file.is_file() and item.name not in seen_dates:
+                            seen_dates.add(item.name)
                             dates.append(item.name)
         elif source == 's3' and self._get_s3_client():
             try:
@@ -342,21 +375,30 @@ class HypnogramCacheManagerYt:
         """Load hypnogram from local/network drive."""
         try:
             date_parsed = self._parse_date(date)
-            # Correct path structure: /rat/date/R2_hypno.pickle
-            hypno_file = self.local_data_root / date_parsed / f"{rat_id}_hypno.pickle"
-            
-            if hypno_file.exists():
+            fname = f"{rat_id}_hypno.pickle"
+            hypno_file: Optional[Path] = None
+            for root in self._candidate_local_data_roots():
+                candidate = root / date_parsed / fname
+                if candidate.is_file():
+                    hypno_file = candidate
+                    break
+
+            if hypno_file is not None:
                 with open(hypno_file, 'rb') as f:
                     hypnogram = pickle.load(f)
                 return hypnogram
-            else:
-                # Only show this warning once per unique file to avoid spam
-                warning_key = f"file_not_found_{hypno_file}"
-                if warning_key not in self._shown_warnings:
-                    self.logger.warning(f"Hypnogram file not found: {hypno_file}")
-                    self._shown_warnings.add(warning_key)
-                return None
-                
+
+            # Primary expected path (for a clear warning message)
+            primary = self.local_data_root / date_parsed / fname
+            warning_key = f"file_not_found_{primary}"
+            if warning_key not in self._shown_warnings:
+                tried = ", ".join(str(r / date_parsed / fname) for r in self._candidate_local_data_roots())
+                self.logger.warning(
+                    f"Hypnogram file not found: {primary} (also tried: {tried})"
+                )
+                self._shown_warnings.add(warning_key)
+            return None
+
         except Exception as e:
             self.logger.error(f"Failed to load hypnogram from local: {e}")
             return None
@@ -828,7 +870,89 @@ class HypnogramCacheManagerYt:
         except Exception as e:
             self.logger.error(f"Failed to cache hypnogram: {e}")
             return False
-            
+
+    def cache_hypnogram_from_data(self, rat_id: str, date: str, hypnogram: Union[np.ndarray, list]) -> bool:
+        """
+        Cache a hypnogram that was computed in-memory (e.g. from .dat files).
+        Saves directly to local cache without loading from file.
+
+        Parameters
+        ----------
+        rat_id : str
+            Rat identifier (e.g., 'R1', 'R2', etc.)
+        date : str
+            Date in YYYY_MM_DD format
+        hypnogram : np.ndarray or list
+            Hypnogram data to cache (computed in-memory)
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
+        """
+        try:
+            cache_key = self._generate_cache_key(rat_id, date)
+
+            # Check if already cached
+            if cache_key in self.cache_index:
+                cache_info = self.cache_index[cache_key]
+                cache_file = Path(cache_info['cache_file'])
+                if cache_file.exists():
+                    try:
+                        with open(cache_file, 'rb') as f:
+                            test_hypno = pickle.load(f)
+                        if test_hypno is not None:
+                            return True
+                    except Exception:
+                        pass
+
+            # Validate hypnogram
+            if hypnogram is None:
+                self.logger.warning(f"Hypnogram is None for {rat_id} on {date}")
+                return False
+            if isinstance(hypnogram, list) and len(hypnogram) == 0:
+                self.logger.warning(f"Hypnogram is empty list for {rat_id} on {date}")
+                return False
+            if isinstance(hypnogram, np.ndarray) and hypnogram.size == 0:
+                self.logger.warning(f"Hypnogram array is empty for {rat_id} on {date}")
+                return False
+
+            self.local_cache_dir.mkdir(parents=True, exist_ok=True)
+            import os as os_module
+            temp_suffix = f'.pkl.tmp.{os_module.getpid()}'
+            cache_file = self.local_cache_dir.resolve() / f"{cache_key}_hypno.pkl"
+            temp_file = cache_file.parent / f"{cache_key}_hypno{temp_suffix}"
+
+            try:
+                with open(temp_file, 'wb') as f:
+                    pickle.dump(hypnogram, f, protocol=pickle.HIGHEST_PROTOCOL)
+                    f.flush()
+                    os.fsync(f.fileno())
+                if not temp_file.exists() or temp_file.stat().st_size == 0:
+                    raise ValueError("Temp file write failed")
+                os.replace(str(temp_file.resolve()), str(cache_file.resolve()))
+                self.cache_index[cache_key] = {
+                    'rat_id': rat_id,
+                    'date': date,
+                    'source': 'computed',
+                    'cache_file': str(cache_file),
+                    'cached_at': datetime.now().isoformat(),
+                    'hypnogram_shape': hypnogram.shape if hasattr(hypnogram, 'shape') else len(hypnogram)
+                }
+                self._save_cache_index()
+                return True
+            except Exception as e:
+                self.logger.error(f"Failed to cache computed hypnogram for {rat_id} on {date}: {e}")
+                try:
+                    if temp_file.exists():
+                        temp_file.unlink()
+                except Exception:
+                    pass
+                return False
+        except Exception as e:
+            self.logger.error(f"Failed to cache hypnogram from data: {e}")
+            return False
+
     def cache_multiple_hypnograms(self, rat_dates: List[Tuple[str, str]], source: str = 'local') -> Dict[str, bool]:
         """
         Cache multiple hypnogram files.
@@ -935,16 +1059,7 @@ class HypnogramCacheManagerYt:
             # Try to automatically reload from source
             self.logger.info(f"Attempting to reload hypnogram for {rat_id}_{date} from source...")
             try:
-                # Try local first
-                success = self.cache_hypnogram(rat_id, date, source='local')
-                if success:
-                    # Verify it was actually cached correctly
-                    hypnogram = self.get_cached_hypnogram(rat_id, date)
-                    if hypnogram is not None:
-                        self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date}")
-                        return hypnogram
-                
-                # Try S3 fallback
+                # Try S3 first
                 if self._check_s3_temp_bucket_exists(rat_id, date):
                     success = self.cache_hypnogram(rat_id, date, source='s3')
                     if success:
@@ -952,6 +1067,14 @@ class HypnogramCacheManagerYt:
                         if hypnogram is not None:
                             self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date} from S3")
                             return hypnogram
+                
+                # Fallback to local source
+                success = self.cache_hypnogram(rat_id, date, source='local')
+                if success:
+                    hypnogram = self.get_cached_hypnogram(rat_id, date)
+                    if hypnogram is not None:
+                        self.logger.info(f"Successfully reloaded and cached hypnogram for {rat_id}_{date}")
+                        return hypnogram
             except Exception as reload_error:
                 self.logger.warning(f"Failed to reload hypnogram for {rat_id}_{date}: {reload_error}")
             
@@ -1228,9 +1351,12 @@ class HypnogramCacheManagerYt:
                         del self.cache_index[cache_key]
                         self._save_cache_index()
 
-            success = self.cache_hypnogram(rat_id, date_str, source='local')
-            if not success and self._check_s3_temp_bucket_exists(rat_id, date_str):
+            if self._check_s3_temp_bucket_exists(rat_id, date_str):
                 success = self.cache_hypnogram(rat_id, date_str, source='s3')
+            else:
+                success = False
+            if not success:
+                success = self.cache_hypnogram(rat_id, date_str, source='local')
 
             if success:
                 hypnogram = self.get_cached_hypnogram(rat_id, date_str)

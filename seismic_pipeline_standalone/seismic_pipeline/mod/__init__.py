@@ -19,6 +19,7 @@ from .sklearnbaseyt import TransformerMixinYt
 from .pipelineyt import PipelineYt, FeatureUnionYt, make_pipeline_yt, make_union_yt
 from .grid_searchyt import GridSearchCVYt, RandomizedSearchCVYt
 from .scoreryt import yt_accuracy_scorer
+from .scaleryt import StandardScalerYt, MaxMinSampleScaler, StandardSampleScaler, PassthroughYt
 from .utilsyt import save_step_data
 
 __all__ = [
@@ -40,5 +41,9 @@ __all__ = [
 
     # Scoring + utilities
     "yt_accuracy_scorer",
+    "StandardScalerYt",
+    "MaxMinSampleScaler",
+    "StandardSampleScaler",
+    "PassthroughYt",
     "save_step_data",
 ]

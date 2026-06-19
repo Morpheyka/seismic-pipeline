@@ -39,7 +39,9 @@ from .seismo import (
     REMProfileMaxMinExtractorYt,
     REMProfileSummaryExtractorYt,
     MetadataAdderYt,
-    HypnogramCacheManagerYt
+    HypnogramCacheManagerYt,
+    HypnoCalculatorYt,
+    DatFileCacheManagerYt,
 )
 
 # Import visualization tools (optional - can be imported directly)
@@ -78,6 +80,8 @@ __all__ = [
     'REMProfileSummaryExtractorYt',
     'MetadataAdderYt',
     'HypnogramCacheManagerYt',
+    'HypnoCalculatorYt',
+    'DatFileCacheManagerYt',
     
     # Visualization tools (if available)
     'visualize_hyperparameter_grid_slices',

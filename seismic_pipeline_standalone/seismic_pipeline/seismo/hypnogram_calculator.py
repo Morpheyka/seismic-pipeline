@@ -14,11 +14,15 @@ import logging
 from datetime import datetime
 import tempfile
 import io
+import os
+import sys
+from contextlib import contextmanager
 
 from scipy.stats import kurtosis
 from sklearn.covariance import EllipticEnvelope as EE
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.mixture import GaussianMixture as GM
+from joblib import load as joblib_load
 
 from .hypnogram_cache_manager import HypnogramCacheManagerYt
 from .dat_file_cache_manager import DatFileCacheManagerYt
@@ -29,6 +33,68 @@ from ..mod.sklearnbaseyt import TransformerMixinYt
 # ============================================================================
 # Helper functions adapted from local_pipeline.py
 # ============================================================================
+
+
+@contextmanager
+def _sys_path(paths: List[str]):
+    """
+    Temporarily prepend paths to sys.path.
+
+    This is needed to unpickle sklearn pipelines that reference custom modules
+    from external research folders.
+    """
+    normalized = [str(Path(p).resolve()) for p in (paths or []) if p]
+    old_path = list(sys.path)
+    try:
+        for path in reversed(normalized):
+            if path not in sys.path:
+                sys.path.insert(0, path)
+        yield
+    finally:
+        sys.path[:] = old_path
+
+
+class MLPChannelQualityPredictor:
+    """
+    Lazy wrapper for a persisted sklearn pipeline used for signal quality.
+
+    The model is expected to accept rows in format:
+    [date (YYYY_MM_DD), channel (1-based), rat_id].
+    """
+
+    def __init__(
+        self,
+        model_path: str,
+        module_paths: Optional[List[str]] = None,
+        good_classes: Tuple[int, ...] = (4, 5),
+    ):
+        self.model_path = str(model_path)
+        self.module_paths = module_paths or []
+        self.good_classes = tuple(int(v) for v in good_classes)
+        self._model = None
+        self._load_error: Optional[Exception] = None
+
+    def _load(self):
+        if self._model is not None:
+            return self._model
+        if self._load_error is not None:
+            raise self._load_error
+        try:
+            with _sys_path(self.module_paths):
+                self._model = joblib_load(self.model_path)
+            return self._model
+        except Exception as e:
+            self._load_error = e
+            raise
+
+    def predict_class(self, rat_id: str, date: str, channel_1b: int) -> int:
+        model = self._load()
+        pred = model.predict([[date, int(channel_1b), str(rat_id)]])[0]
+        return int(pred)
+
+    def is_good(self, rat_id: str, date: str, channel_1b: int) -> bool:
+        pred_class = self.predict_class(rat_id, date, channel_1b)
+        return pred_class in self.good_classes
 
 def arr_to_epochs(arr, epoch_len_sec=5):
     """Split continuous data into epochs of epoch_len_sec seconds assuming 250 Hz."""
@@ -319,6 +385,10 @@ class HypnoCalculatorYt(TransformerMixinYt):
                  metric: str = 'square',  # 'square' or 'abs'
                  threshold: str = 'GMM',  # 'GMM' or 'MAD'
                  channel_quality_model: Optional[Any] = None,
+                 quality_model_path: Optional[str] = None,
+                 quality_model_module_paths: Optional[List[str]] = None,
+                 quality_good_classes: Tuple[int, ...] = (4, 5),
+                 quality_fallback_to_all_channels: bool = False,
                  channel_cutoff_date: str = '2025_06_01'):
         """
         Initialize the hypnogram calculator.
@@ -342,7 +412,15 @@ class HypnoCalculatorYt(TransformerMixinYt):
         threshold : str, default='GMM'
             Artifact threshold method: 'GMM' or 'MAD'
         channel_quality_model : Any, optional
-            Placeholder for future ML model for channel quality prediction
+            Loaded model object or predictor-like object for channel quality prediction
+        quality_model_path : str, optional
+            Path to persisted quality model pickle/joblib.
+        quality_model_module_paths : list of str, optional
+            Additional module search paths required by model unpickling.
+        quality_good_classes : tuple of int, default=(4, 5)
+            Predicted classes considered high quality.
+        quality_fallback_to_all_channels : bool, default=False
+            If True and quality inference fails, do not filter channels by quality.
         channel_cutoff_date : str, default='2025_06_01'
             Date threshold for channel selection (after: 2 channels, before: 4 channels)
         """
@@ -356,7 +434,12 @@ class HypnoCalculatorYt(TransformerMixinYt):
         self.metric = metric
         self.threshold = threshold
         self.channel_quality_model = channel_quality_model
+        self.quality_model_path = quality_model_path
+        self.quality_model_module_paths = quality_model_module_paths or []
+        self.quality_good_classes = tuple(int(v) for v in quality_good_classes)
+        self.quality_fallback_to_all_channels = quality_fallback_to_all_channels
         self.channel_cutoff_date = channel_cutoff_date
+        self._quality_predictor: Optional[MLPChannelQualityPredictor] = None
         
         # Initialize dat cache manager if not provided
         if self.dat_cache_manager is None:
@@ -372,6 +455,8 @@ class HypnoCalculatorYt(TransformerMixinYt):
             raise ValueError(f"Invalid metric '{metric}'. Must be 'square' or 'abs'")
         if threshold not in ['GMM', 'MAD']:
             raise ValueError(f"Invalid threshold '{threshold}'. Must be 'GMM' or 'MAD'")
+        if len(self.quality_good_classes) == 0:
+            raise ValueError("quality_good_classes must contain at least one class label")
     
     def fit(self, X, y=None):
         """Fit the transformer (no-op, stateless)."""
@@ -409,8 +494,25 @@ class HypnoCalculatorYt(TransformerMixinYt):
                 
                 # Calculate hypnogram
                 try:
-                    self._calculate_hypnogram(rat_id, date)
+                    # Pre-cache/load DAT before computation path (local -> S3 fallback).
+                    source = 's3' if self.use_s3_dat else 'local'
+                    eeg_data = self.dat_cache_manager.get_cached_dat_file(rat_id, date, source=source)
+
+                    if eeg_data is None or eeg_data.size == 0:
+                        self.logger.warning(
+                            f"No EEG DAT available for {rat_id} on {date}; "
+                            "trying existing hypnogram fallback from local/S3"
+                        )
+                        created = self._fallback_to_existing_hypnogram(rat_id, date)
+                    else:
+                        created = self._calculate_hypnogram(rat_id, date, eeg_data=eeg_data)
+
+                    # Mark as processed even if explicitly skipped to avoid retries
                     processed_dates.add(cache_key)
+                    if not created:
+                        self.logger.info(
+                            f"Could not compute or fallback hypnogram for {rat_id} on {date}"
+                        )
                 except Exception as e:
                     self.logger.warning(f"Failed to calculate hypnogram for {rat_id} on {date}: {e}")
                     continue
@@ -418,56 +520,98 @@ class HypnoCalculatorYt(TransformerMixinYt):
         # Return exact same X and y
         return X, y
     
-    def _calculate_hypnogram(self, rat_id: str, date: str):
-        """Calculate hypnogram for a specific rat and date."""
-        # Load .dat file
-        source = 's3' if self.use_s3_dat else 'local'
-        eeg_data = self.dat_cache_manager.get_cached_dat_file(rat_id, date, source=source)
-        
+    def _calculate_hypnogram(self, rat_id: str, date: str, eeg_data: Optional[np.ndarray] = None) -> bool:
+        """Calculate hypnogram for a specific rat and date.
+
+        Returns True when a hypnogram was created and cached, False when
+        creation is not possible and fallback also fails.
+        """
+        # Load .dat file if caller didn't pre-cache it.
+        if eeg_data is None:
+            source = 's3' if self.use_s3_dat else 'local'
+            eeg_data = self.dat_cache_manager.get_cached_dat_file(rat_id, date, source=source)
+
         if eeg_data is None or eeg_data.size == 0:
-            raise ValueError(f"No EEG data available for {rat_id} on {date}")
+            self.logger.warning(
+                f"No EEG data available for {rat_id} on {date}; "
+                "trying existing hypnogram fallback from local/S3"
+            )
+            return self._fallback_to_existing_hypnogram(rat_id, date)
         
         # Determine channels based on date
         channels = self._get_channels_for_date(date)
         
-        # Get channel quality (placeholder for ML model)
-        channel_quality = self._get_channel_quality(rat_id, date, eeg_data)
+        # Keep only high-quality channels (predicted classes in self.quality_good_classes)
+        channel_quality = self._get_channel_quality(rat_id, date, eeg_data, channels)
+        selected_channels = [ch for ch in channels if channel_quality.get(ch, -1) in self.quality_good_classes]
+        if len(selected_channels) == 0:
+            self.logger.warning(
+                f"No high-quality channels for {rat_id} on {date}; "
+                "trying existing hypnogram fallback from local/S3"
+            )
+            return self._fallback_to_existing_hypnogram(rat_id, date)
         
         # Run 3-stage pipeline (in-memory CSVs)
-        art_thrs_df = self._prepare_thr_pics(eeg_data, rat_id, channels, channel_quality)
+        art_thrs_df = self._prepare_thr_pics(eeg_data, rat_id, selected_channels, channel_quality)
         
         if art_thrs_df is None or art_thrs_df.empty or np.all(art_thrs_df['Accept'].values == 0):
-            # All channels rejected, create empty hypnogram
-            hypnogram = np.full(17280, -1)
+            self.logger.warning(
+                f"All selected channels rejected by artifact stage for {rat_id} on {date}; "
+                "trying existing hypnogram fallback from local/S3"
+            )
+            return self._fallback_to_existing_hypnogram(rat_id, date)
         else:
             delta_thrs_df, ratio_thrs_df = self._prepare_theta_delta(
-                eeg_data, rat_id, channels, art_thrs_df, channel_quality
+                eeg_data, rat_id, selected_channels, art_thrs_df, channel_quality
             )
             hypnogram = self._score(
-                eeg_data, rat_id, channels, art_thrs_df, delta_thrs_df, ratio_thrs_df, channel_quality
+                eeg_data, rat_id, selected_channels, art_thrs_df, delta_thrs_df, ratio_thrs_df, channel_quality
             )
         
-        # Cache hypnogram
+        # Cache hypnogram directly to hypnogram cache (works even when local_data_root is read-only)
         if self.cache_manager:
-            # Save hypnogram to expected local location first
-            # (where _load_hypnogram_from_local expects it)
-            date_parsed = self._parse_date(date)
-            expected_path = Path(self.local_data_root) / date_parsed / f"{rat_id}_hypno.pickle"
-            
-            # Create directory if needed
-            expected_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Save hypnogram
-            import pickle
-            with open(expected_path, 'wb') as f:
-                pickle.dump(hypnogram, f)
-            
-            # Now cache it (cache_manager will load from the file we just saved)
-            success = self.cache_manager.cache_hypnogram(rat_id, date, source='local')
+            success = self.cache_manager.cache_hypnogram_from_data(rat_id, date, hypnogram)
             if not success:
                 self.logger.warning(f"Failed to cache hypnogram for {rat_id} on {date}")
+                return False
+            # Optionally write to local_data_root for persistence (best effort)
+            try:
+                date_parsed = self._parse_date(date)
+                expected_path = Path(self.local_data_root) / date_parsed / f"{rat_id}_hypno.pickle"
+                expected_path.parent.mkdir(parents=True, exist_ok=True)
+                import pickle
+                with open(expected_path, 'wb') as f:
+                    pickle.dump(hypnogram, f)
+            except (OSError, PermissionError) as e:
+                self.logger.debug(f"Could not write hypnogram to {expected_path}: {e} (cache is populated)")
         
         self.logger.info(f"Calculated and cached hypnogram for {rat_id} on {date}")
+        return True
+
+    def _fallback_to_existing_hypnogram(self, rat_id: str, date: str) -> bool:
+        """
+        Try to resolve missing/insufficient compute case by caching existing hypnogram.
+
+        Source order:
+        1) local WD path
+        2) S3 temp bucket
+        """
+        if self.cache_manager is None:
+            self.logger.warning(
+                f"No cache manager configured for fallback hypnogram lookup ({rat_id} {date})"
+            )
+            return False
+
+        if self.cache_manager.cache_hypnogram(rat_id, date, source='local'):
+            self.logger.info(f"Fallback hypnogram resolved from local for {rat_id} on {date}")
+            return True
+
+        if self.cache_manager.cache_hypnogram(rat_id, date, source='s3'):
+            self.logger.info(f"Fallback hypnogram resolved from S3 for {rat_id} on {date}")
+            return True
+
+        self.logger.warning(f"No fallback hypnogram found in local/S3 for {rat_id} on {date}")
+        return False
     
     def _parse_date(self, date_str: str) -> str:
         """Parse date string to YYYY_MM_DD format."""
@@ -494,21 +638,64 @@ class HypnoCalculatorYt(TransformerMixinYt):
         else:
             return [0, 1, 2, 3]  # 4 channels
     
-    def _get_channel_quality(self, rat_id: str, date: str, eeg_data: np.ndarray) -> Dict[int, float]:
+    def _get_channel_quality(
+        self,
+        rat_id: str,
+        date: str,
+        eeg_data: np.ndarray,
+        channels: List[int],
+    ) -> Dict[int, int]:
         """
-        Get channel quality scores using ML model (placeholder for future implementation).
+        Predict quality class for each requested channel.
         
         Returns:
-            dict mapping channel index (0-based) to quality score
+            dict mapping channel index (0-based) to predicted class (int)
         """
-        # TODO: Implement ML model-based channel quality prediction
-        # For now, return empty dict (no quality filtering)
-        if self.channel_quality_model is not None:
-            # Future: use model to predict quality
-            # quality_scores = self.channel_quality_model.predict(eeg_data)
-            # return {i: score for i, score in enumerate(quality_scores)}
-            pass
-        return {}
+        if not channels:
+            return {}
+
+        date_parsed = self._parse_date(date)
+
+        # No model configured -> preserve legacy behavior (accept all requested channels)
+        if self.channel_quality_model is None and not self.quality_model_path:
+            default_good = max(self.quality_good_classes)
+            return {ch: default_good for ch in channels}
+
+        quality: Dict[int, int] = {}
+        try:
+            for ch in channels:
+                ch_1b = int(ch) + 1
+                # 1) Explicit predictor object
+                if self.channel_quality_model is not None:
+                    predictor = self.channel_quality_model
+                    if hasattr(predictor, "predict_class"):
+                        pred_class = int(predictor.predict_class(rat_id, date_parsed, ch_1b))
+                    elif hasattr(predictor, "is_good"):
+                        pred_class = max(self.quality_good_classes) if predictor.is_good(rat_id, date_parsed, ch_1b) else 0
+                    elif hasattr(predictor, "predict"):
+                        pred_class = int(predictor.predict([[date_parsed, ch_1b, str(rat_id)]])[0])
+                    else:
+                        raise TypeError("channel_quality_model does not expose predict/predict_class/is_good")
+                else:
+                    # 2) Lazy-loaded model from pickle/joblib
+                    if self._quality_predictor is None:
+                        self._quality_predictor = MLPChannelQualityPredictor(
+                            model_path=self.quality_model_path,
+                            module_paths=self.quality_model_module_paths,
+                            good_classes=self.quality_good_classes,
+                        )
+                    pred_class = self._quality_predictor.predict_class(rat_id, date_parsed, ch_1b)
+
+                quality[ch] = int(pred_class)
+
+        except Exception as e:
+            self.logger.warning(f"Channel quality inference failed for {rat_id} on {date}: {e}")
+            if self.quality_fallback_to_all_channels:
+                default_good = max(self.quality_good_classes)
+                return {ch: default_good for ch in channels}
+            return {ch: 0 for ch in channels}
+
+        return quality
     
     def _prepare_thr_pics(self, arr: np.ndarray, rat: str, channels: List[int], 
                          channel_quality: Dict[int, float]) -> Optional[pd.DataFrame]:

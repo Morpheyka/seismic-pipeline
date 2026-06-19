@@ -181,8 +181,8 @@ class CustomEventLabelGeneratorYt(SeismicEventTransformerYt):
                 #   But we have window_days=6. Let me just keep the current calculation for now and fix the display.
                 if abs_step == 0:
                     # Position 0: window ends at event date (offset 0)
-                    # Window: [event-5, event-4, event-3, event-2, event-1, event]
-                    immediate_start_offset = 5  # Window ends at offset 0 (event date)
+                    # Start offset must depend on window_days (not hardcoded to 6-day windows)
+                    immediate_start_offset = self.window_days - 1
                 else:
                     # Use original_position to distinguish positive from negative positions
                     # Positive positions: window ends at abs_step offset

@@ -2,6 +2,19 @@
 *
 !.gitignore
 !README.md
+!otchet_V_0.2.ipynb
+!otchet_V_0.2_8day_final_top10_no_pareto.ipynb
+!otchet_V_0.2_8day_top5_reruns.ipynb
+!final_results/
+!final_results/**
+!run_output_8day/
+!run_output_8day/elpd_per_feature_event_hist.png
+!literature/
+!literature/**
+!reports/
+!reports/**
+!run report/
+!run report/**
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/requirements.txt
@@ -11,6 +24,14 @@ seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/seismic_pipeline/**
 seismic_pipeline_standalone/seismic_pipeline/**/__pycache__/
 seismic_pipeline_standalone/seismic_pipeline/**/*.pyc
+!rem_profiles_export_10days_lib.py
+!rem_profiles_export_10days_lib/**
+!rem_profiles_export_v02_lib.py
+rem_profiles_export_10days_lib/**/*.pyc
+rem_profiles_export_10days_lib/**/__pycache__/
+rem_profiles_export_10days_lib/**/*.pyc
+rem_profiles_export_v02_lib/**/*.pyc
+rem_profiles_export_v02_lib/**/__pycache__/
 
 # Standard excludes under tracked paths
 __pycache__/
@@ -23,3 +44,4 @@ venv/
 *.log
 *.pkl
 .DS_Store
+**/.~lock.*
