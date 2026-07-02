@@ -460,7 +460,7 @@ def sample_model(
 
     with model:
         if backend == "pymc":
-            trace = pm.sample(**sample_kwargs)
+            trace = pm.sample(**sample_kwargs, init="jitter+adapt_diag")
         elif backend in {"numpyro", "blackjax"}:
             import jax
 

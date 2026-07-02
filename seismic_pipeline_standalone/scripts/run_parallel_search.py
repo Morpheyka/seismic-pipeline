@@ -33,6 +33,43 @@ from seismic_pipeline.bayesian.parallel_search import (  # noqa: E402
     run_parallel_search,
 )
 
+CUSTOM_EVENTS = [
+    {"rat_id": "R2", "date": "2022-11-07", "direction": "before"},
+    {"rat_id": "R2", "date": "2022-11-18", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-04-03", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-04-18", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-05-03", "direction": "before"},
+    {"rat_id": "R2", "date": "2024-09-30", "direction": "before"},
+    {"rat_id": "R2", "date": "2024-10-29", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-01-23", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-03-14", "direction": "before"},
+    {"rat_id": "R1", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R2", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R4", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R1", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R2", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R4", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R2", "date": "2022-11-07", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2022-11-18", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-03", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-11", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-21", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2024-09-30", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2024-10-29", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-01-23", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-03-14", "direction": "after_reversed"},
+    {"rat_id": "R1", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R4", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R1", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R4", "date": "2025-07-20", "direction": "after_reversed"},
+]
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run parallel exhaustive changepoint search.")
@@ -65,6 +102,7 @@ def main() -> None:
     )
 
     export_base_cfg = default_export_base_cfg(output_dir=str(out_dir / "profile_cache"))
+    export_base_cfg["events"] = CUSTOM_EVENTS
     results = run_parallel_search(
         config=config,
         export_base_cfg=export_base_cfg,
