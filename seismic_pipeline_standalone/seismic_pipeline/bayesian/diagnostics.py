@@ -483,7 +483,7 @@ def score_changepoint_trace(
         tau_q1 = float(np.percentile(tau_mean_samples, 25))
         tau_q2 = float(np.percentile(tau_mean_samples, 50))
         tau_q3 = float(np.percentile(tau_mean_samples, 75))
-        hdi_60 = az.hdi(tau_mean_samples, hdi_prob=0.60)
+        hdi_60 = az.hdi(tau_mean_samples, prob=0.60)
         tau_hdi_60_lower = float(hdi_60[0])
         tau_hdi_60_upper = float(hdi_60[1])
         tau_hdi_60_width = tau_hdi_60_upper - tau_hdi_60_lower
