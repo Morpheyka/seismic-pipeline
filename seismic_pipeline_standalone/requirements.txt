@@ -10,4 +10,7 @@ joblib>=1.0.0
 antropy>=0.1.9
 nolds>=0.6.2
 tqdm>=4.0.0
+pymc
+arviz
+pytensor
 

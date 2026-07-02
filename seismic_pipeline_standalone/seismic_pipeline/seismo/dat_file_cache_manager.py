@@ -16,6 +16,8 @@ import boto3
 from datetime import datetime
 import tempfile
 
+from seismic_pipeline.config.paths import local_data_root as default_local_data_root
+
 
 class DatFileCacheManagerYt:
     """
@@ -27,7 +29,7 @@ class DatFileCacheManagerYt:
     
     def __init__(self, 
                  local_cache_dir: str = './dat_file_cache',
-                 local_data_root: str = '/mnt/wd/rat',
+                 local_data_root: str | None = None,
                  s3_config: Optional[Dict] = None,
                  s3_rat_bucket: str = 'rat'):
         """
@@ -45,7 +47,9 @@ class DatFileCacheManagerYt:
             S3 bucket name for rat data
         """
         self.local_cache_dir = Path(local_cache_dir)
-        self.local_data_root = Path(local_data_root)
+        self.local_data_root = Path(
+            local_data_root if local_data_root is not None else default_local_data_root()
+        )
         self.s3_config = s3_config
         self.s3_rat_bucket = s3_rat_bucket
         
@@ -103,7 +107,7 @@ class DatFileCacheManagerYt:
             else:
                 # Assume YYYYMMDD format
                 return f"{date_str[:4]}_{date_str[4:6]}_{date_str[6:8]}"
-        except:
+        except (IndexError, ValueError):
             return date_str
     
     def _get_rat_dat_list_local(self, date: str, rat_id: str) -> List[str]:

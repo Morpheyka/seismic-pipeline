@@ -353,7 +353,7 @@ class REMProfileSummaryExtractorYt(TransformerMixinYt):
             try:
                 skewness = scipy_stats.skew(profile)
                 kurtosis = scipy_stats.kurtosis(profile)
-            except:
+            except Exception:
                 skewness = 0
                 kurtosis = 0
             stats.extend([
@@ -376,7 +376,7 @@ class REMProfileSummaryExtractorYt(TransformerMixinYt):
                 else:
                     peak_mean = 0
                     peak_std = 0
-            except:
+            except Exception:
                 peak_count = 0
                 peak_mean = 0
                 peak_std = 0

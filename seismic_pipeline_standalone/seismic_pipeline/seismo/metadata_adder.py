@@ -100,7 +100,7 @@ class MetadataAdderYt(TransformerMixinYt):
                                 numerical_date = 0
                         else:
                             numerical_date = 0
-                    except:
+                    except (ValueError, TypeError):
                         numerical_date = 0
                     row.append(numerical_date)
                 elif col == 'original_rat_id':
@@ -110,7 +110,7 @@ class MetadataAdderYt(TransformerMixinYt):
                             rat_num = int(value[1:])
                         else:
                             rat_num = 0
-                    except:
+                    except (ValueError, TypeError):
                         rat_num = 0
                     row.append(rat_num)
                 else:

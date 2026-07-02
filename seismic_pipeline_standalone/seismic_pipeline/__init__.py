@@ -1,19 +1,19 @@
 """
 Minimal mod package for seismic pipeline standalone version.
 
-This package contains only the classes and functions needed for
-full_seismic_pipeline_example.py to work independently.
-
-The package is organized into three subpackages:
-- mod: Target-aware components that preserve target variables (y) alongside features (X)
-- seismo: Seismic-specific components that work with features (X) only
-- visualization: Visualization and reporting tools for hyperparameter tuning and experiments
+Subpackages:
+- mod: Target-aware sklearn pipeline components (Yt suffix)
+- seismo: Seismic/REM transformers and cache managers
+- visualization: Reports and plotting
+- bayesian: Changepoint PyMC models and search (optional PyMC deps)
+- features: REM chunk feature engineering for changepoint studies
+- config: Defaults, S3 env config, path settings
+- common: Shared infrastructure (logging)
 """
 
-# Initialize logging system
-from .seismo.logging_config import ModLoggerYt, get_mod_logger
+# Initialize logging system (single setup site)
+from .common.logging import ModLoggerYt, get_mod_logger
 
-# Set up logging for the package
 ModLoggerYt.setup_logging()
 
 # Import target-aware components

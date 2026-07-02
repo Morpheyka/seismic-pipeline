@@ -5,23 +5,25 @@
 !otchet_V_0.2.ipynb
 !otchet_V_0.2_8day_final_top10_no_pareto.ipynb
 !otchet_V_0.2_8day_top5_reruns.ipynb
-!final_results/
-!final_results/**
-!run_output_8day/
-!run_output_8day/elpd_per_feature_event_hist.png
 !literature/
 !literature/**
 !reports/
 !reports/**
 !run report/
 !run report/**
+!scripts/
+scripts/*
+!scripts/cluster_setup.sh
 !seismic_pipeline_standalone/
 seismic_pipeline_standalone/*
 !seismic_pipeline_standalone/requirements.txt
 !seismic_pipeline_standalone/full_seismic_pipeline_example_window3.py
 !seismic_pipeline_standalone/full_seismic_pipeline_example.py
+!seismic_pipeline_standalone/scripts/
+!seismic_pipeline_standalone/scripts/**
 !seismic_pipeline_standalone/seismic_pipeline/
 !seismic_pipeline_standalone/seismic_pipeline/**
+seismic_pipeline_standalone/scripts/**/__pycache__/
 seismic_pipeline_standalone/seismic_pipeline/**/__pycache__/
 seismic_pipeline_standalone/seismic_pipeline/**/*.pyc
 !rem_profiles_export_10days_lib.py
@@ -43,5 +45,12 @@ __pycache__/
 venv/
 *.log
 *.pkl
+*.ipynb_checkpoints/
+*.egg-info/
+run_output*/
+run_output_*/
+**/*.csv
+**/*.png
+**/*.pdf
 .DS_Store
 **/.~lock.*
