@@ -2,8 +2,20 @@
 """Launch parallel exhaustive search with profile-level cache."""
 from __future__ import annotations
 
-import argparse
+import os
 import sys
+
+# Force PyTensor to use scipy-openblas before any other imports
+_BLAS_LIB_DIR = "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib"
+if os.path.isdir(_BLAS_LIB_DIR):
+    import pytensor
+    pytensor.config.blas__ldflags = f"-L{_BLAS_LIB_DIR} -lopenblas"
+    # Also set environment variables for any subprocess
+    os.environ.setdefault("LD_LIBRARY_PATH", "")
+    if _BLAS_LIB_DIR not in os.environ["LD_LIBRARY_PATH"]:
+        os.environ["LD_LIBRARY_PATH"] = f"{_BLAS_LIB_DIR}:{os.environ['LD_LIBRARY_PATH']}"
+
+import argparse
 from pathlib import Path
 
 
