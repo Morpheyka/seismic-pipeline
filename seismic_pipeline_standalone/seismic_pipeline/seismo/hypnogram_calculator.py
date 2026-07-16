@@ -36,6 +36,10 @@ from .hypno_features import (
     MLPChannelQualityPredictor,
     arr_to_epochs,
     art_thr,
+    art_thr_gmm,
+    art_thr_mad,
+    art_thr_otsu,
+    art_thr_quantile,
     dc_remove,
     delta_theta,
     gm_delta,
@@ -45,6 +49,7 @@ from .hypno_features import (
     prepare_data,
     stage,
 )
+from .channel_quality_adapter import ChannelQualityAdapter
 
 
 class HypnoCalculatorYt(TransformerMixinYt):
@@ -69,6 +74,8 @@ class HypnoCalculatorYt(TransformerMixinYt):
                  quality_model_path: Optional[str] = None,
                  quality_model_module_paths: Optional[List[str]] = None,
                  quality_good_classes: Tuple[int, ...] = (4, 5),
+                 quality_probability_threshold: float = 0.0,
+                 quality_model_rat_dir: Optional[str] = None,
                  quality_fallback_to_all_channels: bool = False,
                  channel_cutoff_date: str = '2025_06_01'):
         """
@@ -118,9 +125,13 @@ class HypnoCalculatorYt(TransformerMixinYt):
         self.quality_model_path = quality_model_path
         self.quality_model_module_paths = quality_model_module_paths or []
         self.quality_good_classes = tuple(int(v) for v in quality_good_classes)
+        self.quality_probability_threshold = float(quality_probability_threshold)
+        self.quality_model_rat_dir = quality_model_rat_dir
         self.quality_fallback_to_all_channels = quality_fallback_to_all_channels
         self.channel_cutoff_date = channel_cutoff_date
         self._quality_predictor: Optional[MLPChannelQualityPredictor] = None
+        self._quality_adapter: Optional[ChannelQualityAdapter] = None
+        self.last_channel_quality_report: Dict[str, Any] = {}
         
         # Initialize dat cache manager if not provided
         if self.dat_cache_manager is None:
@@ -333,6 +344,11 @@ class HypnoCalculatorYt(TransformerMixinYt):
             dict mapping channel index (0-based) to predicted class (int)
         """
         if not channels:
+            self.last_channel_quality_report = {
+                "rat_id": str(rat_id),
+                "date": self._parse_date(date),
+                "channels": [],
+            }
             return {}
 
         date_parsed = self._parse_date(date)
@@ -340,10 +356,49 @@ class HypnoCalculatorYt(TransformerMixinYt):
         # No model configured -> preserve legacy behavior (accept all requested channels)
         if self.channel_quality_model is None and not self.quality_model_path:
             default_good = max(self.quality_good_classes)
-            return {ch: default_good for ch in channels}
+            self.last_channel_quality_report = {
+                "rat_id": str(rat_id),
+                "date": date_parsed,
+                "channels": [
+                    {
+                        "channel_index": int(ch),
+                        "channel_name": f"ch{int(ch)}",
+                        "predicted_class": int(default_good),
+                        "probability_good": 1.0,
+                        "is_selected": True,
+                        "reason": "no_quality_model_configured",
+                    }
+                    for ch in channels
+                ],
+            }
+            return {int(ch): default_good for ch in channels}
 
         quality: Dict[int, int] = {}
         try:
+            if self.channel_quality_model is None:
+                if self._quality_adapter is None:
+                    rat_dir = self.quality_model_rat_dir or self.local_data_root
+                    self._quality_adapter = ChannelQualityAdapter(
+                        model_path=self.quality_model_path,
+                        module_paths=self.quality_model_module_paths,
+                        good_classes=self.quality_good_classes,
+                        rat_dir=rat_dir,
+                        probability_threshold=self.quality_probability_threshold,
+                    )
+                decisions = self._quality_adapter.evaluate(
+                    rat_id=str(rat_id),
+                    date=date_parsed,
+                    channels=[int(ch) for ch in channels],
+                )
+                self.last_channel_quality_report = {
+                    "rat_id": str(rat_id),
+                    "date": date_parsed,
+                    "channels": self._quality_adapter.to_rows(decisions),
+                }
+                for ch, decision in decisions.items():
+                    quality[int(ch)] = int(decision.predicted_class)
+                return quality
+
             for ch in channels:
                 ch_1b = int(ch) + 1
                 # 1) Explicit predictor object
@@ -357,23 +412,58 @@ class HypnoCalculatorYt(TransformerMixinYt):
                         pred_class = int(predictor.predict([[date_parsed, ch_1b, str(rat_id)]])[0])
                     else:
                         raise TypeError("channel_quality_model does not expose predict/predict_class/is_good")
-                else:
-                    # 2) Lazy-loaded model from pickle/joblib
-                    if self._quality_predictor is None:
-                        self._quality_predictor = MLPChannelQualityPredictor(
-                            model_path=self.quality_model_path,
-                            module_paths=self.quality_model_module_paths,
-                            good_classes=self.quality_good_classes,
-                        )
-                    pred_class = self._quality_predictor.predict_class(rat_id, date_parsed, ch_1b)
-
                 quality[ch] = int(pred_class)
 
+            self.last_channel_quality_report = {
+                "rat_id": str(rat_id),
+                "date": date_parsed,
+                "channels": [
+                    {
+                        "channel_index": int(ch),
+                        "channel_name": f"ch{int(ch)}",
+                        "predicted_class": int(quality[int(ch)]),
+                        "probability_good": float("nan"),
+                        "is_selected": int(quality[int(ch)]) in self.quality_good_classes,
+                        "reason": "provided_predictor_without_probability",
+                    }
+                    for ch in channels
+                ],
+            }
         except Exception as e:
             self.logger.warning(f"Channel quality inference failed for {rat_id} on {date}: {e}")
             if self.quality_fallback_to_all_channels:
                 default_good = max(self.quality_good_classes)
+                self.last_channel_quality_report = {
+                    "rat_id": str(rat_id),
+                    "date": date_parsed,
+                    "channels": [
+                        {
+                            "channel_index": int(ch),
+                            "channel_name": f"ch{int(ch)}",
+                            "predicted_class": int(default_good),
+                            "probability_good": float("nan"),
+                            "is_selected": True,
+                            "reason": "quality_inference_failed_fallback_all_channels",
+                        }
+                        for ch in channels
+                    ],
+                }
                 return {ch: default_good for ch in channels}
+            self.last_channel_quality_report = {
+                "rat_id": str(rat_id),
+                "date": date_parsed,
+                "channels": [
+                    {
+                        "channel_index": int(ch),
+                        "channel_name": f"ch{int(ch)}",
+                        "predicted_class": 0,
+                        "probability_good": float("nan"),
+                        "is_selected": False,
+                        "reason": f"quality_inference_failed: {e}",
+                    }
+                    for ch in channels
+                ],
+            }
             return {ch: 0 for ch in channels}
 
         return quality

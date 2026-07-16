@@ -27,6 +27,45 @@ DEFAULT_EVENTS_10D: List[Dict[str, str]] = [
     {"rat_id": "R4", "date": "2025-07-20"},
 ]
 
+FULL_EXHAUSTIVE_EVENTS_8DAY: List[Dict[str, str]] = [
+    {"rat_id": "R2", "date": "2022-11-07", "direction": "before"},
+    {"rat_id": "R2", "date": "2022-11-18", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-04-03", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-04-18", "direction": "before"},
+    {"rat_id": "R2", "date": "2023-05-03", "direction": "before"},
+    {"rat_id": "R3", "date": "2023-05-03", "direction": "before"},
+    {"rat_id": "R3", "date": "2024-09-30", "direction": "before"},
+    {"rat_id": "R2", "date": "2024-10-29", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-01-23", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-03-14", "direction": "before"},
+    {"rat_id": "R1", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R2", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R4", "date": "2025-07-02", "direction": "before"},
+    {"rat_id": "R1", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R2", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R3", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R4", "date": "2025-07-20", "direction": "before"},
+    {"rat_id": "R2", "date": "2022-11-07", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2022-11-18", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-03", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-11", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2023-04-21", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2024-09-30", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2024-09-30", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2024-10-29", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-01-23", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-03-14", "direction": "after_reversed"},
+    {"rat_id": "R1", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R4", "date": "2025-07-02", "direction": "after_reversed"},
+    {"rat_id": "R1", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R2", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R3", "date": "2025-07-20", "direction": "after_reversed"},
+    {"rat_id": "R4", "date": "2025-07-20", "direction": "after_reversed"},
+]
+
 
 def s3_config_from_env() -> Dict[str, str]:
     """Build S3 client config from environment variables."""

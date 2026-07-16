@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Minimal smoke test for parallel exhaustive changepoint search on a local machine.
+"""Minimal smoke test for parallel exhaustive changepoint search.
 
-Intended for P-core-only thread layout:
-  4 MCMC chains (2 models x 2 chains) + 2 BLAS threads = 6 P-core threads.
+Uses blackjax with benchmark-tuned threading:
+  n_jobs=2, OMP_NUM_THREADS=1 per worker, jax chain_method=parallel (auto).
 
 Usage:
   python scripts/smoke_test_parallel_search.py
@@ -11,12 +11,6 @@ from __future__ import annotations
 
 import os
 import sys
-
-# Thread control must be set before NumPy / PyTensor / BLAS imports.
-os.environ["OMP_NUM_THREADS"] = "2"
-os.environ["MKL_NUM_THREADS"] = "2"
-os.environ["OPENBLAS_NUM_THREADS"] = "2"
-os.environ.setdefault("NUMEXPR_NUM_THREADS", "2")
 
 # Force PyTensor to use scipy-openblas before any other imports
 _BLAS_LIB_DIR = "/opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib"
@@ -31,10 +25,16 @@ if os.path.isdir(_BLAS_LIB_DIR):
 import json
 import time
 import warnings
+import argparse
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+from seismic_pipeline.mod.threading_config import configure_threading
+
+# Benchmark-tuned: 2 parallel models, 1 OMP thread per joblib worker.
+configure_threading(cores=2, threads_per_job=1)
 
 from seismic_pipeline.bayesian import parallel_search as ps
 from seismic_pipeline.bayesian.parallel_search import (  # noqa: E402
@@ -220,13 +220,27 @@ def _verify_results(df, csv_path: Path, expected_models: int) -> tuple[list[str]
         if not bad.empty:
             warnings_out.append(
                 f"{len(bad)} model(s) have r_hat_max > 1.05 (max={rhat.max():.3f}); "
-                "expected with draws=100/tune=100 — re-check on cluster with full MCMC."
+                "re-check convergence on the cluster if this persists with full MCMC."
             )
 
     return issues, warnings_out
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Smoke test for parallel changepoint search.")
+    parser.add_argument(
+        "--nuts-backend",
+        default="blackjax",
+        choices=["pymc", "numpyro", "blackjax"],
+        help="NUTS sampler backend (default: blackjax).",
+    )
+    parser.add_argument(
+        "--jax-chain-method",
+        default="auto",
+        choices=["auto", "parallel", "vectorized"],
+    )
+    args = parser.parse_args()
+
     ps._generate_feature_configs = _smoke_feature_configs  # type: ignore[attr-defined]
     ParallelSearchConfig.rem_profile_grid = property(_zipped_rem_profile_grid)
 
@@ -237,14 +251,15 @@ def main() -> int:
         max_features=2,
         mean_likelihoods=["student_t"],
         range_likelihoods=["beta"],
-        draws=100,
-        tune=100,
-        chains=2,
-        cores_per_chain=1,
-        tau_mode="marginalized",
+        draws=2000,
+        tune=2000,
+        chains=4,
         n_jobs=2,
+        blas_total_cores=2,
+        cores_per_chain=1,
         gc_frequency=2,
-        blas_total_cores=4,
+        nuts_backend=args.nuts_backend,
+        jax_chain_method=args.jax_chain_method,
         record_pareto_events=True,
         out_dir=out_dir,
     )
@@ -261,7 +276,12 @@ def main() -> int:
     print(f"Feature configs: {SMOKE_FEATURE_CONFIGS}")
     print(f"Likelihoods: mean=student_t, range=beta")
     print(f"MCMC: draws={config.draws}, tune={config.tune}, chains={config.chains}")
-    print(f"Parallel: n_jobs={config.n_jobs}, gc_frequency={config.gc_frequency}")
+    print(f"Sampler: nuts_backend={config.nuts_backend}, jax_chain_method={config.jax_chain_method}")
+    print(
+        f"Parallel: n_jobs={config.n_jobs}, blas_total_cores={config.blas_total_cores}, "
+        f"OMP/worker≈{max(1, config.blas_total_cores // config.n_jobs)}"
+    )
+    print(f"GC: gc_frequency={config.gc_frequency}")
     print(f"Expected models: {expected_models}")
     print(f"Output dir: {out_dir.resolve()}")
 

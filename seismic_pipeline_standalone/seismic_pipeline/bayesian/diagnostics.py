@@ -18,40 +18,159 @@ import pymc as pm
 import arviz as az
 import matplotlib.pyplot as plt
 import pytensor.tensor as pt
+from xarray import DataTree
+import xarray as xr
 
 from seismic_pipeline.bayesian.priors import _parse_parameter_selection
 
 def _is_inferencedata(trace) -> bool:
-    return isinstance(trace, az.InferenceData)
+    """True for ArviZ DataTree traces (PyMC default since ArviZ 1.x)."""
+    return isinstance(trace, DataTree)
 def _available_varnames(trace) -> set[str]:
     if _is_inferencedata(trace):
         return set(trace.posterior.data_vars)
     return set(trace.varnames)
 def _values_flat(trace, var_name: str) -> np.ndarray:
     if _is_inferencedata(trace):
-        return np.asarray(trace.posterior[var_name]).reshape(-1)
+        return np.concatenate(
+            [c.reshape(-1) for c in _values_by_chain(trace, var_name)],
+            axis=0,
+        )
     return np.asarray(trace[var_name]).reshape(-1)
 def _values_by_chain(trace, var_name: str) -> list[np.ndarray]:
     if _is_inferencedata(trace):
-        arr = np.asarray(trace.posterior[var_name])
-        return [arr[i] for i in range(arr.shape[0])]
+        da = trace.posterior[var_name]
+        return [
+            np.asarray(da.isel(chain=i).values, dtype=np.float64)
+            for i in range(int(da.sizes["chain"]))
+        ]
     return trace.get_values(var_name, combine=False)
+
+
+def _loglik_numpy_from_posterior(trace: DataTree, var_name: str) -> np.ndarray:
+    """Materialize pointwise log-likelihood without syncing the full JAX posterior."""
+    da = trace.posterior[var_name]
+    ll = np.stack(
+        [
+            np.asarray(da.isel(chain=i).values, dtype=np.float64)
+            for i in range(int(da.sizes["chain"]))
+        ],
+        axis=0,
+    )
+    if ll.ndim == 2:
+        ll = ll[..., np.newaxis]
+    return ll
+
+
+def _attach_loglik_idata_from_posterior(trace: DataTree, var_name: str) -> DataTree:
+    """Attach log_likelihood group without copying the full posterior to numpy."""
+    ll = _loglik_numpy_from_posterior(trace, var_name)
+    dims = list(trace.posterior[var_name].dims)
+    idata = trace.copy(deep=False)
+    idata["log_likelihood"] = xr.Dataset({var_name: (dims, ll)})
+    return idata
+
+
+def _warm_jax_xarray_dataset(
+    ds: xr.Dataset,
+    preferred_vars: Iterable[str] | None = None,
+) -> None:
+    """Trigger a single JAX→host sync before bulk numpy conversion."""
+    if preferred_vars:
+        for name in preferred_vars:
+            if name in ds:
+                da = ds[name]
+                if "chain" in da.dims:
+                    np.asarray(da.isel(chain=0).values)
+                else:
+                    np.asarray(da.values)
+                return
+    for name in ("tau_mean", "changepoint_joint_log_lik", "lp"):
+        if name in ds:
+            da = ds[name]
+            if "chain" in da.dims:
+                np.asarray(da.isel(chain=0).values)
+            else:
+                np.asarray(da.values)
+            return
+    if ds.data_vars:
+        da = next(iter(ds.data_vars.values()))
+        if "chain" in da.dims:
+            np.asarray(da.isel(chain=0).values)
+        else:
+            np.asarray(da.values)
+
+
+def _xarray_dataset_to_numpy(
+    ds: xr.Dataset,
+    *,
+    var_names: Iterable[str] | None = None,
+) -> xr.Dataset:
+    allowed = set(var_names) if var_names is not None else None
+    converted: dict[str, xr.DataArray] = {}
+    for name in ds.data_vars:
+        if allowed is not None and name not in allowed:
+            continue
+        da = ds[name]
+        converted[name] = xr.DataArray(
+            np.asarray(da.values, dtype=np.float64),
+            dims=da.dims,
+            coords=da.coords,
+        )
+    return xr.Dataset(converted)
+
+
+def materialize_inferencedata_numpy(
+    trace: DataTree,
+    *,
+    posterior_var_names: Iterable[str] | None = None,
+    include_sample_stats: bool = True,
+) -> DataTree:
+    """Materialize JAX-backed posterior/sample_stats to host numpy arrays.
+
+    JAX backends return lazy arrays; the first ``.values`` access evaluates the
+  full trace graph (~10–20s). Doing that once here avoids repeated sync during
+    LOO scoring and diagnostics.
+    """
+    if not _is_inferencedata(trace):
+        return trace
+    out = trace.copy(deep=False)
+    if trace.posterior.data_vars:
+        selected_names = None if posterior_var_names is None else set(posterior_var_names)
+        warm_names = (
+            selected_names
+            if selected_names is not None
+            else ("tau_mean", "changepoint_joint_log_lik")
+        )
+        _warm_jax_xarray_dataset(trace.posterior, preferred_vars=warm_names)
+        out.posterior = _xarray_dataset_to_numpy(
+            trace.posterior,
+            var_names=selected_names,
+        )
+    if include_sample_stats and hasattr(trace, "sample_stats") and trace.sample_stats.data_vars:
+        out.sample_stats = _xarray_dataset_to_numpy(trace.sample_stats)
+    return out
+
+
 def _sampler_stat(trace, stat_name: str):
     if _is_inferencedata(trace):
         if hasattr(trace, "sample_stats") and stat_name in trace.sample_stats:
             return np.asarray(trace.sample_stats[stat_name])
-        raise KeyError(f"Sampler stat '{stat_name}' not found in InferenceData.sample_stats")
+        raise KeyError(f"Sampler stat '{stat_name}' not found in trace.sample_stats")
     return trace.get_sampler_stats(stat_name, combine=True)
 def summary_from_trace(trace, var_names):
     """Build ArviZ summary (mean, sd, r_hat, ESS)."""
     if _is_inferencedata(trace):
-        return az.summary(trace, var_names=var_names)
+        try:
+            return az.summary(trace, var_names=var_names)
+        except (AttributeError, TypeError, ValueError):
+            return az.summary(trace.posterior, var_names=var_names)
 
     posterior = {}
     for var in var_names:
         chains = _values_by_chain(trace, var)
         posterior[var] = np.stack(chains, axis=0)
-    idata = az.from_dict(posterior=posterior)
+    idata = az.from_dict({"posterior": posterior})
     return az.summary(idata, var_names=var_names)
 def tau_probabilities(trace):
     """Return tau support and probabilities P(tau=k)."""
@@ -66,8 +185,8 @@ def tau_probabilities(trace):
 
     if "tau_probs" in trace_vars and "tau_support" in trace_vars:
         if _is_inferencedata(trace):
-            probs_draws = np.asarray(trace.posterior["tau_probs"], dtype=float)
-            support_draws = np.asarray(trace.posterior["tau_support"], dtype=float)
+            probs_draws = np.stack(_values_by_chain(trace, "tau_probs"), axis=0)
+            support_draws = np.stack(_values_by_chain(trace, "tau_support"), axis=0)
             probs = probs_draws.mean(axis=(0, 1))
             support = support_draws[0, 0].astype(int).ravel()
         else:
@@ -79,6 +198,19 @@ def tau_probabilities(trace):
         return support, probs
 
     raise ValueError("Neither 'tau' nor ('tau_probs' and 'tau_support') found in trace.")
+
+
+def _tau_mean_samples_from_trace(trace) -> np.ndarray | None:
+    """Return per-draw tau means from either tau_mean or tau_probs/tau_support."""
+    trace_vars = _available_varnames(trace)
+    if "tau_mean" in trace_vars:
+        return _values_flat(trace, "tau_mean").astype(float)
+    if "tau_probs" in trace_vars and "tau_support" in trace_vars:
+        probs = np.stack(_values_by_chain(trace, "tau_probs"), axis=0).astype(float)
+        support = np.stack(_values_by_chain(trace, "tau_support"), axis=0).astype(float)
+        tau_mean = np.sum(probs * support, axis=-1)
+        return tau_mean.reshape(-1)
+    return None
 def _tau_map_from_trace(trace) -> int:
     """MAP estimate of tau (chunk changepoint index)."""
     support, probs = tau_probabilities(trace)
@@ -250,30 +382,67 @@ def _likelihood_pdf_from_posterior(
         threshold = float(params_1.get("threshold", params_2.get("threshold", 0.9)))
         x_unit = np.clip(x, eps, 1.0 - eps)
 
-        def _beta_pdf(xv: np.ndarray, alpha: float, beta: float) -> np.ndarray:
-            return (
-                np.exp(
-                    float(math.lgamma(alpha + beta))
-                    - float(math.lgamma(alpha))
-                    - float(math.lgamma(beta))
-                )
-                * (xv ** (alpha - 1.0))
-                * ((1.0 - xv) ** (beta - 1.0))
-            )
-
-        def _iib_pdf(xv: np.ndarray, pi: float, alpha: float, beta: float) -> np.ndarray:
-            uniform = np.where(xv >= threshold, 1.0 / max(1.0 - threshold, eps), 0.0)
-            return pi * uniform + (1.0 - pi) * _beta_pdf(xv, alpha, beta)
-
         return (
-            _iib_pdf(x_unit, pi_1, alpha_1, beta_1),
-            _iib_pdf(x_unit, pi_2, alpha_2, beta_2),
+            interval_inflated_beta_pdf_mixture(x_unit, pi_1, alpha_1, beta_1, threshold),
+            interval_inflated_beta_pdf_mixture(x_unit, pi_2, alpha_2, beta_2, threshold),
         )
 
     raise ValueError(
         f"Unsupported likelihood '{likelihood}'. "
         "Use one of: normal, student_t, lognormal, gamma, beta, interval_inflated_beta."
     )
+
+
+def _beta_pdf_unit(xv: np.ndarray, alpha: float, beta: float) -> np.ndarray:
+    """Beta(alpha, beta) PDF on (0, 1)."""
+    return (
+        np.exp(
+            float(math.lgamma(alpha + beta))
+            - float(math.lgamma(alpha))
+            - float(math.lgamma(beta))
+        )
+        * (xv ** (alpha - 1.0))
+        * ((1.0 - xv) ** (beta - 1.0))
+    )
+
+
+def interval_inflated_beta_pdf_mixture(
+    xv: np.ndarray,
+    pi: float,
+    alpha: float,
+    beta: float,
+    threshold: float,
+    *,
+    eps: float = 1e-12,
+) -> np.ndarray:
+    """Legacy/profile PDF: pi * Uniform[t,1] + (1-pi) * Beta on all x."""
+    x_unit = np.clip(np.asarray(xv, dtype=float), eps, 1.0 - eps)
+    thr = float(threshold)
+    uniform = np.where(x_unit >= thr, 1.0 / max(1.0 - thr, eps), 0.0)
+    return float(pi) * uniform + (1.0 - float(pi)) * _beta_pdf_unit(x_unit, alpha, beta)
+
+
+def interval_inflated_beta_pdf_model(
+    xv: np.ndarray,
+    pi: float,
+    alpha: float,
+    beta: float,
+    threshold: float,
+    *,
+    eps: float = 1e-12,
+) -> np.ndarray:
+    """Piecewise PDF used by changepoint_model interval_inflated_beta logp.
+
+    - y >= threshold: pi / (1 - threshold)
+    - y <  threshold: (1 - pi) * Beta(y)
+    """
+    x_unit = np.clip(np.asarray(xv, dtype=float), eps, 1.0 - eps)
+    thr = float(threshold)
+    upper = float(pi) / max(1.0 - thr, eps)
+    lower = (1.0 - float(pi)) * _beta_pdf_unit(x_unit, alpha, beta)
+    return np.where(x_unit >= thr, upper, lower)
+
+
 def _likelihood_profile_log_density_y(
     log_density_y: bool | set[tuple[str, str]] | None,
     group_name: str,
@@ -295,6 +464,8 @@ def feature_likelihood_profiles(
     grid_size: int = 300,
     plot: bool = True,
     log_density_y: bool | set[tuple[str, str]] | None = None,
+    save_dir: str | os.PathLike[str] | None = None,
+    plot_stem_prefix: str = "",
 ) -> dict[str, dict[str, pd.DataFrame]]:
     """Return and optionally plot before/after likelihood profiles for each selected feature.
 
@@ -347,22 +518,46 @@ def feature_likelihood_profiles(
                 params_1=params_1,
                 params_2=params_2,
             )
-            profile_df = pd.DataFrame(
-                {
-                    "x": x,
-                    "pdf_before": y_before,
-                    "pdf_after": y_after,
-                }
-            )
+            profile_cols: dict[str, np.ndarray] = {
+                "x": x,
+                "pdf_before": y_before,
+                "pdf_after": y_after,
+            }
+            if likelihood == "interval_inflated_beta":
+                threshold = float(params_1["threshold"])
+                profile_cols["pdf_before_model"] = interval_inflated_beta_pdf_model(
+                    x, params_1["pi"], params_1["alpha"], params_1["beta"], threshold
+                )
+                profile_cols["pdf_after_model"] = interval_inflated_beta_pdf_model(
+                    x, params_2["pi"], params_2["alpha"], params_2["beta"], threshold
+                )
+                profile_cols["pdf_before_mixture"] = y_before
+                profile_cols["pdf_after_mixture"] = y_after
+            profile_df = pd.DataFrame(profile_cols)
             profiles[group_name][feat_name] = profile_df
 
             if plot:
                 use_log_y = _likelihood_profile_log_density_y(
                     log_density_y, group_name, feat_name
                 )
+                from pathlib import Path
+
                 from seismic_pipeline.visualization.changepoint_plots import (
                     plot_feature_likelihood_profile,
+                    plot_interval_inflated_beta_pdf_comparison,
+                    plot_observations_before_after,
                 )
+
+                lik_save = obs_save = iib_cmp_save = None
+                if save_dir is not None:
+                    stem = f"{plot_stem_prefix}_" if plot_stem_prefix else ""
+                    lik_save = Path(save_dir) / f"{stem}{group_name}_{feat_name}_likelihood.png"
+                    obs_save = Path(save_dir) / f"{stem}{group_name}_{feat_name}_observations.png"
+                    if likelihood == "interval_inflated_beta":
+                        iib_cmp_save = (
+                            Path(save_dir)
+                            / f"{stem}{group_name}_{feat_name}_iib_pdf_compare.png"
+                        )
 
                 plot_feature_likelihood_profile(
                     group_name=group_name,
@@ -374,7 +569,31 @@ def feature_likelihood_profiles(
                     observed_2d=observed_2d,
                     trace=trace,
                     use_log_y=use_log_y,
+                    save_path=lik_save,
                 )
+                if likelihood == "interval_inflated_beta":
+                    plot_interval_inflated_beta_pdf_comparison(
+                        group_name=group_name,
+                        feat_name=feat_name,
+                        x=x,
+                        y_before_model=profile_df["pdf_before_model"].to_numpy(dtype=float),
+                        y_after_model=profile_df["pdf_after_model"].to_numpy(dtype=float),
+                        y_before_mixture=profile_df["pdf_before_mixture"].to_numpy(dtype=float),
+                        y_after_mixture=profile_df["pdf_after_mixture"].to_numpy(dtype=float),
+                        threshold=float(params_1["threshold"]),
+                        use_log_y=use_log_y,
+                        save_path=iib_cmp_save,
+                    )
+                if obs_save is not None:
+                    plot_observations_before_after(
+                        group_name=group_name,
+                        feat_name=feat_name,
+                        likelihood=likelihood,
+                        observed_2d=observed_2d,
+                        trace=trace,
+                        title_prefix=plot_stem_prefix,
+                        save_path=obs_save,
+                    )
 
     return profiles
 def changepoint_model_config_fingerprint(config: dict) -> str:
@@ -399,30 +618,63 @@ def _float_ic_scalar(val: Any) -> float:
         return float(np.asarray(val, dtype=float).squeeze())
     except Exception:
         return float("nan")
-def idata_for_waic_from_trace(trace, model) -> az.InferenceData:
-    """Build InferenceData with a log_likelihood group suitable for ``az.waic`` / ``az.loo``."""
+def _has_log_likelihood_group(trace: DataTree) -> bool:
+    return "log_likelihood" in trace.children and bool(trace["log_likelihood"].data_vars)
+def _ic_elpd(ic_result: Any) -> float:
+    for attr in ("elpd_loo", "elpd_waic", "elpd"):
+        if hasattr(ic_result, attr):
+            val = getattr(ic_result, attr)
+            if val is not None:
+                return _float_ic_scalar(val)
+    return float("nan")
+def _ic_p(ic_result: Any) -> float:
+    for attr in ("p_loo", "p_waic", "p"):
+        if hasattr(ic_result, attr):
+            val = getattr(ic_result, attr)
+            if val is not None:
+                return _float_ic_scalar(val)
+    return float("nan")
+def _call_az_waic(idata_ic: DataTree):
+    waic_fn = getattr(az, "waic", None)
+    if waic_fn is None:
+        return None
+    try:
+        return waic_fn(idata_ic, scale="log")
+    except TypeError:
+        return waic_fn(idata_ic)
+
+
+def idata_for_waic_from_trace(trace, model) -> DataTree:
+    """Build DataTree with a log_likelihood group suitable for ``az.loo``."""
+    if _is_inferencedata(trace) and _has_log_likelihood_group(trace):
+        return trace
+
+    trace_vars = _available_varnames(trace)
+
+    # Prefer precomputed marginalized pointwise log-lik from the trace (fast, correct
+    # for tau_mode='marginalized'). Do NOT call pm.compute_log_likelihood first: it
+    # re-scans every posterior draw via PyTensor (~100x slower) and may not populate
+    # log_likelihood for Potential-only observation models.
+    if "changepoint_pointwise_log_lik" in trace_vars:
+        return _attach_loglik_idata_from_posterior(trace, "changepoint_pointwise_log_lik")
+
+    if "changepoint_joint_log_lik" in trace_vars:
+        return _attach_loglik_idata_from_posterior(trace, "changepoint_joint_log_lik")
+
     posterior = _posterior_dict_from_trace(trace)
     if not posterior:
         raise ValueError("No posterior variables found in trace for WAIC/LOO.")
 
-    trace_vars = _available_varnames(trace)
-    if "changepoint_pointwise_log_lik" in trace_vars:
-        ll_chains = _values_by_chain(trace, "changepoint_pointwise_log_lik")
-        ll = np.stack(ll_chains, axis=0).astype(float)
-        if ll.ndim == 2:
-            ll = ll[..., np.newaxis]
-        loglik_group = {"changepoint_pointwise_log_lik": ll}
-        return az.from_dict(posterior=posterior, log_likelihood=loglik_group)
+    if _is_inferencedata(trace):
+        try:
+            with model:
+                idata = pm.compute_log_likelihood(trace, model=model)
+            if _has_log_likelihood_group(idata):
+                return idata
+        except Exception:
+            pass
 
-    if "changepoint_joint_log_lik" in trace_vars:
-        ll_chains = _values_by_chain(trace, "changepoint_joint_log_lik")
-        ll = np.stack(ll_chains, axis=0).astype(float)
-        if ll.ndim == 2:
-            ll = ll[..., np.newaxis]
-        loglik_group = {"changepoint_joint_log_lik": ll}
-        return az.from_dict(posterior=posterior, log_likelihood=loglik_group)
-
-    idata = az.from_dict(posterior=posterior)
+    idata = az.from_dict({"posterior": posterior})
     try:
         with model:
             idata = pm.compute_log_likelihood(idata, model=model)
@@ -431,8 +683,8 @@ def idata_for_waic_from_trace(trace, model) -> az.InferenceData:
             "WAIC/LOO requires pointwise log-likelihood; compute_log_likelihood failed. "
             "For marginalized tau models use changepoint_joint_log_lik in the trace."
         ) from exc
-    if not hasattr(idata, "log_likelihood") or not idata.log_likelihood:
-        raise RuntimeError("compute_log_likelihood did not populate idata.log_likelihood.")
+    if not _has_log_likelihood_group(idata):
+        raise RuntimeError("compute_log_likelihood did not populate log_likelihood.")
     return idata
 _idata_for_waic_from_trace = idata_for_waic_from_trace
 def score_changepoint_trace(
@@ -478,8 +730,8 @@ def score_changepoint_trace(
     tau_hdi_60_lower = float("nan")
     tau_hdi_60_upper = float("nan")
     tau_hdi_60_width = float("nan")
-    if "tau_mean" in _available_varnames(trace):
-        tau_mean_samples = _values_flat(trace, "tau_mean").astype(float)
+    tau_mean_samples = _tau_mean_samples_from_trace(trace)
+    if tau_mean_samples is not None:
         tau_q1 = float(np.percentile(tau_mean_samples, 25))
         tau_q2 = float(np.percentile(tau_mean_samples, 50))
         tau_q3 = float(np.percentile(tau_mean_samples, 75))
@@ -489,7 +741,7 @@ def score_changepoint_trace(
         tau_hdi_60_width = tau_hdi_60_upper - tau_hdi_60_lower
     elif warn_on_fallback:
         warnings.warn(
-            "score_changepoint_trace: ``tau_mean`` not in trace; "
+            "score_changepoint_trace: neither ``tau_mean`` nor ``tau_probs/tau_support`` in trace; "
             "tau_q1/q2/q3 and tau_hdi_60_* set to NaN.",
             UserWarning,
             stacklevel=2,
@@ -562,44 +814,54 @@ def score_changepoint_trace(
     waic_stat = float("nan")
     p_waic = float("nan")
     loo_stat = float("nan")
+    loo_ic = float("nan")
     elpd_loo = float("nan")
     p_loo = float("nan")
+    elpd_waic = float("nan")
     waic_warning_flag = False
     waic_warning_messages: List[str] = []
     criterion_error: str | None = None
     ic_computed = False
+    idata_ic_cache: DataTree | None = None
+    loo_obj_cache: Any | None = None
 
     if model is not None and crit in {"waic", "loo"}:
         try:
             idata_ic = _idata_for_waic_from_trace(trace, model)
-            with warnings.catch_warnings(record=True) as waic_warns:
-                warnings.simplefilter("always")
-                ic_waic = az.waic(idata_ic, scale="log")
-            p_waic = _float_ic_scalar(getattr(ic_waic, "p_waic", float("nan")))
-            waic_stat = _float_ic_scalar(getattr(ic_waic, "waic", float("nan")))
-            elpd_waic = _float_ic_scalar(getattr(ic_waic, "elpd_waic", float("nan")))
-            if not math.isfinite(waic_stat) and math.isfinite(elpd_waic):
-                waic_stat = float(-2.0 * elpd_waic)
-            for w in waic_warns:
-                msg = str(w.message)
-                waic_warning_messages.append(msg)
-                if "posterior variance of the log predictive densities exceeds 0.4" in msg:
-                    waic_warning_flag = True
+            idata_ic_cache = idata_ic
+            if crit == "waic" and getattr(az, "waic", None) is not None:
+                with warnings.catch_warnings(record=True) as waic_warns:
+                    warnings.simplefilter("always")
+                    ic_waic = _call_az_waic(idata_ic)
+                if ic_waic is not None:
+                    p_waic = _ic_p(ic_waic)
+                    waic_stat = _float_ic_scalar(getattr(ic_waic, "waic", float("nan")))
+                    elpd_waic = _ic_elpd(ic_waic)
+                    if not math.isfinite(waic_stat) and math.isfinite(elpd_waic):
+                        waic_stat = float(-2.0 * elpd_waic)
+                    for w in waic_warns:
+                        msg = str(w.message)
+                        waic_warning_messages.append(msg)
+                        if "posterior variance of the log predictive densities exceeds 0.4" in msg:
+                            waic_warning_flag = True
 
-            ic_loo = az.loo(idata_ic, scale="log")
-            p_loo = _float_ic_scalar(getattr(ic_loo, "p_loo", float("nan")))
-            elpd_loo = _float_ic_scalar(getattr(ic_loo, "elpd_loo", float("nan")))
-            loo_ic = _float_ic_scalar(getattr(ic_loo, "loo", float("nan")))
-            if not math.isfinite(loo_ic) and math.isfinite(elpd_loo):
-                loo_ic = float(-2.0 * elpd_loo)
-            if str(loo_report).strip().lower() == "elpd":
-                loo_stat = elpd_loo
-            else:
-                loo_stat = loo_ic
+            ic_loo = None
+            if crit == "loo" or crit == "waic":
+                ic_loo = az.loo(idata_ic, pointwise=True)
+                loo_obj_cache = ic_loo
+                p_loo = _ic_p(ic_loo)
+                elpd_loo = _ic_elpd(ic_loo)
+                loo_ic = _float_ic_scalar(getattr(ic_loo, "loo", float("nan")))
+                if not math.isfinite(loo_ic) and math.isfinite(elpd_loo):
+                    loo_ic = float(-2.0 * elpd_loo)
+                if str(loo_report).strip().lower() == "elpd":
+                    loo_stat = elpd_loo
+                else:
+                    loo_stat = loo_ic
 
             if crit == "waic":
                 elpd = elpd_waic
-            else:
+            elif crit == "loo" and ic_loo is not None:
                 elpd = elpd_loo
             ic_computed = True
         except Exception as exc:
@@ -646,11 +908,15 @@ def score_changepoint_trace(
         "waic": waic_stat,
         "p_waic": p_waic,
         "elpd_loo": elpd_loo,
+        "loo_ic": loo_ic,
+        "loo_reported": loo_stat,
         "loo": loo_stat,
         "p_loo": p_loo,
         "waic_warning_flag": waic_warning_flag,
         "waic_warning_messages": waic_warning_messages,
         "criterion_error": criterion_error,
+        "_idata_ic": idata_ic_cache,
+        "_loo_obj": loo_obj_cache,
     }
     return out
 def changepoint_log_target(
@@ -746,10 +1012,14 @@ def collect_pareto_k_stats(
     model,
     *,
     pareto_threshold: float = 0.7,
+    idata_ic: DataTree | None = None,
+    loo_obj: Any | None = None,
 ) -> tuple[float, int, list[int], int | None]:
     try:
-        idata_ic = idata_for_waic_from_trace(trace, model)
-        loo_obj = az.loo(idata_ic, scale="log", pointwise=True)
+        if loo_obj is None:
+            if idata_ic is None:
+                idata_ic = idata_for_waic_from_trace(trace, model)
+            loo_obj = az.loo(idata_ic, pointwise=True)
         pareto = getattr(loo_obj, "pareto_k", None)
         if pareto is None:
             return float("nan"), 0, [], None

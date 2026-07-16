@@ -42,6 +42,13 @@ from .seismo import (
     HypnogramCacheManagerYt,
     HypnoCalculatorYt,
     DatFileCacheManagerYt,
+    ChannelQualityAdapter,
+    ChannelQualityDecision,
+    HypnogramAlignment,
+    load_hypnogram_array,
+    align_hypnograms,
+    compute_hypnogram_metrics,
+    rem_fraction_profile,
 )
 
 # Import visualization tools (optional - can be imported directly)
@@ -82,6 +89,13 @@ __all__ = [
     'HypnogramCacheManagerYt',
     'HypnoCalculatorYt',
     'DatFileCacheManagerYt',
+    'ChannelQualityAdapter',
+    'ChannelQualityDecision',
+    'HypnogramAlignment',
+    'load_hypnogram_array',
+    'align_hypnograms',
+    'compute_hypnogram_metrics',
+    'rem_fraction_profile',
     
     # Visualization tools (if available)
     'visualize_hyperparameter_grid_slices',

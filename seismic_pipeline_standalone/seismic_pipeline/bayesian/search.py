@@ -402,7 +402,12 @@ def exhaustive_model_search(
     )
     tau_threshold = float(proposal_options.get("tau_threshold", 6.0))
     pareto_threshold = float(proposal_options.get("pareto_threshold", 0.7))
-    max_pareto_retries = 3
+    max_pareto_retries = int(proposal_options.get("max_pareto_retries", 3))
+    enable_pareto_refit_raw = proposal_options.get("enable_pareto_refit", True)
+    if isinstance(enable_pareto_refit_raw, str):
+        enable_pareto_refit = enable_pareto_refit_raw.strip().lower() not in {"0", "false", "no", "off"}
+    else:
+        enable_pareto_refit = bool(enable_pareto_refit_raw)
 
     use_rem_profile_recalc = False
     if configs is not None:
@@ -592,6 +597,9 @@ def exhaustive_model_search(
                     pareto_threshold=pareto_threshold,
                 )
                 if (
+                    enable_pareto_refit
+                    and max_pareto_retries > 0
+                    and
                     loo_n_over > 0
                     and math.isfinite(loo_k_max)
                     and loo_k_max > pareto_threshold

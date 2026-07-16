@@ -31,6 +31,7 @@ from seismic_pipeline.features.runtime import (
 _SHAPE_SHIFT_METRIC = "shape_shift"
 _SHAPE_SHIFT_GROUPS = frozenset({"all", "concat", "odd", "even"})
 FIXED_N_CHUNK_DAYS = 8
+_DAILY_PERIOD_GROUPS = frozenset({"daily", "day", "night"})
 
 def maxmin_scale(row: np.ndarray) -> np.ndarray:
     """Normalize a 1D row to [0, 1] ignoring NaN padding."""
@@ -381,6 +382,8 @@ def expected_fixed_n_chunks(
         for metric in metrics:
             if metric == _SHAPE_SHIFT_METRIC:
                 result[group][metric] = n_days - 1
+            elif group in _DAILY_PERIOD_GROUPS:
+                result[group][metric] = n_days
             else:
                 result[group][metric] = n_chunks
     return result
@@ -469,6 +472,63 @@ def compute_chunk_feature_map_fixed_n(
     return group_data
 
 
+def _global_minmax_normalize_to_minus1_plus1(profiles_slice: np.ndarray) -> np.ndarray:
+    """Normalize each event profile to [-1, 1] using one min/max over all days."""
+    row_min = profiles_slice.min(axis=1, keepdims=True)
+    row_max = profiles_slice.max(axis=1, keepdims=True)
+    denom = row_max - row_min
+    denom[denom == 0] = 1.0
+    return 2.0 * (profiles_slice - row_min) / denom - 1.0
+
+
+def compute_daily_period_feature_map_fixed_n(
+    profiles: np.ndarray,
+    n_points_per_day: int,
+    *,
+    n_days: int = FIXED_N_CHUNK_DAYS,
+) -> dict[str, dict[str, np.ndarray]]:
+    """Compute daily/day/night mean/range on globally normalized 8-day profiles."""
+    n_events = int(profiles.shape[0])
+    total_points = int(n_days * n_points_per_day)
+    if profiles.shape[1] < total_points:
+        raise ValueError(
+            f"profiles width {profiles.shape[1]} < required {total_points} "
+            f"for n_days={n_days}, n_points_per_day={n_points_per_day}"
+        )
+    if int(n_points_per_day) < 2:
+        raise ValueError(f"n_points_per_day must be >=2, got {n_points_per_day}")
+
+    profiles_slice = profiles[:, :total_points]
+    profiles_norm = _global_minmax_normalize_to_minus1_plus1(profiles_slice)
+    profiles_3d = profiles_norm.reshape(n_events, n_days, n_points_per_day)
+
+    split = int(n_points_per_day // 2)
+    if split <= 0 or split >= int(n_points_per_day):
+        raise ValueError(
+            f"Cannot split day/night for n_points_per_day={n_points_per_day}; "
+            "need at least 2 points/day."
+        )
+
+    day_part = profiles_3d[:, :, :split]
+    night_part = profiles_3d[:, :, split:]
+
+    out: dict[str, dict[str, np.ndarray]] = {
+        "daily": {
+            "mean": profiles_3d.mean(axis=2),
+            "range": profiles_3d.max(axis=2) - profiles_3d.min(axis=2),
+        },
+        "day": {
+            "mean": day_part.mean(axis=2),
+            "range": day_part.max(axis=2) - day_part.min(axis=2),
+        },
+        "night": {
+            "mean": night_part.mean(axis=2),
+            "range": night_part.max(axis=2) - night_part.min(axis=2),
+        },
+    }
+    return out
+
+
 def compute_concat_chunk_feature_map(data_norm: np.ndarray, n_chunks: int) -> dict[str, np.ndarray]:
     """Compute features on concatenated odd+even chunk pairs."""
     if n_chunks % 2 != 0:
@@ -525,7 +585,7 @@ def _validate_shape_shift_groups(selection: dict[str, list[str]]) -> dict[str, l
 
 def _parse_feature_selection(feature_selection) -> dict[str, list[str]]:
     base_metrics = {"range", "mean", "std", "skewness", "kurtosis", _SHAPE_SHIFT_METRIC}
-    base_groups = {"all", "odd", "even", "concat", "single"}
+    base_groups = {"all", "odd", "even", "concat", "single", "daily", "day", "night"}
 
     def norm_group(g: str) -> str:
         g = g.strip().lower()
@@ -538,8 +598,10 @@ def _parse_feature_selection(feature_selection) -> dict[str, list[str]]:
     if isinstance(feature_selection, dict):
         for group_name, feats in feature_selection.items():
             g = norm_group(str(group_name))
-            if g not in {"all", "odd", "even", "concat"}:
-                raise ValueError(f"Unknown group '{group_name}'. Use one of: all, odd, even, concat")
+            if g not in {"all", "odd", "even", "concat", "daily", "day", "night"}:
+                raise ValueError(
+                    f"Unknown group '{group_name}'. Use one of: all, odd, even, concat, daily, day, night"
+                )
 
             feats_list = [feats] if isinstance(feats, str) else list(feats)
             out[g] = []
@@ -646,15 +708,48 @@ def build_group_data(
             "shape_shift requires fixed-N mode (set n_points_per_day or export_cfg n_points_per_day)."
         )
 
+    period_metrics_needed = any(
+        group_name in _DAILY_PERIOD_GROUPS
+        and any(metric_name != _SHAPE_SHIFT_METRIC for metric_name in metric_list)
+        for group_name, metric_list in selection.items()
+    )
     chunk_metrics_needed = any(
+        group_name not in _DAILY_PERIOD_GROUPS
+        and
         metric_name != _SHAPE_SHIFT_METRIC
-        for metric_list in selection.values()
+        for group_name, metric_list in selection.items()
         for metric_name in metric_list
     )
 
     fixed_maps: dict[str, dict[str, np.ndarray]] | None = None
+    fixed_period_maps: dict[str, dict[str, np.ndarray]] | None = None
     feature_map: dict[str, np.ndarray] = {}
     concat_feature_map: dict[str, np.ndarray] | None = None
+
+    if period_metrics_needed and not fixed_n_mode:
+        raise ValueError(
+            "Groups daily/day/night require fixed-N mode "
+            "(set n_points_per_day or export_cfg n_points_per_day)."
+        )
+
+    if fixed_n_mode and period_metrics_needed:
+        if data_raw is None:
+            raise ValueError("data_raw is required for fixed-N period features.")
+        if chunk_metrics_needed or uses_shape_shift:
+            raise ValueError(
+                "daily/day/night features cannot be mixed with concat/odd/even/shape_shift "
+                "in one model because chunk counts differ under shared tau."
+            )
+        if int(n_chunks) != int(fixed_n_days):
+            raise ValueError(
+                f"daily/day/night mode requires n_chunks={fixed_n_days}, got {n_chunks}."
+            )
+        n_pts = int(n_points_per_day)
+        fixed_period_maps = compute_daily_period_feature_map_fixed_n(
+            data_raw,
+            n_pts,
+            n_days=fixed_n_days,
+        )
 
     if fixed_n_mode and (chunk_metrics_needed or uses_shape_shift):
         if data_raw is None:
@@ -727,11 +822,27 @@ def build_group_data(
 
     out: dict[str, dict[str, pd.DataFrame]] = {}
     for group_key, metric_list in selection.items():
-        if group_key not in idx_map and group_key != "concat":
-            raise ValueError(f"Unknown group '{group_key}' after parsing")
+        if group_key not in idx_map and group_key not in _DAILY_PERIOD_GROUPS:
+            raise ValueError(f"Unknown group '{group_key}' after parsing.")
         out[group_key] = {}
         for metric_name in metric_list:
             prefix = metric_name if group_key == "all" else f"{metric_name}_{group_key}"
+            if group_key in _DAILY_PERIOD_GROUPS:
+                if not fixed_n_mode:
+                    raise ValueError(
+                        f"Group '{group_key}' requires fixed-N mode with data_raw and n_points_per_day."
+                    )
+                if fixed_period_maps is None:
+                    raise ValueError("Internal error: fixed_period_maps not computed.")
+                if metric_name not in fixed_period_maps[group_key]:
+                    raise ValueError(
+                        f"Metric '{metric_name}' not available for group '{group_key}'."
+                    )
+                out[group_key][metric_name] = _to_feature_df(
+                    fixed_period_maps[group_key][metric_name],
+                    prefix,
+                )
+                continue
             if fixed_n_mode:
                 if fixed_maps is None:
                     raise ValueError("Internal error: fixed_maps not computed.")

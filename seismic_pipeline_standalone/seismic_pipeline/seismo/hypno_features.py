@@ -7,6 +7,7 @@ import sys
 import tempfile
 from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -49,12 +50,29 @@ class MLPChannelQualityPredictor:
         model_path: str,
         module_paths: Optional[List[str]] = None,
         good_classes: Tuple[int, ...] = (4, 5),
+        rat_dir: Optional[str] = None,
     ):
         self.model_path = str(model_path)
         self.module_paths = module_paths or []
         self.good_classes = tuple(int(v) for v in good_classes)
+        self.rat_dir = rat_dir
         self._model = None
         self._load_error: Optional[Exception] = None
+
+    def _configure_model(self, model: Any) -> Any:
+        """Apply runtime overrides expected by research pickles when available."""
+        if not hasattr(model, "set_params"):
+            return model
+        updates: Dict[str, Any] = {}
+        if self.rat_dir:
+            updates["ts_extract__rat_dir"] = str(self.rat_dir)
+        if updates:
+            try:
+                model.set_params(**updates)
+            except Exception:
+                # Some model versions expose different parameter names.
+                pass
+        return model
 
     def _load(self):
         if self._model is not None:
@@ -63,7 +81,8 @@ class MLPChannelQualityPredictor:
             raise self._load_error
         try:
             with _sys_path(self.module_paths):
-                self._model = joblib_load(self.model_path)
+                loaded = joblib_load(self.model_path)
+            self._model = self._configure_model(loaded)
             return self._model
         except Exception as e:
             self._load_error = e
@@ -73,6 +92,27 @@ class MLPChannelQualityPredictor:
         model = self._load()
         pred = model.predict([[date, int(channel_1b), str(rat_id)]])[0]
         return int(pred)
+
+    def predict_good_probability(self, rat_id: str, date: str, channel_1b: int) -> float:
+        model = self._load()
+        if not hasattr(model, "predict_proba"):
+            pred = self.predict_class(rat_id, date, channel_1b)
+            return 1.0 if pred in self.good_classes else 0.0
+        probs = model.predict_proba([[date, int(channel_1b), str(rat_id)]])[0]
+        classes = getattr(model, "classes_", None)
+        if classes is None:
+            pred = self.predict_class(rat_id, date, channel_1b)
+            return float(np.max(probs)) if pred in self.good_classes else float(np.min(probs))
+        good_prob = 0.0
+        for idx, cls in enumerate(classes):
+            if int(cls) in self.good_classes:
+                good_prob += float(probs[idx])
+        return float(good_prob)
+
+    def predict_class_and_proba(self, rat_id: str, date: str, channel_1b: int) -> Tuple[int, float]:
+        pred_class = self.predict_class(rat_id, date, channel_1b)
+        good_prob = self.predict_good_probability(rat_id, date, channel_1b)
+        return pred_class, good_prob
 
     def is_good(self, rat_id: str, date: str, channel_1b: int) -> bool:
         pred_class = self.predict_class(rat_id, date, channel_1b)

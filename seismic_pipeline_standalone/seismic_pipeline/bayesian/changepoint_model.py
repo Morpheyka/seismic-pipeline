@@ -25,6 +25,7 @@ from seismic_pipeline.bayesian.priors import (
     _parse_parameter_selection,
     build_interval_inflated_beta_priors,
 )
+from seismic_pipeline.bayesian.diagnostics import materialize_inferencedata_numpy
 from seismic_pipeline.features.rem_chunk_features import (
     FIXED_N_CHUNK_DAYS,
     shape_shift_tau_chunk_indices,
@@ -272,6 +273,10 @@ def build_changepoint_model(
                             ll_2 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_2, sigma=sigma_2), observed)
                             _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
                     else:
+                        # Positive-support likelihoods are undefined at y<=0.
+                        # shape_shift may contain exact zeros, so use a tiny floor.
+                        lognormal_eps = float(spec.get("eps", 1e-6))
+                        observed_lognormal = np.clip(observed, lognormal_eps, np.inf)
                         if tau_mode == "discrete":
                             mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
                             sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
@@ -279,11 +284,11 @@ def build_changepoint_model(
                                 f"obs_{group_name}_{feat_name}",
                                 mu=mu,
                                 sigma=sigma,
-                                observed=observed,
+                                observed=observed_lognormal,
                             )
                         else:
-                            ll_1 = pm.logp(pm.LogNormal.dist(mu=mu_1, sigma=sigma_1), observed)
-                            ll_2 = pm.logp(pm.LogNormal.dist(mu=mu_2, sigma=sigma_2), observed)
+                            ll_1 = pm.logp(pm.LogNormal.dist(mu=mu_1, sigma=sigma_1), observed_lognormal)
+                            ll_2 = pm.logp(pm.LogNormal.dist(mu=mu_2, sigma=sigma_2), observed_lognormal)
                             _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
                     continue
 
@@ -308,6 +313,10 @@ def build_changepoint_model(
                         spec.get("beta_prior", {"dist": "exponential", "lam": 1.0}),
                         positive_only=True,
                     )
+                    # Positive-support likelihoods are undefined at y<=0.
+                    # shape_shift may contain exact zeros, so use a tiny floor.
+                    gamma_eps = float(spec.get("eps", 1e-6))
+                    observed_gamma = np.clip(observed, gamma_eps, np.inf)
                     if tau_mode == "discrete":
                         alpha = pm.math.switch(tau > feat_idx + 1, alpha_1, alpha_2)
                         beta = pm.math.switch(tau > feat_idx + 1, beta_1, beta_2)
@@ -315,39 +324,46 @@ def build_changepoint_model(
                             f"obs_{group_name}_{feat_name}",
                             alpha=alpha,
                             beta=beta,
-                            observed=observed,
+                            observed=observed_gamma,
                         )
                     else:
-                        ll_1 = pm.logp(pm.Gamma.dist(alpha=alpha_1, beta=beta_1), observed)
-                        ll_2 = pm.logp(pm.Gamma.dist(alpha=alpha_2, beta=beta_2), observed)
+                        ll_1 = pm.logp(pm.Gamma.dist(alpha=alpha_1, beta=beta_1), observed_gamma)
+                        ll_2 = pm.logp(pm.Gamma.dist(alpha=alpha_2, beta=beta_2), observed_gamma)
                         _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
                     continue
 
                 if likelihood == "beta":
                     alpha_1 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_1",
-                        spec.get("alpha_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
+                        spec.get("alpha_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
                         positive_only=True,
                     )
                     alpha_2 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_2",
-                        spec.get("alpha_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
+                        spec.get("alpha_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
                         positive_only=True,
                     )
                     beta_1 = _build_prior(
                         f"beta_{group_name}_{feat_name}_1",
-                        spec.get("beta_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
+                        spec.get("beta_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
                         positive_only=True,
                     )
                     beta_2 = _build_prior(
                         f"beta_{group_name}_{feat_name}_2",
-                        spec.get("beta_prior", {"dist": "exponential_plus", "lam": 0.5, "offset": 1.0}),
+                        spec.get("beta_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
                         positive_only=True,
                     )
-                    # Beta support is (0, 1), so clip normalized data slightly
-                    # away from boundaries to avoid -inf logp at exact 0/1.
-                    beta_eps = float(spec.get("eps", 1e-6))
-                    observed_beta = np.clip(observed, beta_eps, 1.0 - beta_eps)
+                    # Beta support is (0, 1). Optionally rescale observed values
+                    # from [0, support_upper] to [0, 1] before clipping.
+                    support_upper = float(spec.get("support_upper", 1.0))
+                    if support_upper <= 0:
+                        raise ValueError(
+                            f"support_upper must be > 0 for beta likelihood, got {support_upper}"
+                        )
+                    observed_scaled = observed / support_upper
+                    # Clip slightly away from boundaries to avoid -inf at exact 0/1.
+                    beta_eps = float(spec.get("eps", 1e-4))
+                    observed_beta = np.clip(observed_scaled, beta_eps, 1.0 - beta_eps)
                     if tau_mode == "discrete":
                         alpha = pm.math.switch(tau > feat_idx + 1, alpha_1, alpha_2)
                         beta = pm.math.switch(tau > feat_idx + 1, beta_1, beta_2)
@@ -385,8 +401,14 @@ def build_changepoint_model(
                     pi_2, alpha_2, beta_2 = priors_2["pi"], priors_2["alpha"], priors_2["beta"]
                     thr = priors_1["threshold"]
 
+                    support_upper = float(spec.get("support_upper", 1.0))
+                    if support_upper <= 0:
+                        raise ValueError(
+                            f"support_upper must be > 0 for interval_inflated_beta, got {support_upper}"
+                        )
+                    observed_scaled = observed / support_upper
                     eps = float(spec.get("eps", 1e-6))
-                    observed_clipped = np.clip(observed, eps, 1.0 - eps)
+                    observed_clipped = np.clip(observed_scaled, eps, 1.0 - eps)
                     y_obs = pt.as_tensor_variable(observed_clipped)
 
                     if tau_mode == "discrete":
@@ -434,9 +456,13 @@ def sample_model(
     nuts_backend: str = "pymc",
     chains: int = 4,
     cores: int | None = None,
+    blas_cores: int | None = None,
+    jax_chain_method: str = "parallel",
     progressbar: bool = True,
+    jax_var_names: Iterable[str] | None = None,
+    materialize_posterior_vars: Iterable[str] | None = None,
 ):
-    """Run MCMC sampling and return MultiTrace.
+    """Run MCMC sampling and return an ArviZ-compatible DataTree trace.
 
     Parameters
     ----------
@@ -444,51 +470,77 @@ def sample_model(
         - "pymc" (default): classic PyMC NUTS
         - "numpyro": JAX/NumPyro NUTS backend (can use GPU)
         - "blackjax": JAX/BlackJAX NUTS backend (can use GPU)
+    jax_chain_method:
+        JAX backends only. "parallel" (default) or "vectorized".
     """
     backend = str(nuts_backend).lower().strip()
-    sample_kwargs = dict(
-        draws=draws,
-        tune=tune,
-        return_inferencedata=False,
-        compute_convergence_checks=False,
-        target_accept=0.9,
-        chains=chains,
-        progressbar=bool(progressbar),
-    )
-    if cores is not None:
-        sample_kwargs["cores"] = cores
+    target_accept = 0.95
+    compute_checks = False
+    pymc_nuts_kwargs: dict[str, object] = {"max_treedepth": 12}
 
-    with model:
-        if backend == "pymc":
-            trace = pm.sample(**sample_kwargs, init="jitter+adapt_diag")
-        elif backend in {"numpyro", "blackjax"}:
-            import jax
-
-            # With a single device, JAX "parallel" chains via pmap may fail for chains>1.
-            device_count = int(jax.device_count())
-            nuts_sampler_kwargs: dict[str, object] = {}
-            jax_vectorized = chains > 1 and device_count < chains
-            if jax_vectorized:
-                nuts_sampler_kwargs["chain_method"] = "vectorized"
-            # BlackJAX progress bar uses IO callbacks that can fail under vectorized chains.
-            if jax_vectorized:
-                sample_kwargs["progressbar"] = False
-
-            try:
-                trace = pm.sample(
-                    nuts_sampler=backend,
-                    nuts_sampler_kwargs=nuts_sampler_kwargs,
-                    **sample_kwargs,
-                )
-            except ValueError as exc:
-                if "Model can not be sampled with NUTS alone" in str(exc):
-                    raise ValueError(
-                        "JAX backend requires a fully continuous differentiable model. "
-                        "Use tau_mode='marginalized' (or backend='pymc')."
-                    ) from exc
-                raise
-        else:
-            raise ValueError(
-                "Unsupported nuts_backend. Use one of: 'pymc', 'numpyro', 'blackjax'."
+    if backend == "pymc":
+        sample_kwargs = dict(
+            draws=draws,
+            tune=tune,
+            compute_convergence_checks=compute_checks,
+            target_accept=target_accept,
+            chains=chains,
+            progressbar=bool(progressbar),
+        )
+        if cores is not None:
+            sample_kwargs["cores"] = cores
+        if blas_cores is not None:
+            sample_kwargs["blas_cores"] = blas_cores
+        with model:
+            trace = pm.sample(
+                **sample_kwargs,
+                init="jitter+adapt_diag",
+                nuts=pymc_nuts_kwargs,
             )
-    return trace
+        return trace
+
+    if backend in {"numpyro", "blackjax"}:
+        try:
+            import pymc.sampling.jax as pymc_jax
+        except ImportError as exc:
+            raise ImportError(
+                f"nuts_backend={backend!r} requires JAX. Install with: pip install 'numpyro[cpu]'"
+            ) from exc
+        if backend == "blackjax":
+            import importlib.util
+
+            if importlib.util.find_spec("blackjax") is None:
+                raise ImportError(
+                    "nuts_backend='blackjax' requires blackjax. Install with: pip install blackjax"
+                )
+        chain_method = str(jax_chain_method).strip().lower()
+        if chain_method not in {"parallel", "vectorized"}:
+            raise ValueError(
+                f"Invalid jax_chain_method={jax_chain_method!r}. Use 'parallel' or 'vectorized'."
+            )
+        jax_nuts_kwargs = (
+            {"max_tree_depth": 12} if backend == "numpyro" else {}
+        )
+        with model:
+            trace = pymc_jax.sample_jax_nuts(
+                draws=draws,
+                tune=tune,
+                chains=chains,
+                target_accept=target_accept,
+                model=model,
+                progressbar=bool(progressbar),
+                nuts_sampler=backend,
+                chain_method=chain_method,
+                var_names=list(jax_var_names) if jax_var_names is not None else None,
+                compute_convergence_checks=compute_checks,
+                nuts_kwargs=jax_nuts_kwargs,
+            )
+        return materialize_inferencedata_numpy(
+            trace,
+            posterior_var_names=materialize_posterior_vars,
+            include_sample_stats=True,
+        )
+
+    raise ValueError(
+        "Unsupported nuts_backend. Use one of: 'pymc', 'numpyro', 'blackjax'."
+    )

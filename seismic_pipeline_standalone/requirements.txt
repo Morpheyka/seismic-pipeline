@@ -13,4 +13,6 @@ tqdm>=4.0.0
 pymc
 arviz
 pytensor
-
+numpyro[cpu]  # optional JAX backend for pm.sample(nuts_sampler="numpyro")
+blackjax      # optional JAX backend alternative to numpyro
+fastprogress  # required by blackjax progress bars (optional if progressbar=False)

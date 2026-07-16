@@ -67,6 +67,19 @@ def build_summary_var_names(group_data: dict, trace) -> List[str]:
     return sorted(set(out))
 
 
+def build_scoring_summary_var_names(trace) -> List[str]:
+    """Lightweight convergence summary vars for exhaustive search scoring."""
+    available = _available_varnames(trace)
+    out: List[str] = []
+    if "tau" in available:
+        out.append("tau")
+    if "tau_mean" in available:
+        out.append("tau_mean")
+    elif "tau_probs" in available:
+        out.append("tau_probs")
+    return out
+
+
 def fit_config_once(
     config: dict,
     *,
@@ -137,4 +150,5 @@ def fit_config_once(
 _clone_config = clone_config
 _validate_feature_selection_for_n_chunks = validate_feature_selection_for_n_chunks
 _build_summary_var_names = build_summary_var_names
+_build_scoring_summary_var_names = build_scoring_summary_var_names
 _fit_config_once = fit_config_once

@@ -30,21 +30,45 @@ from seismic_pipeline.bayesian.diagnostics import (
 )
 from seismic_pipeline.bayesian.search import compute_model_distance_matrix
 
-def plot_trace_and_tau(trace, trace_vars, title_prefix: str):
+
+def _show_or_save(save_path: str | os.PathLike[str] | None) -> None:
+    if save_path is not None:
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
+
+
+def plot_trace_and_tau(
+    trace,
+    trace_vars,
+    title_prefix: str,
+    *,
+    save_path: str | os.PathLike[str] | None = None,
+):
     """Plot traces for selected vars and tau bar chart."""
     if _is_inferencedata(trace):
-        az.plot_trace(trace, var_names=trace_vars, compact=False)
+        az.plot_trace(trace, var_names=trace_vars)
     else:
         posterior = {}
         for var in trace_vars:
             chains = _values_by_chain(trace, var)
             posterior[var] = np.stack(chains, axis=0)
-        idata = az.from_dict(posterior=posterior)
-        az.plot_trace(idata, var_names=trace_vars, compact=False)
+        idata = az.from_dict({"posterior": posterior})
+        az.plot_trace(idata, var_names=trace_vars)
     plt.suptitle(f"Trace plots: {title_prefix}", y=1.02)
     plt.tight_layout()
-    plt.show()
-def plot_posteriors_like_script(trace, group_data: dict, title_prefix: str):
+    _show_or_save(save_path)
+
+
+def plot_posteriors_like_script(
+    trace,
+    group_data: dict,
+    title_prefix: str,
+    *,
+    save_path: str | os.PathLike[str] | None = None,
+    tau_bar_save_path: str | os.PathLike[str] | None = None,
+):
     """Posterior histograms for before/after tau in script-like style."""
     trace_vars = _available_varnames(trace)
     pairs = []
@@ -101,7 +125,7 @@ def plot_posteriors_like_script(trace, group_data: dict, title_prefix: str):
 
     plt.suptitle(f"Постериоры (до/после tau): {title_prefix}", y=1.02)
     plt.tight_layout()
-    plt.show()
+    _show_or_save(save_path)
 
     support, probs = tau_probabilities(trace)
     plt.figure(figsize=(6, 3.5))
@@ -111,7 +135,7 @@ def plot_posteriors_like_script(trace, group_data: dict, title_prefix: str):
     plt.ylabel("P(tau=k)")
     plt.title(f"Постериорное распределение tau: {title_prefix}")
     plt.tight_layout()
-    plt.show()
+    _show_or_save(tau_bar_save_path)
 def plot_exhaustive_search_results(
     results: list[dict],
     *,
@@ -484,6 +508,59 @@ def plot_model_search_results(
     plt.show()
 
 
+def plot_observations_before_after(
+    *,
+    group_name: str,
+    feat_name: str,
+    likelihood: str,
+    observed_2d: np.ndarray,
+    trace,
+    title_prefix: str = "",
+    save_path: str | os.PathLike[str] | None = None,
+) -> None:
+    """Histogram of raw observations split by MAP tau (before vs after)."""
+    tau_map = _tau_map_from_trace(trace)
+    obs_before, obs_after = _observed_split_by_tau(
+        observed_2d,
+        tau_map,
+        likelihood=likelihood,
+    )
+    color_before, color_after = "#A60628", "#7A68A6"
+    plt.figure(figsize=(7, 4))
+    if obs_before.size > 0:
+        plt.hist(
+            obs_before,
+            bins=15,
+            density=True,
+            alpha=0.55,
+            color=color_before,
+            edgecolor="black",
+            linewidth=0.5,
+            label="наблюдения до tau",
+        )
+    if obs_after.size > 0:
+        plt.hist(
+            obs_after,
+            bins=15,
+            density=True,
+            alpha=0.55,
+            color=color_after,
+            edgecolor="black",
+            linewidth=0.5,
+            label="наблюдения после tau",
+        )
+    title = f"Наблюдения: {group_name}/{feat_name}"
+    if title_prefix:
+        title = f"{title_prefix} — {title}"
+    plt.title(title)
+    plt.xlabel("value")
+    plt.ylabel("density")
+    plt.grid(alpha=0.25)
+    plt.legend()
+    plt.tight_layout()
+    _show_or_save(save_path)
+
+
 def plot_feature_likelihood_profile(
     *,
     group_name: str,
@@ -495,6 +572,7 @@ def plot_feature_likelihood_profile(
     observed_2d: np.ndarray,
     trace,
     use_log_y: bool = False,
+    save_path: str | os.PathLike[str] | None = None,
 ) -> None:
     """Plot before/after likelihood profile for one feature."""
     plt.figure(figsize=(7, 4))
@@ -535,4 +613,55 @@ def plot_feature_likelihood_profile(
     plt.grid(alpha=0.25, which="both" if use_log_y else "major")
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    _show_or_save(save_path)
+
+
+def plot_interval_inflated_beta_pdf_comparison(
+    *,
+    group_name: str,
+    feat_name: str,
+    x: np.ndarray,
+    y_before_model: np.ndarray,
+    y_after_model: np.ndarray,
+    y_before_mixture: np.ndarray,
+    y_after_mixture: np.ndarray,
+    threshold: float,
+    use_log_y: bool = False,
+    save_path: str | os.PathLike[str] | None = None,
+) -> None:
+    """Compare interval_inflated_beta PDF: piecewise model vs legacy mixture plot."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4), sharex=True, sharey=True)
+    panels = (
+        ("before tau", y_before_model, y_before_mixture, "#A60628"),
+        ("after tau", y_after_model, y_after_mixture, "#7A68A6"),
+    )
+    for ax, (title, y_model, y_mix, color) in zip(axes, panels):
+        y_model_plot = np.maximum(y_model, 1e-300) if use_log_y else y_model
+        y_mix_plot = np.maximum(y_mix, 1e-300) if use_log_y else y_mix
+        ax.plot(x, y_model_plot, color=color, linewidth=2.2, label="model (piecewise)")
+        ax.plot(
+            x,
+            y_mix_plot,
+            color=color,
+            linewidth=1.8,
+            linestyle="--",
+            alpha=0.85,
+            label="legacy mixture plot",
+        )
+        ax.axvline(float(threshold), color="gray", linestyle=":", linewidth=1.2, label=f"threshold={threshold:g}")
+        ax.set_title(title)
+        ax.set_xlabel("value")
+        ax.grid(alpha=0.25, which="both" if use_log_y else "major")
+        ax.legend(fontsize=8)
+    axes[0].set_ylabel("density (log scale)" if use_log_y else "density")
+    if use_log_y:
+        for ax in axes:
+            ax.set_yscale("log")
+    fig.suptitle(
+        f"IIB PDF comparison: {group_name}/{feat_name}\n"
+        "model: uniform on [t,1] above t, beta below; mixture: pi*uniform + (1-pi)*beta everywhere",
+        fontsize=10,
+        y=1.03,
+    )
+    fig.tight_layout()
+    _show_or_save(save_path)

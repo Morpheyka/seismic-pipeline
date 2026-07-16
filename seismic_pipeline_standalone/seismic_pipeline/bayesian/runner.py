@@ -48,6 +48,7 @@ def run_variant(
     nuts_backend: str = "pymc",
     chains: int = 4,
     cores: int | None = None,
+    progressbar: bool | None = None,
     tau_mode: str = "discrete",
     tau_lower: int = 2,
     tau_upper: int | None = None,
@@ -179,6 +180,11 @@ def run_variant(
         nuts_backend=nuts_backend,
         chains=chains,
         cores=cores,
+        progressbar=(
+            False
+            if progressbar is None and str(nuts_backend).strip().lower() in {"numpyro", "blackjax"}
+            else True if progressbar is None else bool(progressbar)
+        ),
     )
     available_vars = _available_varnames(trace)
     trace_vars = []

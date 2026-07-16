@@ -1,0 +1,100 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{amsmath}
+\geometry{margin=2.2cm}
+
+\title{Протокол байесовской предиктивной модели\\риска сейсмособытия (24 часа)}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Цель}
+Построить модель вероятности сейсмособытия в следующие 24 часа:
+\[
+P(y_{t+1}=1 \mid \mathcal{F}_t),
+\]
+где признаки формируются только из данных до конца суток $t$.
+
+\section{Реализация}
+Подготовлен следующий пайплайн:
+\begin{itemize}
+  \item формирование ежедневного датасета:
+  \texttt{seismic\_pipeline\_standalone/scripts/build\_seismic\_risk\_dataset.py};
+  \item обучение и валидация байесовских моделей:
+  \texttt{seismic\_pipeline\_standalone/scripts/run\_bayesian\_risk\_cv.py}.
+\end{itemize}
+
+\section{Разметка и контроль утечек}
+\begin{enumerate}
+  \item Ежедневные строки \texttt{rat\_id $\times$ sample\_date}; целевая
+  переменная \texttt{label\_next24h=1}, если событие у этой крысы наступает
+  на следующий день.
+  \item Quiet controls отбираются из дней с буфером по расстоянию до любого
+  события (\texttt{quiet\_buffer\_days}, по умолчанию 8 суток) и матчингом по
+  крысе/месяцу.
+  \item Артефакты исключаются до расчёта признаков:
+  \texttt{row 0 day 1}, \texttt{row 4 day 3}, \texttt{row 5 day 3},
+  \texttt{row 22 day 4}.
+\end{enumerate}
+
+\section{Feature engineering (causal)}
+\begin{itemize}
+  \item \textbf{Уровень}: mean/range/std за 24ч, 48ч, 72ч; первая и вторая
+  половины суток.
+  \item \textbf{Динамика}: тренды последних 3 дней, дельты к предыдущему дню,
+  отношение mean текущего дня к среднему предыдущих 3 дней.
+  \item \textbf{Форма}: \texttt{shape\_l1\_lag1}, \texttt{shape\_l2\_lag1},
+  попарная дисперсия L1/L2 на последних 3 днях.
+  \item \textbf{Аномальность (cross-fitted)}: расстояние текущего дня до
+  медианного референса из \emph{предыдущих} $\le 3$ дней (без включения
+  текущего дня).
+\end{itemize}
+
+\section{Модели}
+Базовая подтверждающая модель:
+\begin{itemize}
+  \item иерархическая байесовская логистическая регрессия;
+  \item случайные intercepts для крысы и месяца;
+  \item регуляризующие нормальные/half-normal priors.
+\end{itemize}
+
+Сравниваются четыре варианта:
+\begin{enumerate}
+  \item \texttt{null}: только глобальный intercept;
+  \item \texttt{calendar}: intercept + rat/month random intercepts;
+  \item \texttt{full}: календарь + все признаки;
+  \item \texttt{no\_shape}: календарь + признаки без shape/anomaly/pairwise.
+\end{enumerate}
+
+\section{Валидация}
+\begin{itemize}
+  \item outer grouped CV по \texttt{group\_event\_date} (все крысы одной даты
+  в одном фолде);
+  \item отдельный temporal holdout (ранние даты train, поздние test);
+  \item метрики: log score, Brier, ROC-AUC, PR-AUC, ECE (10 bins).
+\end{itemize}
+
+\section{Где смотреть результаты}
+После запуска скриптов:
+\begin{itemize}
+  \item \texttt{run\_output\_risk\_model/risk\_daily\_dataset.csv},
+  \texttt{risk\_daily\_dataset\_summary.json};
+  \item \texttt{run\_output\_risk\_model/risk\_model\_cv\_metrics.csv},
+  \texttt{risk\_model\_run\_summary.json}.
+\end{itemize}
+
+\section{Что ещё нужно для финализации}
+\begin{enumerate}
+  \item Подключение к БД с интенсивностями для внешних ковариат и стратификаций
+  по порогу события.
+  \item Предзаданный список quiet-периодов и правила матчирования.
+  \item Репликация на независимом временном диапазоне.
+\end{enumerate}
+
+\end{document}
