@@ -52,5 +52,14 @@ run_output_*/
 **/*.csv
 **/*.png
 **/*.pdf
+!literature/**/*.csv
+!literature/**/*.png
+!literature/**/*.pdf
+!reports/**/*.csv
+!reports/**/*.png
+!reports/**/*.pdf
+!run report/**/*.csv
+!run report/**/*.png
+!run report/**/*.pdf
 .DS_Store
 **/.~lock.*
