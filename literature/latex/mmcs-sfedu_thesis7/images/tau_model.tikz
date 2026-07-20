@@ -1,0 +1,69 @@
+\begin{tikzpicture}[
+  >=Latex,
+  latent/.style={circle, draw, minimum size=9mm, align=center, inner sep=1.5pt},
+  deterministic/.style={rectangle, draw, minimum width=12mm, minimum height=7mm,
+    align=center, inner sep=1.5pt},
+  observed/.style={rectangle, draw, fill=black!12, minimum width=19mm,
+    minimum height=8mm, align=center, inner sep=1.5pt},
+  likelihood/.style={rounded corners=2pt, draw, fill=black!4, minimum width=28mm,
+    minimum height=11mm, align=center, inner sep=2pt},
+  annotation/.style={rectangle, draw, dashed, rounded corners=2pt, align=left,
+    inner sep=3pt, font=\scriptsize},
+  plate/.style={draw, rounded corners=2pt, inner sep=5pt},
+  every node/.style={font=\small}
+]
+  % Generative model
+  \node[latent, minimum size=8mm] (tau) at (0, 3.5) {$\tau$};
+  \node[font=\scriptsize, anchor=south] at (0, 3.78)
+    {$\tau\sim\mathrm{DiscreteUniform}(\mathcal T)$};
+  \node[deterministic] (z) at (0, 1.6) {$z_t$\\[-4pt]\scriptsize $\mathbb{1}[t<\tau]$};
+  \node[latent] (theta1) at (-3.0, 1.5) {$\boldsymbol{\theta}_{f,1}$\\[-1pt]\scriptsize
+    $p(\boldsymbol{\theta}_{f,1})$};
+  \node[latent] (theta2) at (3.0, 1.5) {$\boldsymbol{\theta}_{f,2}$\\[-1pt]\scriptsize
+    $p(\boldsymbol{\theta}_{f,2})$};
+  \node[latent] (nu) at (-3.0, -0.2) {$\nu_f$\\[-1pt]\scriptsize
+    $p(\nu_f)$};
+  \node[likelihood] (lik) at (0, -0.5) {$p_f(x_{e,t,f}\mid z_t,\boldsymbol{\theta}_{f,1},\boldsymbol{\theta}_{f,2})$\\[-1pt]
+    \scriptsize $\mathrm{StudentT}(\mu_{f,z_t},\sigma_{f,z_t},\nu_f)$};
+  \node[observed] (x) at (0, -2.1) {$x_{e,t,f}$\\[-1pt]\scriptsize
+    нормированный REM-признак};
+
+  \draw[->] (tau) -- (z);
+  \draw[->] (z) -- (lik);
+  \draw[->] (theta1) -- (lik);
+  \draw[->] (theta2) -- (lik);
+  \draw[->] (nu) -- (lik);
+  \draw[->] (lik) -- (x);
+
+  % Plates
+  \node[plate, fit=(x), inner xsep=0pt, inner ysep=14pt] (eventplate) {};
+  \node[plate, fit=(z) (lik) (eventplate), inner xsep=0pt, inner ysep=12pt] (timeplate) {};
+  \node[plate, fit=(theta1) (theta2) (nu) (timeplate), inner sep=12pt] (featureplate) {};
+  \node[font=\scriptsize, anchor=north west, xshift=2pt, yshift=-2pt]
+    at (featureplate.north west) {$f\in\mathcal F$};
+  \node[font=\scriptsize, anchor=north west, xshift=2pt, yshift=-0.1pt]
+    at (timeplate.north west) {$t=1,\ldots,T$};
+  \node[font=\scriptsize, anchor=south west, xshift=2pt, yshift=-3pt]
+    at (eventplate.south west) {$e=1,\ldots,E$};
+
+  % Marginalization panel
+  \node[annotation, anchor=north west, text width=48mm] (marg) at (5.2, 0.2) {
+    \textbf{Маргинализация $\tau$ перед NUTS}\\[2pt]
+    $\displaystyle \log p(\mathbf{x}\mid\boldsymbol{\theta})
+      =\log\sum_{k\in\mathcal T}
+      \exp\{\ell_k(\boldsymbol{\theta})-\log|\mathcal T|\}$\\[4pt]
+    После сэмплирования:\\[-1pt]
+    $\displaystyle \widehat p_k
+      =\frac{1}{S}\sum_{s=1}^{S}\pi_k^{(s)}$.\\[-1pt]
+    $\pi_k^{(s)}$ --- условные веса.
+  };
+  \draw[->, dashed] (tau.east) to[out=15,in=180] (marg.west);
+
+  % Legend
+  \node[latent, minimum size=5mm] (legendlatent) at (-4.4, -4.4) {};
+  \node[anchor=west, font=\scriptsize] at (-4.0, -4.4) {случайная величина};
+  \node[deterministic, minimum width=7mm, minimum height=4.5mm] (legenddet) at (-0.6, -4.4) {};
+  \node[anchor=west, font=\scriptsize] at (-0.2, -4.4) {детерминированная величина};
+  \node[observed, minimum width=7mm, minimum height=4.5mm] (legendobs) at (4.2, -4.4) {};
+  \node[anchor=west, font=\scriptsize] at (4.6, -4.4) {наблюдаемые данные};
+\end{tikzpicture}
