@@ -2,6 +2,13 @@
 
 Append-only log of substantial changes and experiments: what, why, result.
 
+## 2026-08-06 — Russian translation of July recheck report
+
+- **Change:** Full Russian rewrite of `reports/july_recheck_methodology_analysis.md` (overwrite original English version); preserved markdown structure, tables, numbers, paths, and English code identifiers.
+- **Why:** User requested Russian scientific version of the July n_points/overlap methodology synthesis for local use and thesis/preprint alignment.
+- **Result:** Report fully translated; technical conclusions unchanged (\(\tau\approx 6.5\)–\(6.7\) d; `daily:range` at N=48; `shape_shift` secondary).
+- **Artifacts:** `reports/july_recheck_methodology_analysis.md`
+
 ## 2026-08-06 — July n_points/overlap recheck synthesis
 
 - **Change:** Detailed analysis of July rewritten methodology (`n_points`+`overlap` vs fixed W/S), July exhaustive/shape_shift runs, old neuroseismo manuscripts, and comparison to 896-config thesis results. Wrote `reports/july_recheck_methodology_analysis.md`; allowed diary/status tracking in `.gitignore`.
