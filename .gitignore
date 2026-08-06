@@ -2,6 +2,8 @@
 *
 !.gitignore
 !README.md
+!RESEARCH_DIARY.md
+!RESEARCH_STATUS_*.md
 !otchet_V_0.2.ipynb
 !otchet_V_0.2_8day_final_top10_no_pareto.ipynb
 !otchet_V_0.2_8day_top5_reruns.ipynb
