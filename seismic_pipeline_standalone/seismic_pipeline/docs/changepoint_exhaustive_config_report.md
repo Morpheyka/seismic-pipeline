@@ -27,6 +27,8 @@
 
 Движки: `exhaustive_model_search` / `_generate_exhaustive_configs` (`search.py`) и `run_parallel_search` + `ParallelSearchConfig` (`parallel_search.py`). Сравнение моделей — elpd LOO (+ фильтры r̂, ESS, divergences, Pareto-k).
 
+**ELPD / LOO columns (CSV):** `elpd_loo` (ArviZ log LPD sum; may be **> 0** for continuous densities such as Beta), `elpd_loo_per_feature_event` = `elpd_loo / (n_features × n_events)` — **preferred ranking key**, `loo_ic = -2 × elpd_loo` (deviance scale). Legend helper: `search_export.elpd_column_legend_markdown()`. See also `reports/beta_boundary_elpd_audit.md`.
+
 ---
 
 
@@ -100,7 +102,8 @@
 | `student_t`              | μ, σ + общий ν   |                                                                 |
 | `lognormal`              | μ, σ (лог-шкала) | clip наблюдений снизу (`eps`)                                   |
 | `gamma`                  | α, β             | clip снизу                                                      |
-| `beta`                   | α, β             | опционально `support_upper` (для range часто `2.0`)             |
+| `beta`                   | α, β             | опционально `support_upper` (для range часто `2.0`); α,β∼Gamma допускают <1 |
+| `beta_constrained`       | α, β ≥ 1         | те же Beta observations; приор `gamma_offset` (Gamma+1) — без U-shape у границ |
 | `interval_inflated_beta` | π, α, β          | смесь Unif(threshold, 1) и Beta; `threshold` по умолчанию `0.9` |
 
 
@@ -112,7 +115,7 @@
 | Метрика                 | Разрешено в модели                            |
 | ----------------------- | --------------------------------------------- |
 | `mean`                  | `student_t`, `lognormal`, `normal`            |
-| `range`                 | `beta`, `lognormal`, `interval_inflated_beta` |
+| `range`                 | `beta`, `beta_constrained`, `lognormal`, `interval_inflated_beta` |
 | `std`                   | `student_t`, `lognormal`, `gamma`             |
 | `skewness` / `kurtosis` | `student_t`                                   |
 | `shape_shift`           | `lognormal`, `gamma`                          |
@@ -126,7 +129,7 @@
 | Метрика       | Варианты в exhaustive grid                    |
 | ------------- | --------------------------------------------- |
 | `mean`        | `student_t`, `lognormal`                      |
-| `range`       | `beta`, `lognormal`, `interval_inflated_beta` |
+| `range`       | `beta`, `beta_constrained`, `lognormal`, `interval_inflated_beta` |
 | `std`         | `student_t`, `lognormal`, `gamma`             |
 | `shape_shift` | `lognormal`, `gamma`                          |
 
@@ -163,15 +166,17 @@
 | ------------------------------------ | ------------------------------------------------------------------------------------------- |
 | `normal` / `student_t` / `lognormal` | μ — из `mu_prior` метрики; σ — HalfNormal (из `sigma_prior` или σ=1); для t: ν ~ Exp+offset |
 | `gamma`                              | α, β ~ Exponential(lam=1)                                                                   |
-| `beta`                               | α, β ~ Gamma(mu=3, sigma=1.5)                                                               |
+| `beta`                               | α, β ~ Gamma(mu=3, sigma=1.5) — оба могут быть <1 → U-shape / spike у границ |
+| `beta_constrained`                   | α, β ~ Gamma_offset(mu=2, sigma=1, offset=1) → поддержка ≥1                 |
 | `interval_inflated_beta`             | π ~ Beta(1, 10); α, β ~ Gamma(mu=3, sigma=1); `threshold=0.9`                               |
 
 
 Пресет `PARAMETER_SELECTION_PRESETS["range_zoib"]` фиксирует ZOIB для range с этими приорами и `eps=1e-6`.
+Пресет `PARAMETER_SELECTION_PRESETS["range_beta_constrained"]` — constrained Beta для range с `support_upper=2`.
 
 ### 4.3 Фабрика распределений (`_build_prior`)
 
-Поддерживаемые `dist`: `normal`, `halfnormal`, `halfstudentt`, `exponential`, `lognormal`, `exponential_plus`, `beta`, `gamma` (через α/β или μ/σ).
+Поддерживаемые `dist`: `normal`, `halfnormal`, `halfstudentt`, `exponential`, `lognormal`, `exponential_plus`, `beta`, `gamma` (через α/β или μ/σ), `gamma_offset` / `gamma_plus` (Gamma + offset), `truncated_gamma` (Truncated Gamma с `lower`/`upper`).
 
 ### 4.4 Опциональные g-priors на μ
 

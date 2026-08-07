@@ -12,6 +12,44 @@ from seismic_pipeline.bayesian.search import (
     summarize_exhaustive_search,
 )
 
+# Column legend for ELPD / LOO scoring (written into CSV headers via docs + sidecar).
+# Ranking recommendation: sort by elpd_loo_per_feature_event (higher is better).
+ELPD_COLUMN_LEGEND: dict[str, str] = {
+    "elpd_loo": (
+        "ArviZ expected log pointwise predictive density (sum of log LPD over LOO units = events). "
+        "Can be > 0 when likelihood densities exceed 1 (e.g. Beta near a boundary)."
+    ),
+    "elpd_loo_per_feature_event": (
+        "elpd_loo / (n_active_features * n_events). Preferred ranking key across models "
+        "with different feature counts."
+    ),
+    "elpd_loo_per_event": "elpd_loo / n_events.",
+    "elpd_loo_per_feature": "Alias of elpd_loo_per_feature_event (legacy column name).",
+    "elpd_loo_per_feature_day": (
+        "elpd_loo / (n_active_features * n_model_days). Day-normalized score; "
+        "not the primary ranking key."
+    ),
+    "loo_ic": (
+        "LOO information criterion on deviance scale: loo_ic = -2 * elpd_loo. "
+        "Always preferred when readers expect 'more negative = worse'."
+    ),
+    "loo": "Reported LOO statistic (elpd_loo when loo_report='elpd'; else loo_ic).",
+    "loo_reported": "Same as 'loo' (explicit alias of the reported scale).",
+}
+
+
+def elpd_column_legend_markdown() -> str:
+    """Return markdown bullet list documenting ELPD/LOO CSV columns."""
+    lines = ["## ELPD / LOO column legend", ""]
+    for key, text in ELPD_COLUMN_LEGEND.items():
+        lines.append(f"- **`{key}`**: {text}")
+    lines.append("")
+    lines.append(
+        "**Ranking recommendation:** use `elpd_loo_per_feature_event` (higher better). "
+        "In papers, also report `loo_ic = -2 * elpd_loo` or mean log score."
+    )
+    return "\n".join(lines)
+
 
 def _config_likelihood_label(config: dict) -> str:
     ps = config.get("parameter_selection") or {}
@@ -27,8 +65,13 @@ def export_exhaustive_search_results_to_csv(
     output_csv: str,
     *,
     output_summary_json: str | None = None,
+    write_legend_md: bool = True,
 ) -> dict[str, str]:
-    """Export exhaustive-search model records to CSV and optional summary JSON."""
+    """Export exhaustive-search model records to CSV and optional summary JSON.
+
+    CSV always includes ``elpd_loo``, ``elpd_loo_per_feature_event``, and ``loo_ic``.
+    When ``write_legend_md`` is true, writes ``<stem>_elpd_legend.md`` beside the CSV.
+    """
     csv_dir = os.path.dirname(output_csv)
     if csv_dir:
         os.makedirs(csv_dir, exist_ok=True)
@@ -37,6 +80,13 @@ def export_exhaustive_search_results_to_csv(
     for rank, rec in enumerate(search_result.get("results") or [], start=1):
         cfg = rec.get("config") or {}
         rem = cfg.get("rem_profile_params") or {}
+        elpd_loo = rec.get("elpd_loo", rec.get("loo"))
+        loo_ic = rec.get("loo_ic")
+        if loo_ic is None and elpd_loo is not None:
+            try:
+                loo_ic = float(-2.0 * float(elpd_loo))
+            except (TypeError, ValueError):
+                loo_ic = None
         rows.append(
             {
                 "rank_by_loo": rank,
@@ -51,10 +101,12 @@ def export_exhaustive_search_results_to_csv(
                 "step_size_hours": rem.get("step_size_hours"),
                 "rem_stage": rem.get("rem_stage"),
                 "loo": rec.get("loo"),
-                "elpd_loo": rec.get("elpd_loo", rec.get("loo")),
+                "elpd_loo": elpd_loo,
+                "loo_ic": loo_ic,
                 "elpd_loo_per_event": rec.get("elpd_loo_per_event"),
                 "elpd_loo_per_feature": rec.get("elpd_loo_per_feature"),
                 "elpd_loo_per_feature_event": rec.get("elpd_loo_per_feature_event"),
+                "elpd_loo_per_feature_day": rec.get("elpd_loo_per_feature_day"),
                 "waic": rec.get("waic"),
                 "r_hat_max": rec.get("r_hat_max"),
                 "ess_min_bulk": rec.get("ess_min_bulk"),
@@ -84,6 +136,12 @@ def export_exhaustive_search_results_to_csv(
     df_results.to_csv(output_csv, index=False)
 
     paths: dict[str, str] = {"results_csv": output_csv}
+    if write_legend_md:
+        legend_path = os.path.splitext(output_csv)[0] + "_elpd_legend.md"
+        with open(legend_path, "w", encoding="utf-8") as f:
+            f.write(elpd_column_legend_markdown())
+            f.write("\n")
+        paths["elpd_legend_md"] = legend_path
     if output_summary_json:
         summary_dir = os.path.dirname(output_summary_json)
         if summary_dir:
@@ -93,6 +151,7 @@ def export_exhaustive_search_results_to_csv(
             "elapsed_total_sec": float(search_result.get("elapsed_total", float("nan"))),
             "results_csv": output_csv,
             "n_rows_saved": int(len(df_results)),
+            "elpd_column_legend": ELPD_COLUMN_LEGEND,
         }
 
         def _json_default(obj: Any) -> Any:

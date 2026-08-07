@@ -266,7 +266,7 @@ def _profile_x_grid(observed: np.ndarray, likelihood: str, grid_size: int) -> np
         x_max = float(np.max(finite)) * 1.2
         return np.linspace(x_min, x_max, grid_size)
 
-    if likelihood in {"beta", "interval_inflated_beta"}:
+    if likelihood in {"beta", "beta_constrained", "interval_inflated_beta"}:
         # Beta / IIB support is strictly (0, 1); use a fixed in-support grid.
         return np.linspace(1e-6, 1.0 - 1e-6, grid_size)
 
@@ -354,7 +354,7 @@ def _likelihood_pdf_from_posterior(
         )
         return y1, y2
 
-    if likelihood == "beta":
+    if likelihood in {"beta", "beta_constrained"}:
         alpha_1 = max(float(params_1["alpha"]), eps)
         alpha_2 = max(float(params_2["alpha"]), eps)
         beta_1 = max(float(params_1["beta"]), eps)
@@ -389,7 +389,8 @@ def _likelihood_pdf_from_posterior(
 
     raise ValueError(
         f"Unsupported likelihood '{likelihood}'. "
-        "Use one of: normal, student_t, lognormal, gamma, beta, interval_inflated_beta."
+        "Use one of: normal, student_t, lognormal, gamma, beta, beta_constrained, "
+        "interval_inflated_beta."
     )
 
 

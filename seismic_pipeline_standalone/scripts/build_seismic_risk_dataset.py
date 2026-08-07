@@ -29,12 +29,15 @@ class DailySample:
     group_event_date: date
 
 
-ARTIFACT_DAYS_BY_KEY: dict[tuple[str, str, str], set[int]] = {
-    ("R2", "2022-11-07", "before"): {0},
-    ("R2", "2023-05-03", "before"): {2},
-    ("R3", "2023-05-03", "before"): {2},
-    ("R2", "2023-04-21", "after_reversed"): {3},
-}
+# Canonical map lives in features.day_mask (corrected after_reversed {1,2}).
+try:
+    from seismic_pipeline.features.day_mask import ARTIFACT_DAYS_BY_KEY
+except ImportError:  # script may run without package on PYTHONPATH
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from seismic_pipeline.features.day_mask import ARTIFACT_DAYS_BY_KEY
 
 
 def _parse_args() -> argparse.Namespace:

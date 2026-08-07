@@ -85,6 +85,7 @@ def test_build_group_data_synthetic() -> None:
         feature_selection={"concat": ["shape_shift"]},
         data_raw=data_raw,
         window_days=n_days,
+        n_points_per_day=n_points,
     )
     df = group_data["concat"]["shape_shift"]
     assert df.shape == (n_events, n_days - 1)

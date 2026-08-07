@@ -1,0 +1,632 @@
+[
+  {
+    "tag": "primary_a_st_bc_mask_on",
+    "role": "Primary A",
+    "feature_block": "daily:mean+range",
+    "mean_lik": "student_t",
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 14.3,
+    "e_tau": 4.2530617214759125,
+    "tau_hdi_60_width": 3.8154354824988963,
+    "elpd_loo": 217.98523807773205,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 3.205665265849001,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.5715432374082748,
+    "loo_pareto_k_n_high": 0,
+    "loo_pareto_event_indices": [],
+    "loo_pareto_events": [],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_a_st_bc_mask_on_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_a_st_bc_mask_on_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_bc_n24_ov0.0",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.0,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 5.72,
+    "e_tau": 2.168639881379521,
+    "tau_hdi_60_width": 0.00019476249069017015,
+    "elpd_loo": 155.59544015408466,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 4.5763364751201365,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7201245782538191,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      21
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 21,
+        "rat_id": "R2",
+        "event_date": "2023-04-11",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 21,
+        "rat_id": "R2",
+        "event_date": "2023-04-11",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.0_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.0_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_zoib_n24_ov0.0",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "zero_inflated_beta",
+    "n_points": 24,
+    "overlap": 0.0,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 7.53,
+    "e_tau": 2.003783118260984,
+    "tau_hdi_60_width": 1.5422510823981384e-08,
+    "elpd_loo": 264.77568068595934,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 7.787520020175275,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7301034495775665,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      23
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.0_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.0_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_bc_n24_ov0.25",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.25,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 5.78,
+    "e_tau": 5.906956963820912,
+    "tau_hdi_60_width": 2.199552944748633,
+    "elpd_loo": 139.46190656914231,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 4.101820781445362,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.5036107794719714,
+    "loo_pareto_k_n_high": 0,
+    "loo_pareto_event_indices": [],
+    "loo_pareto_events": [],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 7,
+        "rat_id": "R2",
+        "event_date": "2024-10-29",
+        "direction": "before"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.25_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.25_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_zoib_n24_ov0.25",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "zero_inflated_beta",
+    "n_points": 24,
+    "overlap": 0.25,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 6.87,
+    "e_tau": 4.487884719917325,
+    "tau_hdi_60_width": 1.517724237643192,
+    "elpd_loo": 200.49637059408735,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 5.896952076296687,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.9044701636149003,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      32
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 32,
+        "rat_id": "R1",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 32,
+        "rat_id": "R1",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.25_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.25_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_bc_n24_ov0.5",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 5.91,
+    "e_tau": 3.79808007697567,
+    "tau_hdi_60_width": 1.4102899532936153,
+    "elpd_loo": 143.30772962204242,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 4.214933224177718,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7014100377000801,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      34
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.5_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_bc_n24_ov0.5_tau_summary.json"
+  },
+  {
+    "tag": "primary_b_zoib_n24_ov0.5",
+    "role": "Primary B",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "zero_inflated_beta",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 7.05,
+    "e_tau": 4.440251346717167,
+    "tau_hdi_60_width": 2.9821159912576594,
+    "elpd_loo": 172.33535816139727,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 5.0686870047469785,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.863728167527689,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      34
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.5_ppc.png",
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_b_zoib_n24_ov0.5_tau_summary.json"
+  },
+  {
+    "tag": "primary_a_mask_off",
+    "role": "sensitivity_mask_off",
+    "feature_block": "daily:mean+range",
+    "mean_lik": "student_t",
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": false,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 2,
+    "sample_seconds": 9.05,
+    "e_tau": 3.1621447676193988,
+    "tau_hdi_60_width": 0.093421056508733,
+    "elpd_loo": 201.44913409065174,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 2.962487266038996,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7792918721917144,
+    "loo_pareto_k_n_high": 3,
+    "loo_pareto_event_indices": [
+      5,
+      6,
+      23
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 5,
+        "rat_id": "R3",
+        "event_date": "2023-05-03",
+        "direction": "before"
+      },
+      {
+        "matrix_idx": 6,
+        "rat_id": "R3",
+        "event_date": "2024-09-30",
+        "direction": "before"
+      },
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 5,
+        "rat_id": "R3",
+        "event_date": "2023-05-03",
+        "direction": "before"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": null,
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_a_mask_off_tau_summary.json"
+  },
+  {
+    "tag": "primary_a_before_only",
+    "role": "before_only",
+    "feature_block": "daily:mean+range",
+    "mean_lik": "student_t",
+    "range_lik": "beta_constrained",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "before_only",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 18,
+    "n_masked_days": 4,
+    "sample_seconds": 10.33,
+    "e_tau": 2.110132865993724,
+    "tau_hdi_60_width": 0.022501974107462352,
+    "elpd_loo": 124.78242664675399,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 3.4661785179653886,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.8936827343022162,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      6
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 6,
+        "rat_id": "R3",
+        "event_date": "2024-09-30",
+        "direction": "before"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 6,
+        "rat_id": "R3",
+        "event_date": "2024-09-30",
+        "direction": "before"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": null,
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/primary_a_before_only_tau_summary.json"
+  },
+  {
+    "tag": "meanrange_st_iib_n24_ov0.5",
+    "role": "sensitivity",
+    "feature_block": "daily:mean+range",
+    "mean_lik": "student_t",
+    "range_lik": "interval_inflated_beta",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 12.03,
+    "e_tau": 5.901248901139752,
+    "tau_hdi_60_width": 0.9922839123491354,
+    "elpd_loo": 215.50181643079384,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 3.16914435927638,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.6340083786982835,
+    "loo_pareto_k_n_high": 0,
+    "loo_pareto_event_indices": [],
+    "loo_pareto_events": [],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": null,
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/meanrange_st_iib_n24_ov0.5_tau_summary.json"
+  },
+  {
+    "tag": "mean_skew_n24_ov0.5",
+    "role": "sensitivity",
+    "feature_block": "daily:mean",
+    "mean_lik": "skew_normal",
+    "range_lik": null,
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 10.51,
+    "e_tau": 6.2884323886363545,
+    "tau_hdi_60_width": 0.6843056556731781,
+    "elpd_loo": 76.44041546964544,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 2.2482475138131015,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7617728718844409,
+    "loo_pareto_k_n_high": 1,
+    "loo_pareto_event_indices": [
+      23
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": null,
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/mean_skew_n24_ov0.5_tau_summary.json"
+  },
+  {
+    "tag": "range_plain_beta_n24_ov0.5_DIAG",
+    "role": "diagnostic_only",
+    "feature_block": "daily:range",
+    "mean_lik": null,
+    "range_lik": "beta",
+    "n_points": 24,
+    "overlap": 0.5,
+    "stratum": "full",
+    "apply_artifacts": true,
+    "day_mask": true,
+    "min_valid_days": 6,
+    "seed": 20260807,
+    "tune": 800,
+    "draws": 600,
+    "chains": 2,
+    "nuts_backend": "blackjax",
+    "n_events_fit": 34,
+    "n_masked_days": 8,
+    "sample_seconds": 5.67,
+    "e_tau": 4.97731967578646,
+    "tau_hdi_60_width": 3.107296437063857,
+    "elpd_loo": 154.77417527720553,
+    "elpd_loo_se": NaN,
+    "elpd_loo_per_feature_event": 4.552181625800163,
+    "r_hat_max": 1.0,
+    "ess_min_bulk": Infinity,
+    "n_divergences": 0,
+    "loo_pareto_k_max": 0.7864755583113504,
+    "loo_pareto_k_n_high": 2,
+    "loo_pareto_event_indices": [
+      23,
+      34
+    ],
+    "loo_pareto_events": [
+      {
+        "matrix_idx": 23,
+        "rat_id": "R2",
+        "event_date": "2024-09-30",
+        "direction": "after_reversed"
+      },
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "loo_pareto_worst_event": [
+      {
+        "matrix_idx": 34,
+        "rat_id": "R3",
+        "event_date": "2025-07-20",
+        "direction": "after_reversed"
+      }
+    ],
+    "windows_dropped": false,
+    "ppc_path": null,
+    "tau_summary_path": "run_output_density_safe_confirmatory/figures/range_plain_beta_n24_ov0.5_DIAG_tau_summary.json"
+  }
+]

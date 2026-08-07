@@ -5,6 +5,8 @@ from .changepoint_model import (
     interval_inflated_beta_logp,
     sample_interval_inflated_beta,
     sample_model,
+    sample_zero_inflated_beta,
+    zero_inflated_beta_logp,
 )
 from .diagnostics import (
     collect_pareto_k_stats,
@@ -31,6 +33,8 @@ __all__ = [
     "run_parallel_search",
     "sample_interval_inflated_beta",
     "sample_model",
+    "sample_zero_inflated_beta",
     "score_changepoint_trace",
     "tau_probabilities",
+    "zero_inflated_beta_logp",
 ]

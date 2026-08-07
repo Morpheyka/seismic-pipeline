@@ -1,0 +1,139 @@
+\begin{thebibliography}{17}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Cicerone et~al.(2009)Cicerone, Ebel, and Britton]{Cicerone2009}
+R.~D. Cicerone, J.~E. Ebel, and J.~Britton.
+\newblock A systematic compilation of earthquake precursors.
+\newblock \emph{Tectonophysics}, 476\penalty0 (3--4):\penalty0 371--396, 2009.
+\newblock \doi{10.1016/j.tecto.2009.06.008}.
+
+\bibitem[Conti et~al.(2021)Conti, Picozza, and Sotgiu]{Conti2021}
+Livio Conti, Piergiorgio Picozza, and Alessandro Sotgiu.
+\newblock A critical review of ground based observations of earthquake
+  precursors.
+\newblock \emph{Frontiers in Earth Science}, 9:\penalty0 676766, 2021.
+\newblock \doi{10.3389/feart.2021.676766}.
+
+\bibitem[Fang et~al.(2010)Fang, Xia, Zhang, Liu, and Yao]{Fang2010}
+Guangzhan Fang, Yang Xia, Chunpeng Zhang, Tiejun Liu, and Dezhong Yao.
+\newblock Optimized single electroencephalogram channel sleep staging in rats.
+\newblock \emph{Laboratory Animals}, 44:\penalty0 312--322, 2010.
+\newblock \doi{10.1258/la.2010.009081}.
+
+\bibitem[Grant et~al.(2011)Grant, Halliday, Balderer, Leuenberger, Newcomer,
+  Cyr, and Freund]{Grant2011}
+Rachel~A. Grant, Tim Halliday, Werner~P. Balderer, Fanny Leuenberger, Michelle
+  Newcomer, Gary Cyr, and Friedemann~T. Freund.
+\newblock Ground water chemistry changes before major earthquakes and possible
+  effects on animals.
+\newblock \emph{International Journal of Environmental Research and Public
+  Health}, 8\penalty0 (6):\penalty0 1936--1956, 2011.
+\newblock \doi{10.3390/ijerph8061936}.
+
+\bibitem[Hoffman and Gelman(2014)]{HoffmanGelman2014}
+Matthew~D. Hoffman and Andrew Gelman.
+\newblock The no-{U}-turn sampler: Adaptively setting path lengths in
+  {H}amiltonian {M}onte {C}arlo.
+\newblock \emph{Journal of Machine Learning Research}, 15\penalty0
+  (47):\penalty0 1593--1623, 2014.
+\newblock URL \url{https://www.jmlr.org/papers/v15/hoffman14a.html}.
+
+\bibitem[Kirschvink(2000)]{Kirschvink2000}
+Joseph~L. Kirschvink.
+\newblock Earthquake prediction by animals: Evolution and sensory perception.
+\newblock \emph{Bulletin of the Seismological Society of America}, 90\penalty0
+  (2):\penalty0 312--323, 2000.
+\newblock \doi{10.1785/0119980114}.
+
+\bibitem[Kumar et~al.(2019)Kumar, Carroll, Hartikainen, and Martin]{Kumar2019}
+Ravin Kumar, Colin Carroll, Ari Hartikainen, and Osvaldo Martin.
+\newblock {A}rvi{Z} a unified library for exploratory analysis of {B}ayesian
+  models in {P}ython.
+\newblock \emph{Journal of Open Source Software}, 4\penalty0 (33):\penalty0
+  1143, 2019.
+\newblock \doi{10.21105/joss.01143}.
+
+\bibitem[Lai et~al.(2023)Lai, Burroni, Guan, and
+  Sheldon]{lai2023automaticallymarginalizedmcmcprobabilistic}
+Jinlin Lai, Javier Burroni, Hui Guan, and Daniel Sheldon.
+\newblock Automatically marginalized {MCMC} in probabilistic programming.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning}, volume 202 of \emph{Proceedings of Machine Learning Research},
+  pages 18301--18318, 2023.
+\newblock URL \url{https://proceedings.mlr.press/v202/lai23a.html}.
+
+\bibitem[Meerlo et~al.(1997)Meerlo, Pragt, and Daan]{Meerlo1997}
+Peter Meerlo, Bertrand~J. Pragt, and Serge Daan.
+\newblock Social stress induces high intensity sleep in rats.
+\newblock \emph{Neuroscience Letters}, 225\penalty0 (1):\penalty0 41--44, 1997.
+\newblock \doi{10.1016/S0304-3940(97)00180-8}.
+
+\bibitem[Palma et~al.(2000)Palma, Suchecki, and Tufik]{Palma2000}
+Beatriz~Duarte Palma, Deborah Suchecki, and Sergio Tufik.
+\newblock Differential effects of acute cold and footshock on the sleep of
+  rats.
+\newblock \emph{Brain Research}, 861\penalty0 (1):\penalty0 97--104, 2000.
+\newblock \doi{10.1016/S0006-8993(00)02024-2}.
+
+\bibitem[Rampin et~al.(1991)Rampin, Cespuglio, Chastrette, and
+  Jouvet]{Rampin1991}
+C.~Rampin, R.~Cespuglio, N.~Chastrette, and M.~Jouvet.
+\newblock Immobilisation stress induces a paradoxical sleep rebound in rat.
+\newblock \emph{Neuroscience Letters}, 126:\penalty0 113--118, 1991.
+\newblock \doi{10.1016/0304-3940(91)90532-X}.
+
+\bibitem[Saevskiy et~al.(2025)Saevskiy, Suntsova, Kosenko, Alam, and
+  Kostin]{Saevskiy2025}
+Anton Saevskiy, Natalia Suntsova, Peter Kosenko, Md~Noor Alam, and Andrey
+  Kostin.
+\newblock Open-source algorithm for automated vigilance state classification
+  using single-channel electroencephalogram in rodents.
+\newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 921, 2025.
+\newblock \doi{10.3390/s25030921}.
+
+\bibitem[Sanford et~al.(2003)Sanford, Tang, Ross, and Morrison]{Sanford2010}
+Larry~D. Sanford, Xiangdong Tang, Richard~J. Ross, and Adrian~R. Morrison.
+\newblock Influence of shock training and explicit fear-conditioned cues on
+  sleep architecture in mice: Strain comparison.
+\newblock \emph{Behavior Genetics}, 33\penalty0 (1):\penalty0 43--58, 2003.
+\newblock \doi{10.1023/A:1021051516829}.
+
+\bibitem[Vehtari et~al.(2017)Vehtari, Gelman, and Gabry]{Vehtari2017}
+Aki Vehtari, Andrew Gelman, and Jonah Gabry.
+\newblock Practical {B}ayesian model evaluation using leave-one-out
+  cross-validation and {WAIC}.
+\newblock \emph{Statistics and Computing}, 27\penalty0 (5):\penalty0
+  1413--1432, 2017.
+\newblock \doi{10.1007/s11222-016-9696-4}.
+
+\bibitem[Vyazovskiy and Tobler(2005)]{Vyazovskiy2005}
+Vladyslav~V. Vyazovskiy and Irene Tobler.
+\newblock Theta activity in the waking {EEG} is a marker of sleep propensity in
+  the rat.
+\newblock \emph{Brain Research}, 1050\penalty0 (1--2):\penalty0 64--71, 2005.
+\newblock \doi{10.1016/j.brainres.2005.05.022}.
+
+\bibitem[Yokoi et~al.(2003)Yokoi, Ikeya, Yagi, and Nagai]{Yokoi2003}
+Sayoko Yokoi, Motoji Ikeya, Takeshi Yagi, and Katsuya Nagai.
+\newblock Mouse circadian rhythm before the {K}obe earthquake in 1995.
+\newblock \emph{Bioelectromagnetics}, 24\penalty0 (4):\penalty0 289--291, 2003.
+\newblock \doi{10.1002/bem.10108}.
+
+\bibitem[Родкин(2011)]{Rodkin2011}
+М.~В. Родкин.
+\newblock Модель сейсмического режима как
+  совокупности эпизодов лавинообразной
+  релаксации, возникающих на множестве
+  метастабильных состояний.
+\newblock \emph{Физика Земли}, \penalty0 (10):\penalty0 18--26,
+  2011.
+\newblock Английский перевод: Alternative to SOC concept-model
+  of seismic regime as a set of episodes of random avalanche-like releases
+  occurring on a set of metastable subsystems, Izvestiya, Physics of the Solid
+  Earth, 47(11), 966--973, doi: 10.1134/S1069351311100107.
+
+\end{thebibliography}

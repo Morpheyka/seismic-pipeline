@@ -137,6 +137,13 @@ class ParallelSearchConfig:
     window_days: int = 8
     rem_stage: int = 2
 
+    # Day-mask (artifacts ∪ missing); K = min_valid_days.
+    day_mask: bool = False
+    day_mask_apply_artifacts: bool = True
+    min_valid_days: int = 6
+    # Plain beta is diagnostic-only when True (excluded from rank_eligible).
+    plain_beta_diagnostic_only: bool = False
+
     # Convergence filters.
     rhat_threshold: float = 1.05
     ess_threshold: float = 100.0
@@ -228,10 +235,27 @@ def run_parallel_search(
         export_cfg.setdefault("window_days", int(config.window_days))
 
         export_result = export_rem_profiles_10days_cached_only(**export_cfg)
-        prep = prepare_model_data(csv_path=export_result["paths"]["nanpad_output_csv"])
+        prep = prepare_model_data(
+            csv_path=export_result["paths"]["nanpad_output_csv"],
+            day_mask=bool(config.day_mask),
+            apply_artifacts=bool(config.day_mask_apply_artifacts),
+            min_valid_days=int(config.min_valid_days),
+            n_points_per_day=int(n_points),
+            window_days=int(config.window_days),
+        )
         data_norm = np.asarray(prep["data_norm"], dtype=float)
         data_raw = np.asarray(prep["data_raw"], dtype=float)
         good_indices = np.asarray(prep["good_indices"], dtype=int)
+        day_valid = prep.get("day_valid")
+        if day_valid is not None:
+            day_valid = np.asarray(day_valid, dtype=bool)
+        if verbose and bool(config.day_mask):
+            print(
+                f"[parallel-search] day_mask ON: n_events={data_norm.shape[0]} "
+                f"n_masked_days={prep.get('n_masked_days', 0)} "
+                f"apply_artifacts={config.day_mask_apply_artifacts}",
+                flush=True,
+            )
         n_chunks_mode = str(config.n_chunks_mode).strip().lower()
         if n_chunks_mode == "window_days":
             n_chunks = int(config.window_days)
@@ -281,6 +305,7 @@ def run_parallel_search(
             good_indices=good_indices,
             n_points=n_points,
             search_config=config,
+            day_valid=day_valid,
             verbose=verbose,
             progress_desc=(
                 f"Models n={n_points} ov={overlap:.2f}"
@@ -387,9 +412,16 @@ def _generate_likelihood_combos(
         spec: dict[str, dict[str, Any]] = {}
         for metric, likelihood in zip(active_metrics, values):
             entry: dict[str, Any] = {"likelihood": likelihood}
-            if metric == "range" and likelihood in {"beta", "interval_inflated_beta"}:
+            if metric == "range" and likelihood in {
+                "beta",
+                "beta_constrained",
+                "interval_inflated_beta",
+                "zero_inflated_beta",
+            }:
                 # Range on globally normalized [-1, 1] profiles is bounded by [0, 2].
                 entry["support_upper"] = 2.0
+            if metric == "range" and likelihood == "interval_inflated_beta":
+                entry.setdefault("threshold", 0.9)
             spec[metric] = entry
         combos.append(spec)
     return combos
@@ -404,6 +436,7 @@ def _fit_models_parallel(
     search_config: ParallelSearchConfig,
     verbose: bool = True,
     progress_desc: str | None = None,
+    day_valid: np.ndarray | None = None,
 ) -> list[dict[str, Any]]:
     """Fit models in parallel by batches of search_config.n_jobs."""
     if not configs:
@@ -437,6 +470,7 @@ def _fit_models_parallel(
                 good_indices=good_indices,
                 n_points=n_points,
                 search_config=search_config,
+                day_valid=day_valid,
             )
             for cfg in batch_configs
         )
@@ -466,6 +500,7 @@ def _fit_one_model(
     good_indices: np.ndarray,
     n_points: int,
     search_config: ParallelSearchConfig,
+    day_valid: np.ndarray | None = None,
 ) -> dict[str, Any]:
     """Fit one config with optional iterative Pareto-k event removal."""
     _pin_worker_cpu_affinity_if_needed(search_config)
@@ -489,6 +524,11 @@ def _fit_one_model(
             data_norm_work = data_norm[active_idx]
             data_raw_work = data_raw[active_idx]
             good_idx_work = np.asarray(good_indices, dtype=int)[active_idx]
+            day_valid_work = (
+                np.asarray(day_valid, dtype=bool)[active_idx]
+                if day_valid is not None
+                else None
+            )
             n_model_events = int(data_norm_work.shape[0])
             n_model_days = int(n_model_events * n_days_window)
             loo_norm_den = int(max(1, n_active_features) * max(1, n_model_days))
@@ -500,6 +540,7 @@ def _fit_one_model(
                 data_raw=data_raw_work,
                 window_days=n_days_window,
                 n_points_per_day=int(n_points),
+                day_valid=day_valid_work,
             )
             tau_upper = (
                 int(search_config.tau_upper)
@@ -911,6 +952,24 @@ def _diagnostic_gate_issues(
 
     if not bool(record.get("metric_validation_passed", True)):
         issues.append("metric_invariant_failed")
+
+    if bool(getattr(search_config, "plain_beta_diagnostic_only", False)):
+        param_sel = record.get("parameter_selection") or {}
+        if isinstance(param_sel, str):
+            try:
+                import json as _json
+
+                param_sel = _json.loads(param_sel)
+            except Exception:
+                param_sel = {}
+        range_lik = ""
+        if isinstance(param_sel, dict):
+            range_lik = str((param_sel.get("range") or {}).get("likelihood", "")).strip().lower()
+        # Also check flattened columns if present.
+        if not range_lik:
+            range_lik = str(record.get("range_likelihood", "")).strip().lower()
+        if range_lik == "beta":
+            issues.append("plain_beta_diagnostic_only")
 
     return (len(issues) == 0), issues
 

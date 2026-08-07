@@ -99,8 +99,14 @@ FEATURE_SELECTION_PRESETS: dict[str, dict[str, list[str]]] = {
 }
 
 LIKELIHOOD_CHOICES_BY_METRIC: dict[str, list[str]] = {
-    "mean": ["student_t", "lognormal"],
-    "range": ["beta", "lognormal", "interval_inflated_beta"],
+    "mean": ["student_t", "skew_normal"],
+    "range": [
+        "beta",
+        "beta_constrained",
+        "lognormal",
+        "interval_inflated_beta",
+        "zero_inflated_beta",
+    ],
     "std": ["student_t", "lognormal", "gamma"],
     "shape_shift": ["lognormal", "gamma"],
 }
@@ -108,14 +114,44 @@ LIKELIHOOD_CHOICES_BY_METRIC: dict[str, list[str]] = {
 PARAMETER_SELECTION_PRESETS: dict[str, dict[str, dict]] = {
     "range_zoib": {
         "range": {
-            "likelihood": "interval_inflated_beta",
-            "threshold": 0.9,
+            "likelihood": "zero_inflated_beta",
+            "support_upper": 2.0,
             "pi_prior": {"dist": "beta", "alpha": 1.0, "beta": 10.0},
             "alpha_prior": {"dist": "gamma", "mu": 3.0, "sigma": 1.0},
             "beta_prior": {"dist": "gamma", "mu": 3.0, "sigma": 1.0},
             "eps": 1e-6,
         }
-    }
+    },
+    "range_iib": {
+        "range": {
+            "likelihood": "interval_inflated_beta",
+            "threshold": 0.9,
+            "support_upper": 2.0,
+            "pi_prior": {"dist": "beta", "alpha": 1.0, "beta": 10.0},
+            "alpha_prior": {"dist": "gamma", "mu": 3.0, "sigma": 1.0},
+            "beta_prior": {"dist": "gamma", "mu": 3.0, "sigma": 1.0},
+            "eps": 1e-6,
+        }
+    },
+    "range_beta_constrained": {
+        "range": {
+            "likelihood": "beta_constrained",
+            "support_upper": 2.0,
+            "alpha_prior": {
+                "dist": "gamma_offset",
+                "mu": 2.0,
+                "sigma": 1.0,
+                "offset": 1.0,
+            },
+            "beta_prior": {
+                "dist": "gamma_offset",
+                "mu": 2.0,
+                "sigma": 1.0,
+                "offset": 1.0,
+            },
+            "eps": 1e-4,
+        }
+    },
 }
 
 REM_PROFILE_CHOICES: list[dict[str, float | int]] = [

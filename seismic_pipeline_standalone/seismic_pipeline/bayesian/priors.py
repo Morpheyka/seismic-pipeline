@@ -102,13 +102,33 @@ def parameter_selection_with_g_prior(
     return out
 
 VALID_LIKELIHOODS: dict[str, list[str]] = {
-    "mean": ["student_t", "lognormal", "normal"],
-    "range": ["beta", "lognormal", "interval_inflated_beta"],
+    "mean": ["student_t", "lognormal", "normal", "skew_normal"],
+    "range": [
+        "beta",
+        "beta_constrained",
+        "lognormal",
+        "interval_inflated_beta",
+        "zero_inflated_beta",
+    ],
     "std": ["student_t", "lognormal", "gamma"],
     "skewness": ["student_t"],
     "kurtosis": ["student_t"],
     "shape_shift": ["lognormal", "gamma"],
 }
+
+# Default shape priors for plain Beta allow α,β < 1 (U-shape / boundary spike).
+# Constrained Beta forces α,β ≥ 1 via Gamma_offset (raw Gamma + 1).
+CONSTRAINED_BETA_SHAPE_PRIOR: dict[str, float | str] = {
+    "dist": "gamma_offset",
+    "mu": 2.0,
+    "sigma": 1.0,
+    "offset": 1.0,
+}
+
+
+def constrained_beta_shape_prior() -> dict[str, float | str]:
+    """Prior for Beta shape params with support ≥ 1 (no U-shape / boundary spike)."""
+    return dict(CONSTRAINED_BETA_SHAPE_PRIOR)
 
 
 def _parse_parameter_selection(parameter_selection, active_features: set[str]) -> dict[str, dict]:
@@ -158,6 +178,9 @@ def _build_prior(var_name: str, spec: dict, *, positive_only: bool = False):
         "lognormal",
         "exponential_plus",
         "gamma",
+        "gamma_offset",
+        "gamma_plus",
+        "truncated_gamma",
     }
     if positive_only and dist not in positive_dists:
         raise ValueError(
@@ -206,10 +229,34 @@ def _build_prior(var_name: str, spec: dict, *, positive_only: bool = False):
             raise ValueError(f"gamma prior sigma must be > 0 for '{var_name}'.")
         return pm.Gamma(var_name, mu=mu, sigma=sigma)
 
+    if dist in {"gamma_offset", "gamma_plus"}:
+        # Gamma(mu, sigma) + offset → support [offset, ∞). Used for β-shape ≥ 1.
+        offset = float(spec.get("offset", 1.0))
+        raw_spec = {k: v for k, v in spec.items() if k not in {"dist", "offset"}}
+        raw_spec["dist"] = "gamma"
+        raw = _build_prior(f"{var_name}_raw", raw_spec, positive_only=True)
+        return pm.Deterministic(var_name, raw + offset)
+
+    if dist == "truncated_gamma":
+        lower = float(spec.get("lower", 1.0))
+        upper = spec.get("upper", None)
+        if "alpha" in spec and "beta" in spec:
+            base = pm.Gamma.dist(alpha=float(spec["alpha"]), beta=float(spec["beta"]))
+        else:
+            mu = float(spec.get("mu", 3.0))
+            sigma = float(spec.get("sigma", 1.5))
+            if sigma <= 0.0:
+                raise ValueError(f"truncated_gamma prior sigma must be > 0 for '{var_name}'.")
+            base = pm.Gamma.dist(mu=mu, sigma=sigma)
+        kwargs: dict[str, Any] = {"lower": lower}
+        if upper is not None:
+            kwargs["upper"] = float(upper)
+        return pm.Truncated(var_name, base, **kwargs)
+
     raise ValueError(
         f"Unsupported prior dist '{dist}' for '{var_name}'. "
         "Use one of: normal, halfnormal, halfstudentt, exponential, lognormal, "
-        "exponential_plus, beta, gamma."
+        "exponential_plus, beta, gamma, gamma_offset, truncated_gamma."
     )
 
 
@@ -273,6 +320,36 @@ def build_interval_inflated_beta_priors(
         "beta": beta,
         "threshold": float(threshold),
         "likelihood_type": "interval_inflated_beta",
+    }
+
+
+def build_zero_inflated_beta_priors(
+    feat_name: str,
+    regime: int,
+    pi_prior: dict | None = None,
+    alpha_prior: dict | None = None,
+    beta_prior: dict | None = None,
+) -> dict:
+    """Build prior RVs for Zero-Inflated Beta (point mass at 0 + Beta on (0, 1)).
+
+    ``pi`` = P(y ≈ 0). Default Beta(1, 10) expects rare exact zeros.
+    """
+    if pi_prior is None:
+        pi_prior = {"dist": "beta", "alpha": 1.0, "beta": 10.0}
+    if alpha_prior is None:
+        alpha_prior = {"dist": "gamma", "mu": 3.0, "sigma": 1.0}
+    if beta_prior is None:
+        beta_prior = {"dist": "gamma", "mu": 3.0, "sigma": 1.0}
+
+    name_prefix = f"{feat_name}_{regime}"
+    pi = _build_prior(f"pi_{name_prefix}", pi_prior, positive_only=False)
+    alpha = _build_prior(f"alpha_{name_prefix}", alpha_prior, positive_only=True)
+    beta = _build_prior(f"beta_{name_prefix}", beta_prior, positive_only=True)
+    return {
+        "pi": pi,
+        "alpha": alpha,
+        "beta": beta,
+        "likelihood_type": "zero_inflated_beta",
     }
 def _g_multiplier(name_prefix: str, n_obs_rows: int, g_prior: dict | None):
     """Scalar g for Zellner-style scaling of Normal mu priors (Chapter 8 style flexible g).

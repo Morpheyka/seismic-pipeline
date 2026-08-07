@@ -17,6 +17,13 @@ from .rem_chunk_features import (
     shape_shift_tau_chunk_indices,
     set_runtime_data_norm,
 )
+from .day_mask import (
+    ARTIFACT_DAYS_BY_KEY,
+    MIN_VALID_DAYS,
+    apply_day_mask_to_profiles,
+    masked_day_indices,
+    primary_cohort_bad_indices,
+)
 from .runtime import (
     ChangepointRunContext,
     get_context,
@@ -31,7 +38,10 @@ from .runtime import (
 )
 
 __all__ = [
+    "ARTIFACT_DAYS_BY_KEY",
     "ChangepointRunContext",
+    "MIN_VALID_DAYS",
+    "apply_day_mask_to_profiles",
     "build_group_data",
     "compute_chunk_feature_map",
     "compute_chunk_features",
@@ -46,10 +56,12 @@ __all__ = [
     "get_runtime_prepare_cfg",
     "group_data_from_precomputed",
     "load_and_normalize",
+    "masked_day_indices",
     "maxmin_scale",
     "precompute_all_features",
     "prepare_model_data",
     "prepare_variant_data",
+    "primary_cohort_bad_indices",
     "shape_shift_tau_chunk_indices",
     "set_context",
     "set_runtime_data_norm",

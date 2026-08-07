@@ -24,6 +24,8 @@ from seismic_pipeline.bayesian.priors import (
     _build_prior,
     _parse_parameter_selection,
     build_interval_inflated_beta_priors,
+    build_zero_inflated_beta_priors,
+    constrained_beta_shape_prior,
 )
 from seismic_pipeline.bayesian.diagnostics import materialize_inferencedata_numpy
 from seismic_pipeline.features.rem_chunk_features import (
@@ -32,6 +34,24 @@ from seismic_pipeline.features.rem_chunk_features import (
 )
 
 _SHAPE_SHIFT_METRIC = "shape_shift"
+
+
+def _finite_obs_mask(observed: np.ndarray) -> np.ndarray:
+    """Boolean mask of finite observations (NaN/Inf → skip in logp)."""
+    return np.isfinite(np.asarray(observed, dtype=float))
+
+
+def _mask_logp(ll, valid_mask: np.ndarray):
+    """Zero-out logp where observations are non-finite (skip, no imputation)."""
+    valid_t = pt.as_tensor_variable(np.asarray(valid_mask, dtype=np.float64))
+    return ll * valid_t
+
+
+def _fill_nonfinite_for_dist(observed: np.ndarray, fill: float) -> np.ndarray:
+    """Replace non-finite entries with a harmless fill so pm.logp stays defined."""
+    out = np.asarray(observed, dtype=float).copy()
+    out[~np.isfinite(out)] = float(fill)
+    return out
 
 
 def resolve_n_group_chunks(group_data: dict) -> int:
@@ -141,6 +161,40 @@ def sample_interval_inflated_beta(
     return np.where(use_upper, upper, lower)
 
 
+def zero_inflated_beta_logp(
+    y,
+    pi: float,
+    alpha: float,
+    beta: float,
+    eps: float = 1e-6,
+):
+    """Zero-Inflated Beta: pi * δ_0 + (1-pi) * Beta(alpha, beta) on (0, 1).
+
+    Observations with y <= eps are treated as the zero atom.
+    """
+    is_zero = pt.le(y, float(eps))
+    logp_zero = pt.log(pi)
+    y_beta = pt.clip(y, float(eps), 1.0 - float(eps))
+    logp_cont = pt.log(1.0 - pi) + pm.logp(pm.Beta.dist(alpha=alpha, beta=beta), y_beta)
+    return pt.switch(is_zero, logp_zero, logp_cont)
+
+
+def sample_zero_inflated_beta(
+    rng: np.random.Generator,
+    size: int,
+    pi: float,
+    alpha: float,
+    beta: float,
+) -> np.ndarray:
+    """Draw from ZOIB: with prob pi return 0, else Beta(alpha, beta)."""
+    pi = float(np.clip(pi, 0.0, 1.0))
+    alpha = max(float(alpha), 1e-6)
+    beta = max(float(beta), 1e-6)
+    cont = rng.beta(alpha, beta, size=size)
+    use_zero = rng.uniform(size=size) < pi
+    return np.where(use_zero, 0.0, cont)
+
+
 def build_changepoint_model(
     group_data: dict,
     tau_lower: int = 2,
@@ -213,14 +267,29 @@ def build_changepoint_model(
 
         for group_name, features in group_data.items():
             for feat_name, observed_df in features.items():
-                observed = observed_df.to_numpy()
+                observed = observed_df.to_numpy(dtype=float)
                 n_obs_rows = int(observed.shape[0])
                 n_cols = int(observed.shape[1])
                 feat_idx = resolve_feat_idx(feat_name, n_cols, n_group_chunks)
                 spec = parameter_cfg[feat_name]
                 likelihood = str(spec.get("likelihood", "normal")).strip().lower()
+                valid_mask = _finite_obs_mask(observed)
+                has_nan = bool(np.any(~valid_mask))
 
-                if likelihood in {"normal", "student_t", "lognormal"}:
+                def _add_ll(ll_1, ll_2):
+                    if has_nan:
+                        ll_1 = _mask_logp(ll_1, valid_mask)
+                        ll_2 = _mask_logp(ll_2, valid_mask)
+                    if tau_mode == "discrete":
+                        regime_before = pt.cast(tau > feat_idx + 1, "float64")[None, :]
+                        pm.Potential(
+                            f"obs_{group_name}_{feat_name}",
+                            pt.sum(regime_before * ll_1 + (1.0 - regime_before) * ll_2),
+                        )
+                    else:
+                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+
+                if likelihood in {"normal", "student_t", "lognormal", "skew_normal"}:
                     mu_1, mu_2 = _build_mu_regime_normals(
                         group_name,
                         feat_name,
@@ -239,26 +308,28 @@ def build_changepoint_model(
                     )
 
                     if likelihood == "normal":
-                        if tau_mode == "discrete":
+                        obs_fill = _fill_nonfinite_for_dist(observed, 0.0)
+                        if tau_mode == "discrete" and not has_nan:
                             mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
                             sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
                             pm.Normal(
                                 f"obs_{group_name}_{feat_name}",
                                 mu=mu,
                                 sigma=sigma,
-                                observed=observed,
+                                observed=obs_fill,
                             )
                         else:
-                            ll_1 = pm.logp(pm.Normal.dist(mu=mu_1, sigma=sigma_1), observed)
-                            ll_2 = pm.logp(pm.Normal.dist(mu=mu_2, sigma=sigma_2), observed)
-                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                            ll_1 = pm.logp(pm.Normal.dist(mu=mu_1, sigma=sigma_1), obs_fill)
+                            ll_2 = pm.logp(pm.Normal.dist(mu=mu_2, sigma=sigma_2), obs_fill)
+                            _add_ll(ll_1, ll_2)
                     elif likelihood == "student_t":
                         nu = _build_prior(
                             f"nu_{group_name}_{feat_name}",
                             spec.get("nu_prior", {"dist": "exponential_plus", "lam": 0.05, "offset": 2.0}),
                             positive_only=True,
                         )
-                        if tau_mode == "discrete":
+                        obs_fill = _fill_nonfinite_for_dist(observed, 0.0)
+                        if tau_mode == "discrete" and not has_nan:
                             mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
                             sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
                             pm.StudentT(
@@ -266,30 +337,66 @@ def build_changepoint_model(
                                 nu=nu,
                                 mu=mu,
                                 sigma=sigma,
-                                observed=observed,
+                                observed=obs_fill,
                             )
                         else:
-                            ll_1 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_1, sigma=sigma_1), observed)
-                            ll_2 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_2, sigma=sigma_2), observed)
-                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                            ll_1 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_1, sigma=sigma_1), obs_fill)
+                            ll_2 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_2, sigma=sigma_2), obs_fill)
+                            _add_ll(ll_1, ll_2)
+                    elif likelihood == "skew_normal":
+                        alpha_1 = _build_prior(
+                            f"alpha_{group_name}_{feat_name}_1",
+                            spec.get("alpha_prior", {"dist": "normal", "mu": 0.0, "sigma": 2.0}),
+                            positive_only=False,
+                        )
+                        alpha_2 = _build_prior(
+                            f"alpha_{group_name}_{feat_name}_2",
+                            spec.get("alpha_prior", {"dist": "normal", "mu": 0.0, "sigma": 2.0}),
+                            positive_only=False,
+                        )
+                        obs_fill = _fill_nonfinite_for_dist(observed, 0.0)
+                        if tau_mode == "discrete" and not has_nan:
+                            mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
+                            sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
+                            alpha = pm.math.switch(tau > feat_idx + 1, alpha_1, alpha_2)
+                            pm.SkewNormal(
+                                f"obs_{group_name}_{feat_name}",
+                                mu=mu,
+                                sigma=sigma,
+                                alpha=alpha,
+                                observed=obs_fill,
+                            )
+                        else:
+                            ll_1 = pm.logp(
+                                pm.SkewNormal.dist(mu=mu_1, sigma=sigma_1, alpha=alpha_1),
+                                obs_fill,
+                            )
+                            ll_2 = pm.logp(
+                                pm.SkewNormal.dist(mu=mu_2, sigma=sigma_2, alpha=alpha_2),
+                                obs_fill,
+                            )
+                            _add_ll(ll_1, ll_2)
                     else:
                         # Positive-support likelihoods are undefined at y<=0.
-                        # shape_shift may contain exact zeros, so use a tiny floor.
                         lognormal_eps = float(spec.get("eps", 1e-6))
-                        observed_lognormal = np.clip(observed, lognormal_eps, np.inf)
-                        if tau_mode == "discrete":
+                        obs_ln = np.clip(
+                            _fill_nonfinite_for_dist(observed, lognormal_eps),
+                            lognormal_eps,
+                            np.inf,
+                        )
+                        if tau_mode == "discrete" and not has_nan:
                             mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
                             sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
                             pm.LogNormal(
                                 f"obs_{group_name}_{feat_name}",
                                 mu=mu,
                                 sigma=sigma,
-                                observed=observed_lognormal,
+                                observed=obs_ln,
                             )
                         else:
-                            ll_1 = pm.logp(pm.LogNormal.dist(mu=mu_1, sigma=sigma_1), observed_lognormal)
-                            ll_2 = pm.logp(pm.LogNormal.dist(mu=mu_2, sigma=sigma_2), observed_lognormal)
-                            _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                            ll_1 = pm.logp(pm.LogNormal.dist(mu=mu_1, sigma=sigma_1), obs_ln)
+                            ll_2 = pm.logp(pm.LogNormal.dist(mu=mu_2, sigma=sigma_2), obs_ln)
+                            _add_ll(ll_1, ll_2)
                     continue
 
                 if likelihood == "gamma":
@@ -313,58 +420,64 @@ def build_changepoint_model(
                         spec.get("beta_prior", {"dist": "exponential", "lam": 1.0}),
                         positive_only=True,
                     )
-                    # Positive-support likelihoods are undefined at y<=0.
-                    # shape_shift may contain exact zeros, so use a tiny floor.
                     gamma_eps = float(spec.get("eps", 1e-6))
-                    observed_gamma = np.clip(observed, gamma_eps, np.inf)
-                    if tau_mode == "discrete":
+                    obs_gamma = np.clip(
+                        _fill_nonfinite_for_dist(observed, gamma_eps),
+                        gamma_eps,
+                        np.inf,
+                    )
+                    if tau_mode == "discrete" and not has_nan:
                         alpha = pm.math.switch(tau > feat_idx + 1, alpha_1, alpha_2)
                         beta = pm.math.switch(tau > feat_idx + 1, beta_1, beta_2)
                         pm.Gamma(
                             f"obs_{group_name}_{feat_name}",
                             alpha=alpha,
                             beta=beta,
-                            observed=observed_gamma,
+                            observed=obs_gamma,
                         )
                     else:
-                        ll_1 = pm.logp(pm.Gamma.dist(alpha=alpha_1, beta=beta_1), observed_gamma)
-                        ll_2 = pm.logp(pm.Gamma.dist(alpha=alpha_2, beta=beta_2), observed_gamma)
-                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                        ll_1 = pm.logp(pm.Gamma.dist(alpha=alpha_1, beta=beta_1), obs_gamma)
+                        ll_2 = pm.logp(pm.Gamma.dist(alpha=alpha_2, beta=beta_2), obs_gamma)
+                        _add_ll(ll_1, ll_2)
                     continue
 
-                if likelihood == "beta":
+                if likelihood in {"beta", "beta_constrained"}:
+                    if likelihood == "beta_constrained":
+                        default_shape = constrained_beta_shape_prior()
+                    else:
+                        default_shape = {"dist": "gamma", "mu": 3.0, "sigma": 1.5}
                     alpha_1 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_1",
-                        spec.get("alpha_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
+                        spec.get("alpha_prior", default_shape),
                         positive_only=True,
                     )
                     alpha_2 = _build_prior(
                         f"alpha_{group_name}_{feat_name}_2",
-                        spec.get("alpha_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
+                        spec.get("alpha_prior", default_shape),
                         positive_only=True,
                     )
                     beta_1 = _build_prior(
                         f"beta_{group_name}_{feat_name}_1",
-                        spec.get("beta_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
+                        spec.get("beta_prior", default_shape),
                         positive_only=True,
                     )
                     beta_2 = _build_prior(
                         f"beta_{group_name}_{feat_name}_2",
-                        spec.get("beta_prior", {"dist": "gamma", "mu": 3.0, "sigma": 1.5}),
+                        spec.get("beta_prior", default_shape),
                         positive_only=True,
                     )
-                    # Beta support is (0, 1). Optionally rescale observed values
-                    # from [0, support_upper] to [0, 1] before clipping.
                     support_upper = float(spec.get("support_upper", 1.0))
                     if support_upper <= 0:
                         raise ValueError(
                             f"support_upper must be > 0 for beta likelihood, got {support_upper}"
                         )
-                    observed_scaled = observed / support_upper
-                    # Clip slightly away from boundaries to avoid -inf at exact 0/1.
                     beta_eps = float(spec.get("eps", 1e-4))
-                    observed_beta = np.clip(observed_scaled, beta_eps, 1.0 - beta_eps)
-                    if tau_mode == "discrete":
+                    observed_scaled = observed / support_upper
+                    # Preserve NaN mask; fill only for dist evaluation.
+                    fill = 0.5
+                    scaled_fill = _fill_nonfinite_for_dist(observed_scaled, fill)
+                    observed_beta = np.clip(scaled_fill, beta_eps, 1.0 - beta_eps)
+                    if tau_mode == "discrete" and not has_nan:
                         alpha = pm.math.switch(tau > feat_idx + 1, alpha_1, alpha_2)
                         beta = pm.math.switch(tau > feat_idx + 1, beta_1, beta_2)
                         pm.Beta(
@@ -376,7 +489,7 @@ def build_changepoint_model(
                     else:
                         ll_1 = pm.logp(pm.Beta.dist(alpha=alpha_1, beta=beta_1), observed_beta)
                         ll_2 = pm.logp(pm.Beta.dist(alpha=alpha_2, beta=beta_2), observed_beta)
-                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                        _add_ll(ll_1, ll_2)
                     continue
 
                 if likelihood == "interval_inflated_beta":
@@ -406,28 +519,52 @@ def build_changepoint_model(
                         raise ValueError(
                             f"support_upper must be > 0 for interval_inflated_beta, got {support_upper}"
                         )
-                    observed_scaled = observed / support_upper
                     eps = float(spec.get("eps", 1e-6))
-                    observed_clipped = np.clip(observed_scaled, eps, 1.0 - eps)
+                    observed_scaled = observed / support_upper
+                    scaled_fill = _fill_nonfinite_for_dist(observed_scaled, 0.5)
+                    observed_clipped = np.clip(scaled_fill, eps, 1.0 - eps)
                     y_obs = pt.as_tensor_variable(observed_clipped)
+                    ll_1 = interval_inflated_beta_logp(y_obs, pi_1, alpha_1, beta_1, thr)
+                    ll_2 = interval_inflated_beta_logp(y_obs, pi_2, alpha_2, beta_2, thr)
+                    _add_ll(ll_1, ll_2)
+                    continue
 
-                    if tau_mode == "discrete":
-                        logp_1 = interval_inflated_beta_logp(y_obs, pi_1, alpha_1, beta_1, thr)
-                        logp_2 = interval_inflated_beta_logp(y_obs, pi_2, alpha_2, beta_2, thr)
-                        regime_before = pt.cast(tau > feat_idx + 1, "float64")[None, :]
-                        pm.Potential(
-                            f"obs_{group_name}_{feat_name}",
-                            pt.sum(regime_before * logp_1 + (1.0 - regime_before) * logp_2),
+                if likelihood == "zero_inflated_beta":
+                    priors_1 = build_zero_inflated_beta_priors(
+                        feat_name=f"{group_name}_{feat_name}",
+                        regime=1,
+                        pi_prior=spec.get("pi_prior"),
+                        alpha_prior=spec.get("alpha_prior"),
+                        beta_prior=spec.get("beta_prior"),
+                    )
+                    priors_2 = build_zero_inflated_beta_priors(
+                        feat_name=f"{group_name}_{feat_name}",
+                        regime=2,
+                        pi_prior=spec.get("pi_prior"),
+                        alpha_prior=spec.get("alpha_prior"),
+                        beta_prior=spec.get("beta_prior"),
+                    )
+                    pi_1, alpha_1, beta_1 = priors_1["pi"], priors_1["alpha"], priors_1["beta"]
+                    pi_2, alpha_2, beta_2 = priors_2["pi"], priors_2["alpha"], priors_2["beta"]
+                    support_upper = float(spec.get("support_upper", 1.0))
+                    if support_upper <= 0:
+                        raise ValueError(
+                            f"support_upper must be > 0 for zero_inflated_beta, got {support_upper}"
                         )
-                    else:
-                        ll_1 = interval_inflated_beta_logp(y_obs, pi_1, alpha_1, beta_1, thr)
-                        ll_2 = interval_inflated_beta_logp(y_obs, pi_2, alpha_2, beta_2, thr)
-                        _accumulate_marginalized_loglik(ll_1, ll_2, n_obs_rows, feat_idx)
+                    eps = float(spec.get("eps", 1e-6))
+                    observed_scaled = observed / support_upper
+                    # Keep near-zeros as zeros for the atom; fill NaN with mid for dist.
+                    scaled_fill = _fill_nonfinite_for_dist(observed_scaled, 0.5)
+                    y_obs = pt.as_tensor_variable(scaled_fill)
+                    ll_1 = zero_inflated_beta_logp(y_obs, pi_1, alpha_1, beta_1, eps=eps)
+                    ll_2 = zero_inflated_beta_logp(y_obs, pi_2, alpha_2, beta_2, eps=eps)
+                    _add_ll(ll_1, ll_2)
                     continue
 
                 raise ValueError(
                     f"Unsupported likelihood '{likelihood}' for feature '{feat_name}'. "
-                    "Use one of: normal, student_t, lognormal, gamma, beta, interval_inflated_beta."
+                    "Use one of: normal, student_t, skew_normal, lognormal, gamma, beta, "
+                    "beta_constrained, interval_inflated_beta, zero_inflated_beta."
                 )
 
         if tau_mode == "marginalized":

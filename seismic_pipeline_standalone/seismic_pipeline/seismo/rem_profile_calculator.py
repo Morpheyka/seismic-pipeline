@@ -66,6 +66,7 @@ class REMProfileCalculatorYt(TransformerMixinYt):
             has_valid_data = False
             missing_dates = []
             
+            n_pts = self.n_points_per_day
             for date in window_dates:
                 rem_profile = self._calculate_rem_profiles_for_rat_date(rat_id, date)
                 if rem_profile.size > 0:
@@ -74,8 +75,17 @@ class REMProfileCalculatorYt(TransformerMixinYt):
                     has_valid_data = True
                 else:
                     missing_dates.append(date)
-            
-            if has_valid_data:
+                    # Fixed-N mode: keep day-aligned slots so missing dates do not
+                    # shift later days; fill with NaN of length n_points_per_day.
+                    if n_pts is not None and int(n_pts) > 0:
+                        window_features.append(
+                            np.full(int(n_pts), np.nan, dtype=float)
+                        )
+                        day_lengths.append(0)
+
+            if has_valid_data or (
+                n_pts is not None and int(n_pts) > 0 and len(window_features) > 0
+            ):
                 window_features_concat = np.concatenate(window_features)
                 all_features.append(window_features_concat)
                 valid_indices.append(i)

@@ -473,12 +473,31 @@ def compute_chunk_feature_map_fixed_n(
 
 
 def _global_minmax_normalize_to_minus1_plus1(profiles_slice: np.ndarray) -> np.ndarray:
-    """Normalize each event profile to [-1, 1] using one min/max over all days."""
-    row_min = profiles_slice.min(axis=1, keepdims=True)
-    row_max = profiles_slice.max(axis=1, keepdims=True)
-    denom = row_max - row_min
-    denom[denom == 0] = 1.0
-    return 2.0 * (profiles_slice - row_min) / denom - 1.0
+    """Normalize each event profile to [-1, 1] using one min/max over finite values only."""
+    finite = np.isfinite(profiles_slice)
+    out = np.full_like(profiles_slice, np.nan, dtype=float)
+    for i in range(profiles_slice.shape[0]):
+        mask = finite[i]
+        if not np.any(mask):
+            continue
+        row = profiles_slice[i]
+        rmin = float(np.min(row[mask]))
+        rmax = float(np.max(row[mask]))
+        if rmax == rmin:
+            out[i, mask] = 0.0
+        else:
+            out[i, mask] = 2.0 * (row[mask] - rmin) / (rmax - rmin) - 1.0
+    return out
+
+
+def _nanmean_axis2(arr: np.ndarray) -> np.ndarray:
+    with np.errstate(all="ignore"):
+        return np.nanmean(arr, axis=2)
+
+
+def _nanrange_axis2(arr: np.ndarray) -> np.ndarray:
+    with np.errstate(all="ignore"):
+        return np.nanmax(arr, axis=2) - np.nanmin(arr, axis=2)
 
 
 def compute_daily_period_feature_map_fixed_n(
@@ -486,8 +505,14 @@ def compute_daily_period_feature_map_fixed_n(
     n_points_per_day: int,
     *,
     n_days: int = FIXED_N_CHUNK_DAYS,
+    day_valid: np.ndarray | None = None,
 ) -> dict[str, dict[str, np.ndarray]]:
-    """Compute daily/day/night mean/range on globally normalized 8-day profiles."""
+    """Compute daily/day/night mean/range on globally normalized 8-day profiles.
+
+    Days marked invalid in ``day_valid`` (shape ``(n_events, n_days)``, True=keep)
+    are set to NaN before normalization; feature values for those days stay NaN.
+    Normalization uses only finite (valid) points within each event window.
+    """
     n_events = int(profiles.shape[0])
     total_points = int(n_days * n_points_per_day)
     if profiles.shape[1] < total_points:
@@ -498,7 +523,18 @@ def compute_daily_period_feature_map_fixed_n(
     if int(n_points_per_day) < 2:
         raise ValueError(f"n_points_per_day must be >=2, got {n_points_per_day}")
 
-    profiles_slice = profiles[:, :total_points]
+    profiles_slice = np.array(profiles[:, :total_points], dtype=float, copy=True)
+    if day_valid is not None:
+        valid = np.asarray(day_valid, dtype=bool)
+        if valid.shape != (n_events, n_days):
+            raise ValueError(
+                f"day_valid shape {valid.shape} != {(n_events, n_days)}"
+            )
+        shaped = profiles_slice.reshape(n_events, n_days, n_points_per_day)
+        shaped = shaped.copy()
+        shaped[~valid] = np.nan
+        profiles_slice = shaped.reshape(n_events, total_points)
+
     profiles_norm = _global_minmax_normalize_to_minus1_plus1(profiles_slice)
     profiles_3d = profiles_norm.reshape(n_events, n_days, n_points_per_day)
 
@@ -514,16 +550,16 @@ def compute_daily_period_feature_map_fixed_n(
 
     out: dict[str, dict[str, np.ndarray]] = {
         "daily": {
-            "mean": profiles_3d.mean(axis=2),
-            "range": profiles_3d.max(axis=2) - profiles_3d.min(axis=2),
+            "mean": _nanmean_axis2(profiles_3d),
+            "range": _nanrange_axis2(profiles_3d),
         },
         "day": {
-            "mean": day_part.mean(axis=2),
-            "range": day_part.max(axis=2) - day_part.min(axis=2),
+            "mean": _nanmean_axis2(day_part),
+            "range": _nanrange_axis2(day_part),
         },
         "night": {
-            "mean": night_part.mean(axis=2),
-            "range": night_part.max(axis=2) - night_part.min(axis=2),
+            "mean": _nanmean_axis2(night_part),
+            "range": _nanrange_axis2(night_part),
         },
     }
     return out
@@ -692,8 +728,13 @@ def build_group_data(
     csv_path: str | None = None,
     n_points_per_day: int | None = None,
     fixed_n_days: int = FIXED_N_CHUNK_DAYS,
+    day_valid: np.ndarray | None = None,
 ) -> dict:
-    """Build group_data dict used by changepoint model from feature_selection only."""
+    """Build group_data dict used by changepoint model from feature_selection only.
+
+    ``day_valid`` optional bool array ``(n_events, n_days)`` — False days become NaN
+    features (daily/day/night only) and are skipped in changepoint logp.
+    """
 
     selection = _parse_feature_selection(feature_selection)
     uses_shape_shift = _selection_uses_shape_shift(selection)
@@ -749,6 +790,7 @@ def build_group_data(
             data_raw,
             n_pts,
             n_days=fixed_n_days,
+            day_valid=day_valid,
         )
 
     if fixed_n_mode and (chunk_metrics_needed or uses_shape_shift):
@@ -1082,9 +1124,27 @@ def prepare_variant_data(data_norm: np.ndarray, mode: str):
 def prepare_model_data(
     csv_path: str = "samples_10days_nanpad.csv",
     bad_sample_indices: List[int] | None = None,
+    *,
+    day_mask: bool = False,
+    apply_artifacts: bool = True,
+    min_valid_days: int | None = None,
+    n_points_per_day: int | None = None,
+    window_days: int = FIXED_N_CHUNK_DAYS,
 ) -> dict:
-    """Load/normalize CSV and apply sample exclusion mask for modeling."""
+    """Load/normalize CSV and apply sample exclusion mask for modeling.
+
+    When ``day_mask=True``, artifact∪missing days are tracked via a validity
+    matrix; windows with fewer than ``min_valid_days`` valid days (default K=6)
+    are added to ``bad_sample_indices``. Feature builders receive ``day_valid``
+    for the retained rows.
+    """
     global _RUNTIME_LAST_PREPARE_CFG
+
+    from seismic_pipeline.features.day_mask import (
+        MIN_VALID_DAYS,
+        build_valid_day_matrix_from_metadata,
+        ineligible_indices,
+    )
 
     data_raw, data_norm = load_and_normalize(csv_path)
     day_lengths_all = _resolve_day_lengths_per_sample(
@@ -1095,8 +1155,42 @@ def prepare_model_data(
     data_raw_plot = data_raw.copy()
     data_norm_plot = data_norm.copy()
 
-    bad_sample_indices = bad_sample_indices or []
+    bad_sample_indices = list(bad_sample_indices or [])
     n_samples = data_norm_plot.shape[0]
+    day_valid_all: np.ndarray | None = None
+    n_masked_days_total = 0
+
+    export_cfg = get_runtime_export_cfg() or {}
+    n_pts = n_points_per_day
+    if n_pts is None and export_cfg.get("n_points_per_day") is not None:
+        n_pts = int(export_cfg["n_points_per_day"])
+
+    if day_mask:
+        meta = _exported_metadata_rows(csv_path, n_samples)
+        k = int(MIN_VALID_DAYS if min_valid_days is None else min_valid_days)
+        # Cohort always defined under full mask ON (artifacts ∪ missing).
+        valid_on = build_valid_day_matrix_from_metadata(
+            meta,
+            data_raw_plot,
+            n_points_per_day=n_pts,
+            window_days=window_days,
+            apply_artifacts=True,
+            apply_missing=True,
+        )
+        bad_sample_indices = sorted(
+            set(bad_sample_indices) | set(ineligible_indices(valid_on, min_valid_days=k))
+        )
+        # Feature mask: artifacts optional (sensitivity OFF), missing always on.
+        day_valid_all = build_valid_day_matrix_from_metadata(
+            meta,
+            data_raw_plot,
+            n_points_per_day=n_pts,
+            window_days=window_days,
+            apply_artifacts=bool(apply_artifacts),
+            apply_missing=True,
+        )
+        n_masked_days_total = int((~day_valid_all).sum())
+
     bad_set = set(bad_sample_indices)
     for idx in bad_set:
         if idx < 0 or idx >= n_samples:
@@ -1113,10 +1207,22 @@ def prepare_model_data(
         if day_lengths_all is not None
         else None
     )
+    day_valid_model = (
+        day_valid_all[good_indices] if day_valid_all is not None else None
+    )
     _RUNTIME_LAST_PREPARE_CFG = {
         "csv_path": csv_path,
         "bad_sample_indices": sorted(bad_set),
         "day_lengths_per_sample": day_lengths_model,
+        "day_mask": bool(day_mask),
+        "apply_artifacts": bool(apply_artifacts),
+        "min_valid_days": (
+            int(MIN_VALID_DAYS if min_valid_days is None else min_valid_days)
+            if day_mask
+            else None
+        ),
+        "day_valid": day_valid_model,
+        "n_masked_days": int((~day_valid_model).sum()) if day_valid_model is not None else 0,
     }
     set_runtime_prepare_cfg(_RUNTIME_LAST_PREPARE_CFG)
     set_runtime_data_raw(data_raw_model)
@@ -1130,4 +1236,8 @@ def prepare_model_data(
         "n_samples_original": n_samples,
         "day_lengths_per_sample": day_lengths_model,
         "csv_path": csv_path,
+        "day_valid": day_valid_model,
+        "day_mask": bool(day_mask),
+        "n_masked_days": int((~day_valid_model).sum()) if day_valid_model is not None else 0,
+        "n_masked_days_all_exported": n_masked_days_total,
     }

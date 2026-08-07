@@ -1,0 +1,40 @@
+\begin{thebibliography}{4}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Hoffman and Gelman(2014)]{HoffmanGelman2014}
+Matthew~D. Hoffman and Andrew Gelman.
+\newblock The no-{U}-turn sampler: Adaptively setting path lengths in
+  {H}amiltonian {M}onte {C}arlo.
+\newblock \emph{Journal of Machine Learning Research}, 15\penalty0
+  (47):\penalty0 1593--1623, 2014.
+\newblock URL \url{https://www.jmlr.org/papers/v15/hoffman14a.html}.
+
+\bibitem[Saevskiy et~al.(2025)Saevskiy, Suntsova, Kosenko, Alam, and
+  Kostin]{Saevskiy2025}
+Anton Saevskiy, Natalia Suntsova, Peter Kosenko, Md~Noor Alam, and Andrey
+  Kostin.
+\newblock Open-source algorithm for automated vigilance state classification
+  using single-channel electroencephalogram in rodents.
+\newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 921, 2025.
+\newblock \doi{10.3390/s25030921}.
+
+\bibitem[Vehtari et~al.(2017)Vehtari, Gelman, and Gabry]{Vehtari2017}
+Aki Vehtari, Andrew Gelman, and Jonah Gabry.
+\newblock Practical {B}ayesian model evaluation using leave-one-out
+  cross-validation and {WAIC}.
+\newblock \emph{Statistics and Computing}, 27\penalty0 (5):\penalty0
+  1413--1432, 2017.
+\newblock \doi{10.1007/s11222-016-9696-4}.
+
+\bibitem[Vyazovskiy and Tobler(2005)]{Vyazovskiy2005}
+Vladyslav~V. Vyazovskiy and Irene Tobler.
+\newblock Theta activity in the waking {EEG} is a marker of sleep propensity in
+  the rat.
+\newblock \emph{Brain Research}, 1050\penalty0 (1--2):\penalty0 64--71, 2005.
+\newblock \doi{10.1016/j.brainres.2005.05.022}.
+
+\end{thebibliography}
