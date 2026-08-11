@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: "Seismic Pipeline: Bayesian REM Changepoint Analysis"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Ponomarev
+    given-names: Sergey
+    affiliation: Southern Federal University
+repository-code: "https://github.com/Morpheyka/seismic-pipeline"
+url: "https://github.com/Morpheyka/seismic-pipeline"
+version: "conference-article-2026.08"
+date-released: "2026-08-11"
+keywords:
+  - REM sleep
+  - changepoint
+  - Bayesian inference
+  - neuroseismology
+license: MIT

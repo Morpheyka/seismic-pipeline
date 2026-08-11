@@ -5,6 +5,8 @@ This module provides functionality to calculate REM sleep profiles
 from cached hypnogram data and corresponding EEG signals.
 """
 
+import warnings
+
 import numpy as np
 import pandas as pd
 from typing import List, Tuple, Dict, Optional, Union, Any
@@ -25,6 +27,8 @@ class REMProfileCalculatorYt(TransformerMixinYt):
                  window_size_hours: int = 6,  # Size of the sliding window in hours
                  step_size_hours: int = 1,    # Step size for the sliding window in hours
                  rem_stage: int = 2,  # REM stage value in hypnogram
+                 n_points_per_day: int | None = None,
+                 overlap: float = 0.0,
                  epoch_length_sec: int = 5,
                  sampling_rate: int = 250,
                  profile_features: List[str] = None,
@@ -34,69 +38,71 @@ class REMProfileCalculatorYt(TransformerMixinYt):
         self.window_size_hours = window_size_hours
         self.step_size_hours = step_size_hours
         self.rem_stage = rem_stage
+        self.n_points_per_day = n_points_per_day
+        self.overlap = overlap
         self.epoch_length_sec = epoch_length_sec
         self.sampling_rate = sampling_rate
         self.profile_features = profile_features or ['rem_percentage']
         self.fail_on_missing_data = fail_on_missing_data
         self.max_length_ = 0  # Initialize max_length_
 
-    def _calculate_features_for_X(self, X: List[Dict]) -> Tuple[List[np.ndarray], List[int]]:
+    def _calculate_features_for_X(
+        self,
+        X: List[Dict],
+        *,
+        return_day_lengths: bool = False,
+    ) -> Tuple[List[np.ndarray], List[int]] | Tuple[List[np.ndarray], List[int], List[List[int]]]:
         """Helper to calculate features for a given X."""
-        # #region agent log
-        import time as _t; _feat_t0 = _t.time()
-        _total_dates = 0; _total_missing = 0
-        # #endregion
         all_features = []
         valid_indices = []
+        all_day_lengths: List[List[int]] = []
         missing_data_samples = []
         
         for i, row in enumerate(X):
             rat_id = row['rat_id']
             window_dates = row['window_dates']
             window_features = []
+            day_lengths: List[int] = []
             has_valid_data = False
             missing_dates = []
             
+            n_pts = self.n_points_per_day
             for date in window_dates:
-                # #region agent log
-                _total_dates += 1
-                # #endregion
                 rem_profile = self._calculate_rem_profiles_for_rat_date(rat_id, date)
                 if rem_profile.size > 0:
                     window_features.append(rem_profile)
+                    day_lengths.append(int(rem_profile.size))
                     has_valid_data = True
                 else:
                     missing_dates.append(date)
-                    # #region agent log
-                    _total_missing += 1
-                    # #endregion
-            
-            if has_valid_data:
+                    # Fixed-N mode: keep day-aligned slots so missing dates do not
+                    # shift later days; fill with NaN of length n_points_per_day.
+                    if n_pts is not None and int(n_pts) > 0:
+                        window_features.append(
+                            np.full(int(n_pts), np.nan, dtype=float)
+                        )
+                        day_lengths.append(0)
+
+            if has_valid_data or (
+                n_pts is not None and int(n_pts) > 0 and len(window_features) > 0
+            ):
                 window_features_concat = np.concatenate(window_features)
                 all_features.append(window_features_concat)
                 valid_indices.append(i)
+                all_day_lengths.append(day_lengths)
             
             # Track samples with missing data
             if missing_dates:
                 missing_data_samples.append((rat_id, missing_dates))
-        
-        # #region agent log
-        _feat_elapsed = _t.time() - _feat_t0
-        import json as _j, os as _os
-        _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-        try:
-            with open(_logpath, 'a') as _f:
-                _f.write(_j.dumps({"hypothesisId":"H2_H3","location":"rem_profile_calculator.py:_calculate_features_for_X","message":"features_calc_summary","data":{"n_samples":len(X),"total_dates":_total_dates,"total_missing":_total_missing,"valid_samples":len(valid_indices),"elapsed_s":round(_feat_elapsed,3)},"timestamp":int(_t.time()*1000)}) + '\n')
-        except Exception:
-            pass
-        # #endregion
         
         # If fail_on_missing_data is True and we have missing data, raise exception
         if self.fail_on_missing_data and missing_data_samples:
             missing_info = "; ".join([f"{rat_id}: {', '.join(dates)}" for rat_id, dates in missing_data_samples])
             raise ValueError(f"Missing hypnogram data for: {missing_info}. "
                            f"This parameter combination cannot be evaluated.")
-                
+        
+        if return_day_lengths:
+            return all_features, valid_indices, all_day_lengths
         return all_features, valid_indices
 
     def fit(self, X, y=None):
@@ -171,49 +177,21 @@ class REMProfileCalculatorYt(TransformerMixinYt):
                 return np.array([])
 
             # First try to get cached hypnogram
-            # #region agent log
-            import time as _t; _t0 = _t.time()
-            # #endregion
             hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
-            # #region agent log
-            _t_cache = _t.time() - _t0
-            # #endregion
             
             # If not cached, try to cache it from S3 source first
             if hypnogram is None:
-                # #region agent log
-                _t1 = _t.time()
-                # #endregion
                 if self.cache_manager._check_s3_temp_bucket_exists(rat_id, date):
                     success = self.cache_manager.cache_hypnogram(rat_id, date, 's3')
                 else:
                     success = False
-                # #region agent log
-                _t_s3 = _t.time() - _t1
-                # #endregion
                 if success:
                     hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
                 else:
                     # If S3 fails, fallback to local source
-                    # #region agent log
-                    _t2 = _t.time()
-                    # #endregion
                     success = self.cache_manager.cache_hypnogram(rat_id, date, 'local')
                     if success:
                         hypnogram = self.cache_manager.get_cached_hypnogram(rat_id, date)
-                    # #region agent log
-                    _t_local = _t.time() - _t2
-                    import json as _j, os as _os
-                    if not hasattr(self, '_dbg_miss_count'): self._dbg_miss_count = 0
-                    self._dbg_miss_count += 1
-                    if self._dbg_miss_count <= 50:
-                        _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-                        try:
-                            with open(_logpath, 'a') as _f:
-                                _f.write(_j.dumps({"hypothesisId":"H1_H2","location":"rem_profile_calculator.py:160","message":"missing_hypnogram_lookup","data":{"rat_id":rat_id,"date":date,"s3_check_time_s":round(_t_s3,4),"local_time_s":round(_t_local,4),"total_miss_time_s":round(_t_local+_t_s3,4),"miss_count":self._dbg_miss_count},"timestamp":int(_t.time()*1000)}) + '\n')
-                        except Exception:
-                            pass
-                    # #endregion
                     
                     if hypnogram is None:
                         # Mark as missing so future lookups skip S3 entirely
@@ -253,19 +231,81 @@ class REMProfileCalculatorYt(TransformerMixinYt):
                 self.logger.warning(f"Hypnogram array is empty for {rat_id} on {date}")
                 return np.array([])
                 
-            # Use the exact algorithm from Stage4DAG.py
-            rem_profile = self._fraction(hypno_data, (self.window_size_hours, self.step_size_hours), self.rem_stage, self.epoch_length_sec)
-            
+            if self.n_points_per_day is not None:
+                return self.compute_rem_profile_fixed_n(
+                    hypno_data,
+                    self.n_points_per_day,
+                    self.overlap,
+                    self.rem_stage,
+                )
+
+            # Legacy hour-based sliding window (deprecated)
+            rem_profile = self._fraction(
+                hypno_data,
+                (self.window_size_hours, self.step_size_hours),
+                self.rem_stage,
+                self.epoch_length_sec,
+            )
             return np.array(rem_profile)
             
         except Exception as e:
             self.logger.error(f"Failed to calculate REM profiles for {rat_id} on {date}: {e}")
             return np.array([])
             
+    def compute_rem_profile_fixed_n(
+        self,
+        hypnogram: np.ndarray,
+        n_points: int,
+        overlap: float,
+        rem_stage: int = 2,
+    ) -> np.ndarray:
+        """
+        Compute REM profile with fixed number of points per day.
+
+        Parameters
+        ----------
+        hypnogram : np.ndarray of shape (M,)
+            Array of sleep stage labels (0=wake, 1=NREM, 2=REM) per 5-sec epoch.
+        n_points : int
+            Number of profile points per day (e.g., 12, 24, 48).
+        overlap : float
+            Overlap fraction in [0.0, 1.0). Window width = segment_length / (1 - overlap).
+        rem_stage : int
+            Label value for REM sleep (default 2).
+
+        Returns
+        -------
+        profile : np.ndarray of shape (n_points,)
+            REM fraction (0-100) at each point.
+        """
+        t = len(hypnogram)
+        segment_len = t / n_points
+        window_len = segment_len / (1.0 - overlap)
+
+        profile = np.zeros(n_points)
+
+        for i in range(n_points):
+            center = (i + 0.5) * segment_len
+            start = int(max(0, center - window_len / 2))
+            end = int(min(t, center + window_len / 2))
+
+            if end > start:
+                window_epochs = hypnogram[start:end]
+                rem_fraction = 100.0 * np.sum(window_epochs == rem_stage) / len(window_epochs)
+            else:
+                rem_fraction = 0.0
+
+            profile[i] = rem_fraction
+
+        return profile
+
     def _fraction(self, hypno: np.ndarray, slide_hours: Tuple[int, int], stage: int, window_sec: int) -> List[float]:
         """
         Calculate REM percentage using sliding window approach (exact algorithm from Stage4DAG.py).
-        
+
+        .. deprecated::
+            Use :meth:`compute_rem_profile_fixed_n` with ``n_points_per_day`` and ``overlap``.
+
         Parameters
         ----------
         hypno : np.ndarray
@@ -276,12 +316,18 @@ class REMProfileCalculatorYt(TransformerMixinYt):
             Sleep stage to calculate percentage for
         window_sec : int
             Length of each epoch in seconds
-            
+
         Returns
         -------
         list of float
             REM percentages for each window
         """
+        warnings.warn(
+            "_fraction is deprecated; use compute_rem_profile_fixed_n with "
+            "n_points_per_day and overlap instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         points_hour = int(3600 / window_sec)
         res = []
         i = 0

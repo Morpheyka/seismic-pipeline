@@ -499,7 +499,7 @@ def visualize_hyperparameter_grid_slices(grid_search, output_dir='.', param_pair
                 try:
                     clean_values = [v for v in values if v is not None and not (hasattr(v, '__class__') and 'MaskedConstant' in str(v.__class__))]
                     unique_values = list(set(clean_values)) if clean_values else []
-                except:
+                except Exception:
                     unique_values = []
         param_values[param_name] = unique_values
     

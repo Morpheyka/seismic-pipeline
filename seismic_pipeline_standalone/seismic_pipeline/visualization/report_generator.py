@@ -59,6 +59,7 @@ from pathlib import Path
 
 # Import visualization function
 from .hyperparameter_grid_visualizer import visualize_hyperparameter_grid_slices
+from .report_pdf import compile_markdown_to_pdf, detect_pdf_engine
 
 
 class ReportGenerator:
@@ -1758,151 +1759,15 @@ class ReportGenerator:
         
         self._compile_markdown_to_pdf(md_path, output_dir, pdf_engine)
         return self
-    
+
     def _compile_markdown_to_pdf(self, md_path: str, output_dir: str, pdf_engine: Optional[str] = None):
-        """
-        Compile markdown file to PDF using pandoc or other available engine.
-        
-        Internal method - use compile_pdf_from_markdown() for public API.
-        
-        Args:
-            md_path: Path to markdown file
-            output_dir: Directory where PDF should be saved
-            pdf_engine: PDF engine to use. If None, will try to auto-detect.
-        """
-        import subprocess
-        
-        # Determine PDF output path
-        pdf_file_name = os.path.splitext(os.path.basename(md_path))[0] + '.pdf'
-        pdf_path = os.path.join(output_dir, pdf_file_name)
-        
-        # Try to find available PDF engine
-        if pdf_engine is None:
-            pdf_engine = self._detect_pdf_engine()
-        
-        if pdf_engine is None:
-            print("Warning: No PDF engine found. Install pandoc to enable PDF compilation.")
-            print("  Install pandoc: https://pandoc.org/installing.html")
-            return
-        
-        try:
-            if pdf_engine == 'pandoc':
-                # Use absolute paths to avoid issues with spaces in directory names
-                md_path_abs = os.path.abspath(md_path)
-                pdf_path_abs = os.path.abspath(pdf_path)
-                output_dir_abs = os.path.abspath(output_dir)
-                
-                # Use pandoc to convert markdown to PDF
-                # Run from output directory so relative image paths work
-                # Create a temporary header file with LaTeX commands for Russian TOC title and image positioning
-                import tempfile
-                header_file = tempfile.NamedTemporaryFile(mode='w', suffix='.tex', delete=False, encoding='utf-8')
-                header_file.write('\\usepackage[utf8]{inputenc}\n')
-                header_file.write('\\usepackage[russian]{babel}\n')
-                header_file.write('\\renewcommand{\\contentsname}{Содержание}\n')
-                # Fix image positioning to prevent floating - use [H] positioning for all figures
-                header_file.write('\\usepackage{float}\n')
-                header_file.write('\\usepackage{placeins}\n')
-                # Set default float placement to [H] (here, no floating)
-                header_file.write('\\floatplacement{figure}{H}\n')
-                header_file.write('\\floatplacement{table}{H}\n')
-                # Add FloatBarrier before and after each image to prevent text from moving
-                header_file.write('\\let\\oldincludegraphics\\includegraphics\n')
-                header_file.write('\\renewcommand{\\includegraphics}[2][]{\\FloatBarrier\\oldincludegraphics[#1]{#2}\\FloatBarrier}\n')
-                header_file.close()
-                
-                cmd = [
-                    'pandoc',
-                    md_path_abs,
-                    '-o', pdf_path_abs,
-                    '--pdf-engine=xelatex',  # Use xelatex for better Unicode support
-                    '--standalone',
-                    '--toc',  # Add table of contents
-                    '--wrap=none',  # Don't wrap lines - helps with image positioning
-                    '--include-in-header', header_file.name,  # Include LaTeX commands for Russian TOC and image positioning
-                    '--variable', 'lang=ru-RU',  # Set document language to Russian (IETF format)
-                    '--variable', 'geometry:margin=1in',
-                    '--variable', 'mainfont:DejaVu Serif',
-                    '--variable', 'sansfont:DejaVu Sans',
-                    '--variable', 'monofont:DejaVu Sans Mono',
-                ]
-                
-                # Run pandoc from the output directory so images are found
-                result = subprocess.run(
-                    cmd,
-                    cwd=output_dir_abs,
-                    capture_output=True,
-                    text=True,
-                    check=False
-                )
-                
-                if result.returncode != 0:
-                    # Try with pdflatex if xelatex fails
-                    # Header file already includes inputenc and babel, so it should work with pdflatex too
-                    print(f"Warning: xelatex failed, trying pdflatex...")
-                    cmd[4] = '--pdf-engine=pdflatex'
-                    result = subprocess.run(
-                        cmd,
-                        cwd=output_dir_abs,
-                        capture_output=True,
-                        text=True,
-                        check=False
-                    )
-                
-                # Clean up temporary header file
-                try:
-                    if os.path.exists(header_file.name):
-                        os.unlink(header_file.name)
-                except Exception:
-                    pass
-                
-                # Clean up temporary header file
-                try:
-                    if os.path.exists(header_file.name):
-                        os.unlink(header_file.name)
-                except Exception:
-                    pass
-                
-                if result.returncode == 0:
-                    print(f"Compiled PDF report to: {pdf_path}")
-                else:
-                    print(f"Error compiling PDF: {result.stderr}")
-                    if result.stdout:
-                        print(f"Pandoc stdout: {result.stdout}")
-                    print(f"Pandoc command: {' '.join(cmd)}")
-            else:
-                print(f"PDF engine '{pdf_engine}' is not yet supported. Using pandoc.")
-                self._compile_markdown_to_pdf(md_path, output_dir, 'pandoc')
-                
-        except FileNotFoundError:
-            print(f"Error: {pdf_engine} not found. Please install it to enable PDF compilation.")
-        except Exception as e:
-            print(f"Error compiling PDF: {e}")
-    
+        """Compile markdown file to PDF (delegates to report_pdf module)."""
+        compile_markdown_to_pdf(md_path, output_dir, pdf_engine)
+
     def _detect_pdf_engine(self) -> Optional[str]:
-        """
-        Detect available PDF compilation engine.
-        
-        Returns:
-            Name of available engine ('pandoc', etc.) or None if none found
-        """
-        import subprocess
-        
-        # Check for pandoc
-        try:
-            result = subprocess.run(
-                ['pandoc', '--version'],
-                capture_output=True,
-                text=True,
-                timeout=5
-            )
-            if result.returncode == 0:
-                return 'pandoc'
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            pass
-        
-        return None
-    
+        """Detect available PDF compilation engine."""
+        return detect_pdf_engine()
+
     def _slugify(self, text: str) -> str:
         """
         Convert text into a filesystem-friendly slug.

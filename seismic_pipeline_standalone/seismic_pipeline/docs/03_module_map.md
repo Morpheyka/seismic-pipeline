@@ -36,6 +36,33 @@ Typical dataflow:
 | Viz | `visualize_hyperparameter_grid_slices` | `visualization/hyperparameter_grid_visualizer.py` | grid-search | images | Produces slice heatmaps / bar charts |
 | Reporting | `ReportGenerator` | `visualization/report_generator.py` | artifacts | md/json | JSON sections → compiled markdown (optional PDF) |
 
+## Changepoint / Bayesian stack (8-day notebooks)
+
+Separate from the sklearn classifier pipeline; optional deps in `requirements-bayesian.txt`.
+
+| Layer | Module | Role |
+|---|---|---|
+| Report orchestration | `changepoint_report.py` (standalone) | CSV load, diagnostics, MCMC reruns, t-tests, `build_changepoint_report()` |
+| Defaults | `config/changepoint_defaults.py` | `DEFAULT_EVENTS_10D`, `FEATURE_SELECTION_PRESETS`, env-based S3 config |
+| REM export | `seismo/rem_export.py` | `export_rem_profiles_10days_cached_only` from hypnogram cache |
+| Chunk features | `features/rem_chunk_features.py` | `build_group_data`, `prepare_model_data`, max-min scaling |
+| Runtime | `features/runtime.py` | `ChangepointRunContext`, shared export/prepare cfg |
+| PyMC model | `bayesian/changepoint_model.py` | `build_changepoint_model`, `sample_model` |
+| Scoring | `bayesian/diagnostics.py` | WAIC/LOO, `collect_pareto_k_stats`, trace summaries |
+| Search | `bayesian/search.py` | `exhaustive_model_search`, Hamming distance |
+| MH search | `bayesian/mh_search.py` | `metropolis_hastings_model_search` |
+| Runner | `bayesian/runner.py` | `run_variant`, posterior predictive checks |
+| Plots | `visualization/changepoint_plots.py` | `plot_exhaustive_search_results`, trace plots |
+| Facade | `rem_profiles_export_10days_lib.py` | Backward-compatible re-exports for notebooks |
+
+Dataflow for changepoint studies:
+
+1. **Events** → `export_rem_profiles_10days_cached_only` → REM CSV matrices  
+2. **prepare_model_data** → normalized matrix + sample mask  
+3. **build_group_data** → chunk feature DataFrames per group  
+4. **build_changepoint_model** → PyMC model → **sample_model** / **run_variant**  
+5. **changepoint_report** → diagnostics, reruns, ReportGenerator markdown
+
 ## Recommended “agent heuristics”
 
 If you’re building an agent that assembles pipelines from docs, these heuristics work well:

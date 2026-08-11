@@ -161,3 +161,31 @@ python full_seismic_pipeline_example_window3.py --output-dir ./run_output
 - `seismic_pipeline_standalone/seismic_pipeline/seismo/` — калькулятор гипнограмм, менеджеры кэшей (гипнограммы и `.dat`), калькулятор REM-профиля и др.
 - `hypnogram_cache/`, `dat_file_cache/` — локальные кэши (часто создаются в корне репозитория при запуске оттуда).
 - `copy_plan.md` — план и поток данных для функции авто-гипнограммы.
+
+---
+
+## Bayesian changepoint / conference article
+
+Release [`conference-article-2026.08`](https://github.com/Morpheyka/seismic-pipeline/releases/tag/conference-article-2026.08) — байесовская модель одной точки разладки REM на 8-суточных окнах (density-safe protocol, PSIS-LOO).
+
+- **Reproduce:** [`REPRODUCE.md`](REPRODUCE.md)
+- **Article:** [`literature/conference_article_ru/latex/conference_article.pdf`](literature/conference_article_ru/latex/conference_article.pdf)
+- **Frozen results:** [`seismic_pipeline_standalone/artifacts/conference_article/`](seismic_pipeline_standalone/artifacts/conference_article/)
+- **Main search (article):** `scripts/run_parallel_search_8day_density_safe.py` (IIB/ZOIB grid)
+- **Confirmatory:** `scripts/run_density_safe_confirmatory.py`
+- **Neg-control:** `scripts/run_density_safe_neg_control.py`
+
+### Байесовский changepoint (кратко)
+
+```bash
+cd seismic_pipeline_standalone
+pip install -r requirements-lock.txt
+python scripts/run_parallel_search_8day_density_safe.py --smoke-only
+python ../literature/conference_article_ru/figures/results/plot_e_tau_screening.py
+```
+
+---
+
+## Байесовский changepoint / conference article (RU)
+
+См. [`REPRODUCE.md`](REPRODUCE.md) — три уровня воспроизводимости (фигуры за минуты; confirmatory за часы; full search за дни на кластере).
