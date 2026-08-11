@@ -56,3 +56,7 @@ run_output_*/
 **/*.pdf
 .DS_Store
 **/.~lock.*
+
+# Conference article LaTeX figures (needed to rebuild PDF)
+!literature/conference_article_ru/latex/images/
+!literature/conference_article_ru/latex/images/**

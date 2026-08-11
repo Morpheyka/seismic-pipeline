@@ -95,10 +95,15 @@ def edge_frac(s: pd.Series) -> float:
     return float((s <= TAU_EDGE).mean())
 
 
+def _ensure_dir(path: Path) -> None:
+    if path.is_symlink() or path.is_dir():
+        return
+    path.mkdir(parents=True, exist_ok=True)
+
 def save_fig(fig: plt.Figure, stem: str) -> None:
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    LATEX_IMG.mkdir(parents=True, exist_ok=True)
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    _ensure_dir(REPORT_DIR)
+    _ensure_dir(LATEX_IMG)
+    _ensure_dir(DATA_DIR)
     for d in (OUT_DIR, REPORT_DIR, LATEX_IMG):
         fig.savefig(d / f"{stem}.png", dpi=450)
         fig.savefig(d / f"{stem}.svg")
