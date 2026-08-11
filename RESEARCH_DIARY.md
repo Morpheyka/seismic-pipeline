@@ -1,3 +1,11 @@
+## 2026-08-11 — Public main cleanup + research → WD
+
+- **Change:** С `main` убраны `literature/`, `reports/`, `final_results/`, `run report/`, `otchet_*.ipynb`; Level A plot scripts/data перенесены в `seismic_pipeline_standalone/artifacts/conference_article/figures/`; обновлены `REPRODUCE.md`, `.gitignore`, README. Research-архив скопирован на WD.
+- **Why:** Публичная ссылка в статье — только код + артефакты для цитирования/воспроизведения; черновики/диссертация не должны раздувать GitHub.
+- **Result:** IIB n=366, E[τ]≈5.48 подтверждены; tag/release `conference-article-2026.08` сохранены (PDF статьи — в history тега).
+- **Artifacts:** WD `/home/aksay/mnt/wd/aksay/ponomarev/seismic-pipeline-research-2026-08`; figures under `artifacts/conference_article/figures/`
+- **Next:** при необходимости обновить body release (ссылка на PDF → tag history).
+
 ## 2026-08-11 — Release prep: conference-article-2026.08
 
 - **Change:** Split IIB article script vs BC+normal; frozen CSV в `artifacts/conference_article/`; REPRODUCE.md, CITATION.cff, LICENSE, requirements-lock; обновлены plot scripts и ack в tex.

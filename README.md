@@ -71,12 +71,19 @@ Configure threading (e.g. `MAX_CORES`, `THREADS_PER_JOB`) at the top of the scri
 
 ---
 
+## Citation / conference article
+
+- Release: [`conference-article-2026.08`](https://github.com/Morpheyka/seismic-pipeline/releases/tag/conference-article-2026.08)
+- Reproduce: [`REPRODUCE.md`](REPRODUCE.md) (Level A figures from frozen CSV; B/C need data access)
+- Cite: [`CITATION.cff`](CITATION.cff)
+- Frozen artifacts: `seismic_pipeline_standalone/artifacts/conference_article/`
+
 ## Repository layout (main parts)
 
-- `seismic_pipeline_standalone/` – Pipeline package, `requirements.txt`, and example runner (`full_seismic_pipeline_example_window3.py`).
+- `seismic_pipeline_standalone/` – Pipeline package, `requirements.txt` / `requirements-lock.txt`, example runners, scripts.
+- `seismic_pipeline_standalone/artifacts/conference_article/` – Frozen CSV + Level A plot scripts.
 - `seismic_pipeline_standalone/seismic_pipeline/seismo/` – Hypnogram calculator, cache managers (hypnogram + `.dat`), REM profile calculator, etc.
-- `hypnogram_cache/`, `dat_file_cache/` – Local caches (often created at repo root when running from there).
-- `copy_plan.md` – Plan and data flow for the auto-hypnogram feature.
+- Local caches (`hypnogram_cache/`, `dat_file_cache/`, `run_output*`) are not part of the published tree.
 
 ---
 

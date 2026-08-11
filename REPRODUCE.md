@@ -2,11 +2,9 @@
 
 Release: [`conference-article-2026.08`](https://github.com/Morpheyka/seismic-pipeline/releases/tag/conference-article-2026.08)
 
-Статья: [`literature/conference_article_ru/latex/conference_article.tex`](literature/conference_article_ru/latex/conference_article.tex)
-
 Замороженные результаты: [`seismic_pipeline_standalone/artifacts/conference_article/`](seismic_pipeline_standalone/artifacts/conference_article/)
 
-Протокол: [`literature/conference_article_ru/plan/experiment-protocol.md`](literature/conference_article_ru/plan/experiment-protocol.md)
+Исходники статьи (LaTeX/PDF, thesis, черновики) сохранены в git history тега `conference-article-2026.08` и в локальном research-архиве; на публичном `main` оставлен только код и артефакты для цитирования/воспроизведения.
 
 ## Окружение
 
@@ -25,11 +23,12 @@ pip install -r seismic_pipeline_standalone/requirements-lock.txt
 
 ```bash
 cd seismic_pipeline_standalone
-python ../literature/conference_article_ru/figures/results/plot_e_tau_screening.py
-python ../literature/conference_article_ru/figures/results/plot_e_tau_mean.py
+python artifacts/conference_article/figures/plot_e_tau_screening.py
+python artifacts/conference_article/figures/plot_e_tau_mean.py
 ```
 
-Сверка: `literature/conference_article_ru/figures/data/*.csv` и SVG в `figures/results/`.
+Сверка: `artifacts/conference_article/figures/data/*.csv` и SVG рядом со скриптами.
+Ключевые числа: IIB n=366, E[τ]≈5.48 (см. `fig_iib_main_e_tau_summary.csv`).
 
 ## Уровень B — confirmatory + neg-control (часы, n=34)
 
@@ -53,7 +52,7 @@ python scripts/run_parallel_search_8day_density_safe.py --skip-smoke \
   --out-dir ./run_output_8day_density_safe --draws 2000 --tune 4000 --chains 4
 ```
 
-Post-article эксперимент BC+normal — отдельный скрипт:
+Post-article эксперимент BC+normal — отдельный скрипт (не смешивать с IIB-grid статьи):
 
 ```bash
 python scripts/run_parallel_search_8day_density_safe_bc_normal.py --skip-smoke \
@@ -72,6 +71,12 @@ python scripts/run_parallel_search_8day_density_safe_bc_normal.py --skip-smoke \
 | Range (статья) | plain beta, beta_constrained, IIB@0.9, ZOIB |
 | MCMC | BlackJAX NUTS, 4 chains, tune=4000, draws=2000 (full) |
 
+## Статья PDF
+
+PDF статьи был в дереве `literature/` на теге `conference-article-2026.08`
+([исторический путь на теге](https://github.com/Morpheyka/seismic-pipeline/blob/conference-article-2026.08/literature/conference_article_ru/latex/conference_article.pdf)).
+На очищенном `main` PDF не хранится — используйте release/tag или локальный research-архив.
+
 ## Цитирование
 
-См. [`CITATION.cff`](CITATION.cff) или Zenodo/GitHub release `conference-article-2026.08`.
+См. [`CITATION.cff`](CITATION.cff) или GitHub release `conference-article-2026.08`.
