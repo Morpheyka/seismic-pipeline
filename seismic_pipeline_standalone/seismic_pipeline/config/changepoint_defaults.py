@@ -101,8 +101,11 @@ FEATURE_SELECTION_PRESETS: dict[str, dict[str, list[str]]] = {
 LIKELIHOOD_CHOICES_BY_METRIC: dict[str, list[str]] = {
     "mean": ["student_t", "skew_normal"],
     "range": [
+        "beta",
         "beta_constrained",
-        "normal",
+        "lognormal",
+        "interval_inflated_beta",
+        "zero_inflated_beta",
     ],
     "std": ["student_t", "lognormal", "gamma"],
     "shape_shift": ["lognormal", "gamma"],
