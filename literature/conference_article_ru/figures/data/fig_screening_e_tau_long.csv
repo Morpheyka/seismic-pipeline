@@ -1,0 +1,1465 @@
+features,likelihoods,n_points,overlap,range_lik,e_tau,has_mean,has_range
+daily: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.442282181638925,False,True
+daily: range,range=beta,24,0.0,beta,3.081418671364834,False,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0160541868205084,True,True
+daily: range,range=beta,24,0.25,beta,4.403764575814342,False,True
+daily: range,range=beta,24,0.5,beta,5.23852401155087,False,True
+daily: range; night: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.00000000000005,False,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.685999927676014,True,True
+daily: range,range=beta_constrained,24,0.5,beta_constrained,3.6108077722083953,False,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000139892452374,True,True
+daily: range,range=beta_constrained,24,0.25,beta_constrained,5.963659181473327,False,True
+"daily: mean, range",mean=student_t; range=beta,24,0.25,beta,5.76573114478315,True,True
+"daily: mean, range",mean=skew_normal; range=beta,24,0.25,beta,5.991555113188225,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.996027325774582,True,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.744681316149578,True,True
+daily: range,range=beta,12,0.0,beta,6.995025414431038,False,True
+"daily: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,6.381846017458769,True,True
+daily: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.926781989720892,False,True
+daily: range; night: mean,mean=student_t; range=beta,24,0.0,beta,2.4510721451538893,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000000004809,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.965289458497498,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta,24,0.5,beta,6.070589945553999,True,True
+daily: range; night: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.2896817533760188,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.000000300916242,True,True
+daily: range,range=beta,12,0.25,beta,5.459582584667254,False,True
+daily: range; night: range,range=beta,24,0.5,beta,2.62381956539744,False,True
+day: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.566320465320388,False,True
+day: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.939939867097767,False,True
+daily: range,range=beta,12,0.5,beta,4.420698135936838,False,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.222645092587977,True,True
+daily: range,range=beta_constrained,12,0.5,beta_constrained,4.39284015904553,False,True
+daily: range; day: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.352249340427522,False,True
+daily: range; night: range,range=beta_constrained,24,0.0,beta_constrained,2.000000662719831,False,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.390244907226403,True,True
+daily: range; day: range; night: range,range=beta,24,0.5,beta,3.693536171335976,False,True
+daily: range; night: range,range=beta_constrained,24,0.5,beta_constrained,2.182010833135869,False,True
+daily: mean; day: range,mean=skew_normal; range=beta,24,0.25,beta,3.945451065691396,True,True
+daily: range; day: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.073022138300636,False,True
+day: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.835243533135322,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta,24,0.5,beta,2.684766638742301,True,True
+"daily: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.02486854887524,True,True
+daily: range; day: range; night: range,range=beta_constrained,24,0.5,beta_constrained,2.3093060214547827,False,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.9936564198707325,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.09621477271439,True,True
+daily: range; night: range,range=beta,12,0.0,beta,7.019994314816448,False,True
+day: range,range=beta,24,0.5,beta,5.74245419551019,False,True
+day: range,range=beta_constrained,24,0.5,beta_constrained,5.732257284967582,False,True
+day: range,range=beta,12,0.5,beta,4.310764924472151,False,True
+day: range,range=beta_constrained,12,0.5,beta_constrained,4.549551684290391,False,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,24,0.25,beta,5.808963508818899,True,True
+day: range,range=beta,24,0.0,beta,5.516591760405562,False,True
+daily: range; day: range,range=beta,12,0.0,beta,6.997721541879058,False,True
+day: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.119936584936939,False,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,24,0.0,beta,2.0047799183502115,True,True
+day: range; night: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.996098224697995,False,True
+"daily: range; night: mean, range",mean=student_t; range=beta,24,0.0,beta,2.000575058853036,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.309474076058827,True,True
+day: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.413222569756624,False,True
+daily: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.693364737106629,False,True
+day: range,range=beta_constrained,24,0.0,beta_constrained,6.670499767256012,False,True
+daily: mean; day: range,mean=skew_normal; range=beta,24,0.5,beta,6.302241625916367,True,True
+daily: range; day: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.462389489868655,False,True
+day: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.989288828053301,False,True
+daily: range; day: range; night: range,range=beta,12,0.5,beta,2.000118401587512,False,True
+daily: range; day: range; night: range,range=beta_constrained,12,0.5,beta_constrained,2.037228009679274,False,True
+night: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.211129182131816,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta,12,0.0,beta,7.017117924042478,True,True
+daily: range; night: mean,mean=skew_normal; range=beta,24,0.25,beta,4.596880182670043,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,12,0.0,beta,6.997162512136495,True,True
+daily: range; night: mean,mean=student_t; range=beta,24,0.25,beta,4.170879382936354,True,True
+day: range,range=beta_constrained,12,0.25,beta_constrained,5.173507384018029,False,True
+daily: range; night: range,range=beta,12,0.5,beta,2.000017400055723,False,True
+day: range,range=beta,12,0.25,beta,5.314481878729751,False,True
+daily: range; night: range,range=beta_constrained,12,0.5,beta_constrained,2.000302587457756,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.0477936034866415,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.998208503948403,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.000004733568248,False,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.25997023222929,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,24,0.25,beta,3.1987714065303097,True,True
+day: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.412128276572052,False,True
+day: range; night: range,range=beta,12,0.5,beta,2.014720749942376,False,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,24,0.0,beta,2.088166812240745,True,True
+day: range; night: range,range=beta_constrained,12,0.5,beta_constrained,2.0441078060172204,False,True
+daily: range; day: range; night: range,range=beta,12,0.0,beta,7.007421398667274,False,True
+daily: range; night: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.029282593371303,False,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.91707346960682,True,True
+day: range; night: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0117814127726064,False,True
+"daily: mean, range; day: range",mean=student_t; range=beta,12,0.5,beta,4.783787605461828,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.0000004522942594,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.0000002789828297,True,True
+day: range; night: range,range=beta_constrained,12,0.25,beta_constrained,4.295516121583023,False,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.3792325355070485,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.167640416185407,True,True
+day: range; night: range,range=beta,12,0.25,beta,4.212693466357033,False,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.849915743024757,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.81951036715607,True,True
+night: range,range=beta,12,0.5,beta,2.0192893764818654,False,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.765575399930114,True,True
+night: range,range=beta_constrained,12,0.5,beta_constrained,2.056612871311246,False,True
+"daily: mean, range",mean=student_t; range=beta,12,0.5,beta,5.406563014671205,True,True
+"daily: mean, range; night: range",mean=student_t; range=beta,12,0.5,beta,2.000000366750602,True,True
+day: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.124428158180578,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.000237343372262,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.00001458516382,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.000000410788921,True,True
+night: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.048470376353651,False,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,12,0.5,beta,2.000348241414608,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.342096279541288,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.992934665520026,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.576280753572375,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.109742419687142,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.963142471656212,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.899006805136122,True,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.038213674736729,True,True
+daily: mean; day: range,mean=skew_normal; range=beta,12,0.5,beta,5.747627148539965,True,True
+daily: mean; night: range,mean=student_t; range=beta,12,0.0,beta,6.45232109242919,True,True
+daily: mean; night: range,mean=student_t; range=beta,24,0.5,beta,2.8378761562612995,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.970309542704048,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.31359374688679,True,True
+daily: mean; day: range,mean=student_t; range=beta,12,0.5,beta,5.271738344357447,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.519180267355542,True,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.711368531637154,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0185642182901957,True,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.923459424536394,True,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.60148174613308,True,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.576674450350206,True,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.6267483884610443,True,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.693163110191767,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.343257356222206,True,True
+night: range,range=beta_constrained,12,0.25,beta_constrained,4.178373893360598,False,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.67464227785541,True,True
+night: range,range=beta,12,0.25,beta,4.277840357663713,False,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,12,0.0,beta,6.528951216689281,True,True
+day: range; night: mean,mean=skew_normal; range=beta,24,0.0,beta,6.42281223577908,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.126087414400291,True,True
+night: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.863112136846239,False,True
+day: range; night: mean,mean=student_t; range=beta,24,0.0,beta,5.726491795628136,True,True
+night: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.037301355904589,False,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.883944671817208,True,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.203877378229391,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.102394243749785,True,True
+night: range,range=beta_constrained,12,0.0,beta_constrained,5.876810814949092,False,True
+night: range,range=beta,12,0.0,beta,6.232277007972706,False,True
+day: range; night: range,range=beta_constrained,24,0.0,beta_constrained,2.000135944989041,False,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,12,0.0,beta,7.004135370282809,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.003513581420667,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.805012832632215,True,True
+night: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,4.7280274580627815,False,True
+night: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.073586428307529,False,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,3.530746172659162,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,12,0.5,beta,2.0006261895837816,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.391115248403705,True,True
+daily: mean; night: range,mean=student_t; range=beta,12,0.25,beta,5.019168517735867,True,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.758297517869347,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.447122934992765,True,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.1122889792425377,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.173823204785895,True,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.626863438186105,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,12,0.0,beta,7.0322685605347885,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,12,0.0,beta,6.999401048650048,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,12,0.0,beta,7.001806764268284,True,True
+night: range,range=beta_constrained,24,0.5,beta_constrained,2.8524850383056566,False,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.116006730234728,True,True
+night: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000048359862413,False,True
+night: range,range=beta,24,0.5,beta,2.925393086641693,False,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,7.135705338146037,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.016915000722043,True,True
+daily: range; night: mean,mean=student_t; range=beta,12,0.0,beta,6.959880192189696,True,True
+daily: range; night: mean,mean=skew_normal; range=beta,12,0.0,beta,7.004957124804291,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,7.017416643526524,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.994159914513102,True,True
+night: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.952995417604275,False,True
+night: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.5353165184937345,False,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,2.493084883421366,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.189742010220427,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,12,0.25,beta,6.136496967795601,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.4314371508608,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.073666379121881,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.799951370138443,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.044377952769807,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,3.392282867120116,True,True
+"day: mean, range",mean=student_t; range=beta,24,0.25,beta,3.296444367628677,True,True
+night: range,range=beta,24,0.0,beta,2.0745271355219623,False,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.554211685457791,True,True
+day: range; night: mean,mean=student_t; range=beta,24,0.5,beta,5.672955867814392,True,True
+daily: range; day: mean,mean=student_t; range=beta,12,0.0,beta,6.998901426202464,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,24,0.5,beta,2.639375537280371,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.802412782863094,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000289757896,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.820867936493526,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.000956466493951,True,True
+night: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.930656198749373,False,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,12,0.5,beta,2.0002035214545324,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.7854361581563385,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,12,0.0,beta,6.643577691346955,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.0000872593653347,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.7703174921391645,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.000021579057674,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,4.719844685390644,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.053198408199178,True,True
+"night: mean, range",mean=student_t; range=beta,24,0.0,beta,2.052431108102572,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.506968930172176,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0193792409363254,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,12,0.5,beta,2.0001343589507807,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.032800831769064,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.0947932452073874,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,3.4077426340537817,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.994134730356734,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0037524874849493,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0000000361275285,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.6086459735613925,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,12,0.25,beta,5.990887945464184,True,True
+day: mean; night: range,mean=student_t; range=beta,24,0.0,beta,2.2026019392540155,True,True
+daily: range; night: mean,mean=student_t; range=beta,12,0.25,beta,5.732804686031925,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.494608052179332,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.341731421463844,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.0029208410686765,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.991149091727522,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.237974033295571,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.981390652383911,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,2.7262677575817125,True,True
+"night: mean, range",mean=student_t; range=beta,24,0.5,beta,2.5732403000580115,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,12,0.0,beta,7.001053566879524,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.477428587828747,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.6245745246804,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.602223653847274,True,True
+"night: mean, range",mean=student_t; range=beta,12,0.0,beta,6.072400250084261,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.502045883472127,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,7.172108584229141,True,True
+"night: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.688899269132683,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,6.951818075622302,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.744125973466478,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,5.777681101792081,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,4.510731649377748,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.0667203176042315,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.514287223523384,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.832353362445739,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.551561481874822,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.05478128309048,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.031958506920715,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.458053803036082,True,True
+day: range; night: mean,mean=student_t; range=beta,12,0.5,beta,4.655521104290747,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.018440048809894,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.879746706539154,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.041627466052483,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.189938898417606,True,True
+day: mean; night: range,mean=student_t; range=beta,12,0.0,beta,6.112683587856084,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,2.948485738692032,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.043750915914783,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.943099700100725,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,4.426469579058844,True,True
+"night: mean, range",mean=student_t; range=beta,12,0.5,beta,2.000065401003268,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.092339673217605,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.0592770636512405,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.138276565385851,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.417172069434784,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.254049717324004,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.438157432504589,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.162652347728089,True,True
+daily: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0006302635102253,False,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.1123930496335834,True,True
+daily: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.187933196631287,False,True
+daily: range; day: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.453217226778272,False,True
+"daily: mean, range",mean=skew_normal; range=beta,24,0.0,beta,5.875125727281628,True,True
+"daily: mean, range",mean=student_t; range=beta,24,0.0,beta,5.05359794628157,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.996678853635495,True,True
+daily: range,range=beta_constrained,24,0.0,beta_constrained,2.271796354251135,False,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.499890329539367,True,True
+daily: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.820669442187036,False,True
+daily: range; day: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.088058467663274,False,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.7947064233580665,True,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.575067940962756,True,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000000000033,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0000000001153184,True,True
+"daily: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,3.6705093253415257,True,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.549037185381954,True,True
+daily: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.001247452567216,False,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,3.831598276547331,True,True
+daily: range; day: range,range=beta,24,0.0,beta,5.750006876122133,False,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0003923671257016,True,True
+daily: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.69912406397455,False,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,24,0.0,beta,6.736858661167576,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta,24,0.0,beta,6.542009275694733,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0002793023342544,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0008136196724298,True,True
+daily: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000506219111421,False,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000236642328077,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0007043640500024,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.044011548861272,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.264130960379818,True,True
+daily: range; day: range,range=beta,24,0.25,beta,3.3426570188926856,False,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.11326771335798,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.1129413723112997,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.751611553284505,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.00000000405422,False,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.884682042704364,True,True
+daily: range; day: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.825654195840156,False,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.238347068285656,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.684886320609528,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.8447177207575445,True,True
+daily: range; day: range,range=beta,24,0.5,beta,5.976717010045346,False,True
+daily: range; day: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.169821399569048,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta,24,0.0,beta,2.073449808352354,True,True
+daily: range; day: range,range=beta_constrained,24,0.0,beta_constrained,6.184967174841945,False,True
+daily: range; day: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.298234131155329,False,True
+daily: range; day: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.54246537194507,False,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.7028279054603255,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,24,0.0,beta,2.473610235934787,True,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.5622370309909215,True,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.847905827950724,True,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.377763737221388,True,True
+daily: range; day: range,range=beta_constrained,24,0.25,beta_constrained,4.46121414419392,False,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,24,0.25,beta,3.373916909648556,True,True
+"daily: mean, range",mean=skew_normal; range=beta,24,0.5,beta,6.588853830596078,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,24,0.0,beta,5.9185336253038745,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta,24,0.25,beta,3.653869908914144,True,True
+"daily: mean, range",mean=student_t; range=beta,24,0.5,beta,5.533934273306534,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,24,0.0,beta,4.64833415607827,True,True
+daily: range; night: range,range=beta,24,0.0,beta,2.010724197924565,False,True
+daily: range; day: range,range=beta_constrained,24,0.5,beta_constrained,4.29400180565418,False,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.550973193305473,True,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.97923276222603,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.1824550803081655,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.311065468931422,True,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.064175942432069,True,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.990422985584737,True,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.043816791429275,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.259718622444195,True,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.065734279266176,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,24,0.0,beta,5.897048631434321,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,24,0.0,beta,5.508130540423631,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.256907239685041,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.479350218809273,True,True
+"daily: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.8648095423639126,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.323171867296014,True,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.639016961272768,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,5.2580002290231,True,True
+daily: range,range=beta_constrained,12,0.0,beta_constrained,6.931943110249807,False,True
+daily: range; night: mean,mean=skew_normal; range=beta,24,0.0,beta,2.7577313350669823,True,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.7236460587137765,True,True
+daily: range; night: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.335159888710782,False,True
+daily: mean; day: range,mean=student_t; range=beta,24,0.0,beta,6.607466516582711,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,24,0.5,beta,6.421841174629195,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000000007198,True,True
+daily: mean; day: range,mean=skew_normal; range=beta,24,0.0,beta,6.653387432616115,True,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.8883945048065245,True,True
+daily: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.670365571984203,False,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.208113261032478,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.227155878402222,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.195337058371279,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.0166185874541607,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.847350928648988,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.854914939463018,True,True
+day: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.346303335620003,False,True
+daily: range; day: range; night: range,range=beta,24,0.0,beta,2.185092782726737,False,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,4.986115888232495,True,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000452288905644,True,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.85437850456821,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.7925889243665365,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.203173119520001,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,4.717981549869776,True,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.999652742443395,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.4122399139990223,True,True
+daily: range,range=beta_constrained,12,0.25,beta_constrained,5.624222852367231,False,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.924958640037695,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000000000192,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000000009252,True,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.704009244256652,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.705326680655864,False,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,24,0.0,beta,4.801422318443108,True,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.441626988820278,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,24,0.0,beta,5.534444890692127,True,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.229697199653174,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.542871711530398,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,24,0.0,beta,2.925225428411028,True,True
+daily: range; day: mean,mean=student_t; range=beta,24,0.0,beta,3.4540750883748847,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.598009428422456,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.059022072682122,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.88582922137036,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.360828322129655,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.467085493763086,True,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.082047692469528,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,3.991362586081564,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.396839627063142,True,True
+"daily: mean, range",mean=student_t; range=beta,12,0.0,beta,6.995207931897543,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,4.543438130477002,True,True
+daily: range; night: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.002231131852904,False,True
+"daily: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.993025462392874,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0003135750778123,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.601522290602303,False,True
+daily: range; day: range; night: range,range=beta,24,0.25,beta,4.296158886986142,False,True
+day: range,range=beta_constrained,24,0.25,beta_constrained,3.525029278560361,False,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,24,0.0,beta,5.619679696269543,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0001978514469725,True,True
+daily: range; night: range,range=beta,24,0.25,beta,4.722809912473114,False,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.727763786565388,True,True
+daily: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.467505119018465,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta,24,0.25,beta,4.962133491209404,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.180968764168406,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,24,0.0,beta,5.467461980540914,True,True
+daily: mean; day: range,mean=student_t; range=beta,24,0.25,beta,3.8699301960539496,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,24,0.25,beta,5.598339669461924,True,True
+day: range,range=beta,24,0.25,beta,3.386412849083104,False,True
+"daily: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.925653823047616,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.808193344708571,True,True
+daily: range; day: range; night: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.609605018861018,False,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.83960125189107,True,True
+daily: range; day: range,range=beta_constrained,12,0.25,beta_constrained,5.722349520921511,False,True
+daily: range; day: range; night: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.491119283114504,False,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,24,0.5,beta,5.235755625844948,True,True
+daily: range; day: range,range=beta,12,0.25,beta,5.742729765150177,False,True
+daily: range; day: range,range=beta,12,0.5,beta,4.10208506078792,False,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.239974456240957,True,True
+daily: range; day: range,range=beta_constrained,12,0.5,beta_constrained,3.832912827284887,False,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.195878436217102,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.628183630279461,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.481948725875145,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.5175382757187643,True,True
+daily: range; night: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.570277023946598,False,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.105517199137337,True,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.0654089188284903,True,True
+daily: range; day: range; night: range,range=beta_constrained,24,0.0,beta_constrained,2.0000001180904023,False,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.054044708749685,True,True
+daily: range; day: range; night: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.058587894426801,False,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.1181383436819226,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.178652360964034,True,True
+daily: range; night: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.870145342812235,False,True
+daily: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.736732316437996,False,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.259805413506317,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,3.437334967137603,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,24,0.25,beta,3.1819360990303984,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.475263078610183,True,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.878761145208623,True,True
+daily: range; night: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.6644158270966414,False,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.002062534049186,True,True
+daily: range; day: range; night: range,range=beta_constrained,24,0.25,beta_constrained,7.011915576518724,False,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.980691014282226,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,5.388988834590081,True,True
+day: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.112458501296968,False,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,24,0.25,beta,3.316427715977432,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.999692564720748,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.358854099076916,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,24,0.25,beta,6.064089188433525,True,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.590322033973367,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.999734161185498,True,True
+daily: range; day: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.448460765522244,False,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,4.439517842647223,True,True
+daily: range; day: range,range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.385955038238405,False,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.301845591418741,True,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.692590578912327,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.9332902843209965,True,True
+daily: range; day: range; night: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.065015008281902,False,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000011123517293,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.944153386267923,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.092381637977574,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.521106223672488,True,True
+daily: range; night: range,range=beta_constrained,24,0.25,beta_constrained,7.056329118400937,False,True
+daily: range; night: range,range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.109449590737782,False,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,6.008545047704,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.99997384186751,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0520533393946923,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.999492491409359,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.490585814759129,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.70347159365157,True,True
+daily: range; night: range,range=beta_constrained,12,0.0,beta_constrained,7.077064939000181,False,True
+daily: mean; day: range,mean=student_t; range=beta,24,0.5,beta,6.00610048137344,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.582387984278253,True,True
+daily: range; night: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.19668158042602,False,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.505419938630044,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.659711081580051,True,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.28870213457626,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.999259017214879,True,True
+daily: range; day: range; night: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,3.408606080388908,False,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,24,0.0,beta,6.123962427071001,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.934677892985994,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta,12,0.0,beta,6.999031439568574,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,24,0.0,beta,6.957324627798719,True,True
+daily: range; night: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.336796311843725,False,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,24,0.0,beta,6.408267575567064,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.483084249332251,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,5.68705558575245,True,True
+daily: range; day: range,range=beta_constrained,12,0.0,beta_constrained,7.009225805246691,False,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,3.6384585543961503,True,True
+daily: range; day: range; night: range,range=beta_constrained,12,0.25,beta_constrained,5.202095082478209,False,True
+daily: mean; night: range,mean=student_t; range=beta,24,0.0,beta,2.7944436289412637,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,24,0.0,beta,6.726793731222376,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.940722025084334,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.834706166206227,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.468422691054176,True,True
+daily: range; day: range; night: range,range=beta,12,0.25,beta,4.876341148276658,False,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.874990568914239,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,24,0.0,beta,4.453389684214356,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.991997610682478,True,True
+daily: range; night: range,range=beta_constrained,12,0.25,beta_constrained,5.26449630072692,False,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.196140758416617,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,12,0.0,beta,6.993479536447191,True,True
+daily: range; night: range,range=beta,12,0.25,beta,4.625789192964602,False,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.522305395054166,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.900293040223223,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.904962482237781,True,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.19245895762519,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,6.220592864032574,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.005062106588996,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.1627388520543205,True,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.945971774870672,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.328824070525178,True,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.504292126032536,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.404886673167282,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,24,0.25,beta,3.1922919707594555,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,24,0.0,beta,2.0006850084809336,True,True
+daily: range; day: range; night: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.1358506742080205,False,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.126401675794477,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.499897719592553,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.904452870035925,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.2849098637115475,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.753600076399476,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.009446318704561,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,24,0.25,beta,6.026348563012809,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.999565776354384,True,True
+daily: range; day: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,2.0000341374629653,False,True
+day: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.976166785279099,False,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.999794920326059,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.244776803417579,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.118962886492835,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.673921182740674,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.352650538898181,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.947809829362239,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,24,0.25,beta,6.149647682466453,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.188969947385582,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.990667209194642,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.501674702675411,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.573213015552094,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,12,0.25,beta,6.15055445177378,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.137681323275477,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,4.325505439964846,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta,12,0.25,beta,6.091377319764575,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.658705411401121,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,3.946710398817277,True,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.620763658088851,True,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.106837182566292,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,3.943464277590399,False,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.546555745338644,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,24,0.0,beta,6.776690530691795,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,24,0.0,beta,6.856597501020784,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,24,0.5,beta,5.47732118166974,True,True
+daily: range; night: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.726004416920618,False,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,24,0.5,beta,5.862954282704673,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.955977634547709,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.925995131687479,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.119867677125691,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,24,0.0,beta,2.605748756011164,True,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.378695838296524,True,True
+"daily: mean, range",mean=skew_normal; range=beta,12,0.25,beta,6.250555012469869,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.867070592544314,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,24,0.0,beta,2.753410405105808,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.861136535589868,True,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.650329735644435,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta,12,0.5,beta,5.7365758674135785,True,True
+daily: range; day: range; night: range,range=beta_constrained,12,0.0,beta_constrained,7.034354482688799,False,True
+"daily: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.167707749596784,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.4967573543719,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.989580160829121,True,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,2.249381849011617,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.901814699197866,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,24,0.5,beta,6.854205892417372,True,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.04045436975908,True,True
+"daily: mean, range",mean=student_t; range=beta,12,0.25,beta,5.972300858397584,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,2.6122032060388207,True,True
+"daily: mean, range; day: range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.668061451935438,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.829210589378189,True,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.254829824245968,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.688166359776711,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,6.552908543695658,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.83091601138027,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.563822323989808,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.2978061564571615,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.623004618880353,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,24,0.25,beta,5.023168106598922,True,True
+day: range; night: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.849132175682448,False,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,24,0.5,beta,5.372704380109916,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,24,0.5,beta,6.075989367318479,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.435454013198532,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.566348154105183,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,24,0.25,beta,5.3752302937071885,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.310158022536417,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.807200554825468,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.301024977539975,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.213969919103314,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.284721770696085,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.373503232004322,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.9769360541543,True,True
+day: range; night: range,range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.0279644776728345,False,True
+day: range; night: range,range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.947486687317367,False,True
+daily: range; day: mean,mean=student_t; range=beta,24,0.25,beta,4.377045045980353,True,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.976246106247209,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.391338335560145,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,3.743700424694441,True,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.219009147384173,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,24,0.5,beta,3.96209065068722,True,True
+"daily: mean, range; day: range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.070341139204434,True,True
+"daily: mean, range; day: range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.645231712448815,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.356676697811235,True,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.063501322999644,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.7955168829057215,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.173689608126415,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.354673318289679,True,True
+"daily: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.123272914476879,True,True
+"daily: mean, range; day: range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.648082659745041,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,24,0.25,beta,4.406348536145393,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.469280037286008,True,True
+"daily: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.797394093117331,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,12,0.25,beta,6.420200286108791,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.600137653986248,True,True
+daily: range; day: range; night: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,4.50018861511401,False,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.29147864861939,True,True
+daily: range; night: mean,mean=student_t; range=beta,24,0.5,beta,5.38626513150129,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.765960810975247,True,True
+"daily: mean, range; night: range",mean=student_t; range=beta,12,0.25,beta,5.782086533863053,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.7717553366631495,True,True
+daily: range; night: mean,mean=skew_normal; range=beta,24,0.5,beta,5.361010589459552,True,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.538360373614458,True,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.077140405052108,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.581506235654118,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,24,0.5,beta,5.911453675224903,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.583640294497004,True,True
+"daily: mean, range",mean=skew_normal; range=beta,12,0.5,beta,6.056503084767448,True,True
+day: range; night: range,range=zero_inflated_beta,12,0.25,zero_inflated_beta,3.5991084388168684,False,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.3652822456421463,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.059013843267265,True,True
+"daily: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.964058210613577,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.615541977623873,True,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.859216610719408,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.0425512127832026,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.543186151858349,True,True
+"daily: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.611512119840799,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,24,0.5,beta,5.850715653992784,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=beta,12,0.5,beta,2.000005361031074,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.997209241716942,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.264495889211763,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.0953216597392084,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.16372465432326,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,24,0.5,beta,6.486090105496006,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.0000002091493045,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.647535280969399,True,True
+day: range; night: range,range=beta_constrained,24,0.5,beta_constrained,3.623971471869968,False,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,24,0.25,beta,3.648637139346417,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.290830924477194,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.337988684189613,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.183572716260401,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,24,0.25,beta,4.538013320250125,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.357918619625837,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000002179136,True,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.335842013576063,True,True
+day: range; night: range,range=beta,24,0.5,beta,3.499069687448645,False,True
+"daily: range; night: mean, range",mean=student_t; range=beta,24,0.25,beta,4.293429881273489,True,True
+"daily: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.80397155064229,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,24,0.25,beta,5.296841486527512,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.880705867388715,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.266736150936864,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.221625491965789,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.149937695459033,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.017098520613555,True,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.611278456108193,True,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.478801422795689,True,True
+"daily: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.962596784661119,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,6.494762804868772,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.276994684284607,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,12,0.5,beta,2.0353839484428558,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.414323853575059,True,True
+daily: mean; day: range,mean=skew_normal; range=beta,12,0.25,beta,6.424317949959521,True,True
+daily: mean; day: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.359790089333495,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.24671486332714,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,24,0.5,beta,5.850553082758901,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.188120486843658,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.075664638382833,True,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.829843913571228,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,4.208470479288748,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,12,0.0,beta,6.363163132820102,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.287229330478547,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,4.882772133802868,True,True
+"daily: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.523300304125883,True,True
+"daily: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0003376621936075,True,True
+daily: mean; day: range,mean=student_t; range=beta,12,0.25,beta,5.925467902468808,True,True
+daily: mean; night: range,mean=student_t; range=beta,24,0.25,beta,6.061996905933045,True,True
+"daily: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.4552209579799587,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,24,0.0,beta,2.5433957332156254,True,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.318723965608124,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.3066930771039584,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,24,0.5,beta,5.147902355698342,True,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.407660502490275,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,24,0.0,beta,4.000015488661734,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,4.428578033266911,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.525969275256637,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.709401355389026,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.333393341907298,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta,12,0.25,beta,6.424006178505634,True,True
+daily: mean; day: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.533967878465994,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.832321138921039,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.207077637894923,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.412208186694562,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.1265938085625318,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.003154136758106,True,True
+day: range; night: range,range=beta,24,0.25,beta,4.630471096060365,False,True
+day: range; night: range,range=beta_constrained,24,0.25,beta_constrained,5.945892109253385,False,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.299393283896992,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.808367758452901,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,12,0.25,beta,5.1107747977448135,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.606419560832894,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.535434130148413,True,True
+day: range; night: range,range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.946504908141156,False,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.001517799664096,True,True
+daily: mean; day: range; night: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.948604075911594,True,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.397360738616499,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,24,0.25,beta,5.802519228655847,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.472348319228716,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.840490896695368,True,True
+daily: mean; day: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.232063865219297,True,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.590908095279451,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.775405026472403,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.691681622666455,True,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.510209529870304,True,True
+daily: mean; day: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.806438545195814,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.103527309825963,True,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.296088636106669,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,24,0.5,beta,2.98694021856534,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.195094812793748,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta,24,0.5,beta,2.247235775121056,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.728581030829771,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.201428347384918,True,True
+daily: mean; day: range,mean=skew_normal; range=beta,12,0.0,beta,6.319709886184639,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.818465537302755,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.869932899902045,True,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.482020908912604,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.913365310910452,True,True
+daily: mean; day: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.045969731070343,True,True
+day: range; night: range,range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.790795187922455,False,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.008201061065076,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.238598324516924,True,True
+daily: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.300161315144198,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.5271560444967145,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.286988593318535,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000499104597333,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.582532320498645,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,4.27550413761562,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,7.403236901082024,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.689907831547717,True,True
+day: range; night: range,range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.019956302276004,False,True
+day: range; night: range,range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000000125451433,False,True
+daily: mean; day: range,mean=student_t; range=beta,12,0.0,beta,5.371204945491858,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,5.408854991595014,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.036174909031537,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.080002180266135,True,True
+daily: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.453258179224868,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.309539680556244,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta,12,0.0,beta,7.066108528141291,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,2.4386540942758126,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.0458135736306167,True,True
+daily: mean; day: range; night: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.513824251835494,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,24,0.0,beta,4.452200516433172,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.287596108637685,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.9999722218623,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,24,0.5,beta,5.125119291020542,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.1889635660934084,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,24,0.25,beta,4.1293618440052535,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,5.595572754185524,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,24,0.0,beta,4.261135923928551,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,24,0.25,beta,4.072290720756427,True,True
+day: range; night: range,range=beta,24,0.0,beta,3.34417953374122,False,True
+daily: mean; day: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.561533448738226,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.844324082254184,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.719639933741326,True,True
+daily: mean; day: range; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.35772240832357,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,24,0.25,beta,4.641884028494726,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,24,0.25,beta,4.287105482732722,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.1479805166392105,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.1831721262912067,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.591955635187342,True,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.762897211642092,True,True
+daily: mean; day: range; night: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.109814302466349,True,True
+daily: range; day: mean,mean=student_t; range=beta,24,0.5,beta,5.254677069674652,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.211270986765802,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.2519284119275795,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.432500878126911,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.540628137171623,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.039739527298802,True,True
+day: range; night: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.349001087162358,False,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.971206304535123,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.046905676236078,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.999615344294336,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000015103424647,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.2189232213898205,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,12,0.0,beta,6.994263392604905,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.00719220402433,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,24,0.5,beta,6.640139259880357,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.974016627611092,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.49872563764517,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.547031771123456,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.178754082166016,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,24,0.5,beta,2.546844662418599,True,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000813704513107,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.221444483044105,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.014567360646855,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,5.793509143177109,True,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.983461446359705,True,True
+daily: mean; night: range,mean=skew_normal; range=beta,12,0.25,beta,6.011745724715023,True,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.151179840877987,True,True
+day: range; night: mean,mean=skew_normal; range=beta,24,0.25,beta,3.2605979783505363,True,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000949473237587,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,24,0.5,beta,2.785101491695911,True,True
+day: range; night: range,range=beta_constrained,12,0.0,beta_constrained,5.567838343082396,False,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.163355764079801,True,True
+daily: mean; night: range,mean=student_t; range=beta,12,0.5,beta,2.0242674540803867,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.033877867749258,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,24,0.5,beta,5.585727032343441,True,True
+daily: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.332189523321232,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,3.5241994088203565,True,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,3.747461424278404,True,True
+daily: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.555296560796752,True,True
+day: range; night: mean,mean=student_t; range=beta,24,0.25,beta,3.3445021193188875,True,True
+daily: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.315262087124484,True,True
+day: range; night: range,range=beta,12,0.0,beta,5.63643958629844,False,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.998087752277607,True,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000077098330067,True,True
+daily: mean; night: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.133601458559218,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.888235426191609,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.545937466221141,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.628709903406341,True,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.064889804434171,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.655231911488366,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta,12,0.0,beta,7.018603910163455,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.826172952692528,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,2.241990883454245,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.00176419217185,True,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.3457958603264246,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,24,0.25,beta,4.756356317375605,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.115892820171793,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,12,0.0,beta,6.98062067541619,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,12,0.0,beta,7.000186335785051,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,24,0.25,beta,4.240001932023946,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.798660392199589,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,5.861382799658706,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.188604908800437,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.865908942759024,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.001448552158627,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.833000250156422,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.765280941163149,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.478683677322856,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.499772986121729,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.787104084399746,True,True
+"day: mean, range",mean=student_t; range=beta,24,0.0,beta,5.801496866006368,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.153897091070334,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.07522903061667,True,True
+"day: mean, range",mean=skew_normal; range=beta,24,0.0,beta,5.822814633514426,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.854399696161008,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.31400106096354,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.035241492107531,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,6.782403616977441,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.798731825224133,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.344025222298964,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,12,0.25,beta,5.8326089071279545,True,True
+day: range,range=beta_constrained,12,0.0,beta_constrained,5.683906260680916,False,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,24,0.0,beta,3.2770714257095186,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.718261625035801,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.353328653444658,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.890999261009578,True,True
+day: range; night: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.7799212131173,False,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.0336683618491165,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.987045807166481,True,True
+day: range,range=beta,12,0.0,beta,5.055947315857685,False,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.409796233429016,True,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.06599283501248,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0000011040255736,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.012871931529459,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,24,0.0,beta,2.45684012083645,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.050530316837882,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.0001145475179225,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,7.000064666666065,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.261994012722562,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,24,0.5,beta,6.2261408246208365,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,12,0.0,beta,7.009646524698189,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.003592487578038,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,6.242643142606251,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.246127178595,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.72248113516534,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.169307110440246,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,6.9496413160089325,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,12,0.0,beta,7.009318635466979,True,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.0001380893854455,True,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.449143234006983,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.533439250646048,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.479928326132519,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.26741774585734,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.8368034058673683,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,24,0.5,beta,6.060087768990673,True,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.5228405351672376,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,24,0.25,beta,6.659469243434261,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,24,0.25,beta,6.722285552633502,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,12,0.0,beta,6.997392481779046,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,24,0.25,beta,5.2778203937596055,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,7.058883892495635,True,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.547031052311369,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,5.777461552772639,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.589614740144414,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.700535648375026,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,24,0.25,beta,5.050603316886727,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,24,0.0,beta,6.390199159442669,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,7.04228183873112,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.498986503553057,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.12562821403061,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.911442479548484,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.085591669823782,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.162978903177983,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.406464698911531,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.19822871841292,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,24,0.0,beta,5.986310067784821,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.954200213541043,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.890037412168633,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,24,0.0,beta,5.316764946122377,True,True
+night: range,range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.1113814871061365,False,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,4.500159948886753,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,6.925993589257437,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.423298611949839,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,3.8461961415841417,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.499486762989704,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,4.500000876343131,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.243615707044693,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.081051071650641,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.059936054939978,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,12,0.5,beta,4.705936255616392,True,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.33566695410215,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000063285561845,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta,12,0.25,beta,6.833587334808547,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.433448858427397,True,True
+day: range,range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.300317629396088,False,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.998094921001635,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.1947680207566895,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.9479154476317815,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.468247109684977,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.793734350221005,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,24,0.0,beta,3.740831719366304,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.525714059082793,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.599519380172764,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.993143630963558,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,12,0.25,beta,5.140031060022373,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta,12,0.5,beta,3.850925102310505,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,3.5012012252240177,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,3.872597211960066,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.1550492866253705,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.008145215355942,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.927409095023697,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,3.221580674858903,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.8871780120359767,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.858094504982744,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.000250126257572,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,24,0.5,beta,3.113558835899602,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.001086613993712,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.40729588830029,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,12,0.0,beta,6.991714879866384,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta,12,0.5,beta,3.941176892474099,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.707257338676307,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,3.573089540086361,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,24,0.5,beta,2.7710720931289274,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,12,0.25,beta,5.191929801498844,True,True
+"day: mean, range",mean=skew_normal; range=beta,24,0.25,beta,3.33583465090482,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,3.837735289829981,True,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.483939862660183,True,True
+daily: range; day: range; night: mean,mean=student_t; range=beta,12,0.5,beta,3.056022968235728,True,True
+"daily: range; day: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,3.4416042555676234,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.107945717100866,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,3.841786846595099,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,24,0.5,beta,5.155393958484535,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.373818677282434,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.410450473578684,True,True
+day: range; night: mean,mean=skew_normal; range=beta,24,0.5,beta,5.74961035298338,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.949200816375829,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.933913265395965,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.526858964530505,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,12,0.25,beta,6.14898947051,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.222906982432715,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.270758551245217,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.308406056827065,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,5.455335813147137,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,3.879954634660124,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.269443397691491,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.581270953195385,True,True
+daily: range; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.925160065634561,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.689798006055328,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.154590914671538,True,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.0744935067189583,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.881693310061825,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.067704982505282,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.035576779891004,True,True
+daily: range; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.507937259630859,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.86220203111004,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.0942089756114264,True,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,4.500884328103371,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,4.505859710691818,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.775044045221527,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,24,0.25,beta,4.0142741100083335,True,True
+"daily: range; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.271396590570424,True,True
+"daily: range; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,3.8336659686087726,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.228700161581005,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,6.924173852556584,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,24,0.25,beta,5.538284602805494,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.877051250778255,True,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.386605339588531,True,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.304065943166656,True,True
+daily: range; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.401420115988624,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.228870839359422,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.00000535557429,True,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.846249161444133,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.7913164952978144,True,True
+"daily: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.813351770724287,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,12,0.25,beta,6.200703591507193,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.177686762092112,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.80579950497881,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.0443216186984925,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,24,0.25,beta,6.123945014219823,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.372716097974995,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,5.943969572147628,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.126104561525708,True,True
+"daily: range; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.671337921193165,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,24,0.25,beta,5.922873718413669,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,2.5606904467032288,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,12,0.5,beta,2.0000058485943666,True,True
+daily: range; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.652714890470851,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.014667527924457,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta,12,0.25,beta,4.986626278331187,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.78559496687614,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.509600671132124,True,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,7.012705437894709,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.216768614012468,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,2.321287723651498,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.890767363296604,True,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,2.951727764250104,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.626904710832239,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,24,0.5,beta,5.4211566506882,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,4.718415334158107,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.0000189880962798,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=beta,12,0.5,beta,2.132547403570125,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.663457008990805,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.916440052777412,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.628795357093456,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.577452364736612,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,12,0.25,beta,4.001093061023925,True,True
+night: range,range=beta_constrained,24,0.0,beta_constrained,2.212350290976702,False,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,24,0.5,beta,5.306592709398305,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta,12,0.5,beta,2.010561606207351,True,True
+"night: mean, range",mean=skew_normal; range=beta,24,0.0,beta,2.108874731091192,True,True
+night: range,range=beta,24,0.25,beta,5.381790782930356,False,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.742903517081141,True,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.844113462666452,True,True
+"daily: range; night: mean, range",mean=student_t; range=beta,12,0.5,beta,2.0000745984890838,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.009637932260887,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,4.016456763631136,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.547326552628575,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.989802583819101,True,True
+daily: range; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.0211420355076286,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.817780550287005,True,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.8618617010020815,True,True
+night: range,range=beta_constrained,24,0.25,beta_constrained,4.429602736435931,False,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.798811142940232,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.843987234989807,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.968471344662986,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,24,0.5,beta,3.567520402665824,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,12,0.25,beta,5.7827090434061885,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.5093327945108665,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,12,0.0,beta,6.511391547813065,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,12,0.25,beta,4.564536267918152,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.718007332922326,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,12,0.25,beta,6.300050860429876,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.382476337426975,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.792481557369135,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,12,0.5,beta,2.004931053078118,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,3.5668876947480754,True,True
+daily: range; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.031977824641753,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.064297166874694,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,24,0.5,beta,4.1596715027010776,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,6.068885082216043,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,4.413393228384551,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.053545800018528,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.057145808383426,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,12,0.5,beta,2.1337965034742674,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,12,0.25,beta,6.720728841393231,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.313387799366449,True,True
+"daily: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.38592619939169,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.8359829056979113,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.0245949392735967,True,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,5.444863416919869,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.173542145891132,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,3.826956570728506,True,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.792331456182904,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.189948664838585,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,24,0.5,beta,5.267472679291557,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.43757679196405,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.370988524913652,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,12,0.0,beta,5.087169502545679,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,12,0.25,beta,6.135949686813341,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,12,0.0,beta,6.2307426668653285,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,3.0457435015570296,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.272765686385049,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.014994165261997,True,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.777232455452093,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.0007109057156773,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.05237961800083,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.337826331674833,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.289555699391835,True,True
+"daily: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.000223449431933,True,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,3.856324357843493,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,5.521771295962548,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,24,0.25,beta,3.360652399592781,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,24,0.5,beta_constrained,3.938011491705109,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.460534434433841,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0422246255970897,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,24,0.25,beta,3.786665133356374,True,True
+daily: range; day: mean,mean=student_t; range=beta,12,0.25,beta,5.7704989869446415,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.326107956175243,True,True
+daily: range; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.000029415527991,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.5936538214591343,True,True
+night: range,range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.210855110910193,False,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.114659334091773,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.724262296172579,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,4.768191626676769,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.6364985089781374,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.143362830452755,True,True
+"day: range; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.170481600983297,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.368216933124635,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,7.320209702734585,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.00332826785229,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.050286665965651,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.0186768548762375,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,24,0.5,beta,3.270785054908339,True,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.012427323328033,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.2760934845105565,True,True
+"day: range; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.440648590452515,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,12,0.25,beta,4.679267804155699,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.855729056839252,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.58489103106566,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,3.0609421168784485,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.219248434912648,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.2165241651171455,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.559429770976153,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.697494087086007,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.914265509509722,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.9315420436799995,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,4.306726196141166,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,6.873823375280529,True,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,5.000298991817163,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.472033481721267,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.769076991400577,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.485999256705257,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,12,0.0,beta,6.598490758182019,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,12,0.25,beta,5.974294893923254,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.000002078602023,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.0,zero_inflated_beta,2.0043240801934687,True,True
+"day: mean, range",mean=skew_normal; range=beta,24,0.5,beta,5.794229332365787,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=beta,12,0.5,beta,6.119314477032977,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.956162452582487,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.012603902699872,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.271771637221682,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,6.073224459457896,True,True
+"day: mean, range; night: range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.0426461621075145,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.236435999324772,True,True
+"day: mean, range; night: range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.087705442644566,True,True
+"day: range; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.439180377776867,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.118559318044079,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=beta,12,0.5,beta,5.593292594510732,True,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.637656154632771,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.376069825773258,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,12,0.0,beta,6.336251780840405,True,True
+"day: range; night: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.723447888738482,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,24,0.0,beta,2.025292604143043,True,True
+"day: mean, range",mean=student_t; range=beta,24,0.5,beta,5.771558222533591,True,True
+"day: range; night: mean, range",mean=student_t; range=beta,12,0.0,beta,5.636274162022967,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,6.075396452504637,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.167259561384504,True,True
+"night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.203153214614806,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,5.100728863748772,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.495299368855251,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.780416525360549,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,24,0.0,beta,2.1382576880200084,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,5.686840974105238,True,True
+"day: range; night: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.280575558363561,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.925199128847746,True,True
+"daily: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.787472549533803,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,7.18115972683931,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta,12,0.5,beta,5.382302538742777,True,True
+"daily: mean, range; day: mean",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.448148508260576,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.620951899710044,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,6.023170032080863,True,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.046682909486676,True,True
+daily: range; night: mean,mean=skew_normal; range=beta,12,0.25,beta,6.179625301359174,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,7.292805672496929,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.004352032100932,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,4.089455407186943,True,True
+day: mean; night: range,mean=skew_normal; range=beta,24,0.0,beta,2.1540564533683555,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta,12,0.5,beta,5.356380101986166,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.226336095285092,True,True
+"day: range; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.241849059448999,True,True
+"daily: mean, range; day: mean",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.511595467133829,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,7.079440749866944,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.253907450339987,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.0,beta_constrained,2.006235528653604,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,2.990996225643361,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,12,0.5,beta,6.882709303365701,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=beta,12,0.25,beta,7.403950111800031,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.869472411110593,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=beta,12,0.5,beta,5.792973869116525,True,True
+"daily: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.61033009304692,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.296240366677543,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,7.38009274933737,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,12,0.25,beta,6.181939983481732,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,7.416269705692757,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.869580445341347,True,True
+"daily: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.602058969335296,True,True
+"daily: mean, range; day: mean",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.0434334466716,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000381835609684,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.331155003541508,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.079703317403859,True,True
+daily: mean; day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,7.204998445241282,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.137257025508923,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.010811184924317,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.0,beta_constrained,2.005694518616512,True,True
+"daily: mean; day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.742599232420991,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,7.000786115383862,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.188222770874878,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.021333598358639,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.861720953448061,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.3707139787763207,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.23070910024556,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.364676791023848,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.0,interval_inflated_beta,3.77086563579564,True,True
+"daily: mean, range; day: mean",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.94988778713799,True,True
+"daily: mean; day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.773831087397139,True,True
+"daily: mean; day: mean, range",mean=student_t; range=beta,12,0.5,beta,5.304584769272546,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.566444290199581,True,True
+"daily: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.649640312691566,True,True
+"day: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.410692186262733,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,5.796063047766269,True,True
+"day: mean, range; night: range",mean=skew_normal; range=beta,12,0.0,beta,5.35035471832186,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=beta,12,0.5,beta,5.786145268413517,True,True
+"night: mean, range",mean=skew_normal; range=beta,24,0.25,beta,4.024197817494993,True,True
+"daily: mean; day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.611814537266067,True,True
+"night: mean, range",mean=student_t; range=beta,24,0.25,beta,4.103474456306108,True,True
+"day: mean, range; night: range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.577980334110569,True,True
+"day: mean, range; night: range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.142398860172136,True,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.410095272488394,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.067139202950605,True,True
+daily: range; night: mean,mean=skew_normal; range=beta,12,0.5,beta,6.097518414924283,True,True
+daily: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,5.531423392900486,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.998431196135355,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.34320520688977,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.691310128038745,True,True
+daily: mean; day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.287568679294859,True,True
+"day: mean, range; night: range",mean=student_t; range=beta,12,0.0,beta,5.729031236838045,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,12,0.25,beta,5.105677855735275,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.026600284777247,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.010909165697006,True,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.251742651306064,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.430590993199344,True,True
+daily: range; day: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,4.24856856994095,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,7.536684654113161,True,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.613677745349964,True,True
+daily: range; day: mean,mean=skew_normal; range=beta,12,0.5,beta,4.4618288798883246,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.760678400416103,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.585328746954921,True,True
+"day: mean, range",mean=student_t; range=beta,12,0.25,beta,5.4979328320910135,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,12,0.0,beta,6.9983884288375,True,True
+"night: mean, range",mean=skew_normal; range=beta,24,0.5,beta,2.709669189016666,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.373233373225341,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.106684002919213,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.143030122755012,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,12,0.25,beta,5.030771695585219,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,7.176223577387352,True,True
+"daily: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.968146578373801,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,12,0.25,beta,6.816646479315585,True,True
+daily: range; day: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.508338414377157,True,True
+daily: range; day: mean,mean=student_t; range=beta,12,0.5,beta,4.4129583253092175,True,True
+daily: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.994412414431903,True,True
+daily: range; night: mean,mean=student_t; range=beta,12,0.5,beta,4.483947620795289,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.962892107344718,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.24211504818643,True,True
+"day: mean, range; night: range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,4.417155867360062,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.431995234362562,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.2851035883470536,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.86360748879562,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,7.124494083372476,True,True
+daily: range; day: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.124954708199116,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,7.109803266632714,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta,12,0.5,beta,2.358546025473648,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.334417730636124,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,7.001708487753264,True,True
+daily: range; night: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.053827998218644,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,24,0.5,beta,6.212466523096902,True,True
+daily: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.541019144394128,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,5.819646618151803,True,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,6.560261282902392,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta,12,0.5,beta,2.1002031069319123,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,7.029686240858934,True,True
+day: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.173108604159353,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.476383561308187,True,True
+day: range; night: mean,mean=skew_normal; range=beta,12,0.5,beta,6.859542822655914,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.210313466639119,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.357984379365552,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,7.027944645720727,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,4.738654278930326,True,True
+"daily: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.456812501397206,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,24,0.5,beta,5.621180587595208,True,True
+"daily: mean; night: mean, range",mean=student_t; range=beta,12,0.5,beta,2.0000608318987774,True,True
+"day: mean, range",mean=skew_normal; range=beta,12,0.5,beta,4.391170228354244,True,True
+day: range; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.321230123465034,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,5.51135616813613,True,True
+daily: range; day: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.992876150404391,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.182501760892548,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta,12,0.5,beta,2.168226118447776,True,True
+"day: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.982073913534245,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.1233064192766267,True,True
+daily: mean; day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.238522154181095,True,True
+day: range; night: mean,mean=student_t; range=beta,12,0.25,beta,5.7409599928827095,True,True
+daily: range; day: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.527640704109645,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.43470254317654,True,True
+daily: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,3.8118690075641184,True,True
+day: range; night: mean,mean=skew_normal; range=beta,12,0.25,beta,6.752966554324846,True,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.48358067253214,True,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.575433374537454,True,True
+"daily: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0746478109146893,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.177078028424925,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.059831079235661,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.238853075380874,True,True
+"day: mean, range",mean=student_t; range=beta,12,0.5,beta,4.299441521362213,True,True
+"day: mean, range",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.062001536613876,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.1737668796754575,True,True
+daily: mean; day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.3959011452254115,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,6.098118652399302,True,True
+daily: range; night: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.026808981735279,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.25,interval_inflated_beta,5.1296087153167145,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.614981935139308,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,7.027706062414579,True,True
+daily: range; day: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,4.976925663125361,True,True
+day: range; night: mean,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,4.770897149775587,True,True
+day: range; night: mean,mean=student_t; range=beta,12,0.0,beta,4.701566101686086,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,4.352531790701551,True,True
+day: range; night: mean,mean=skew_normal; range=beta,12,0.0,beta,5.08968046695584,True,True
+day: mean; night: range,mean=skew_normal; range=beta,12,0.25,beta,4.1257062114642045,True,True
+day: range; night: mean,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,4.502580271404186,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.557674645584517,True,True
+day: range; night: mean,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.553791808606071,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.348826732970116,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,5.934166110244822,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,24,0.25,beta,5.559148101549463,True,True
+day: mean; night: range,mean=student_t; range=beta,24,0.25,beta,4.61082065702481,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,5.278508201672086,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,4.150477234122997,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.980333265010184,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,24,0.25,beta_constrained,4.630783755223486,True,True
+day: mean; night: range,mean=student_t; range=beta,12,0.25,beta,4.485847377037262,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.25,beta_constrained,5.278750161808695,True,True
+day: mean; night: range,mean=skew_normal; range=beta,12,0.0,beta,6.137204317074603,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,24,0.25,beta,4.091505910663457,True,True
+day: mean; night: range,mean=skew_normal; range=beta,24,0.25,beta,5.231941978014495,True,True
+day: mean; night: range,mean=student_t; range=beta_constrained,12,0.0,beta_constrained,6.105106588091477,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,4.510918176406872,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,24,0.25,beta_constrained,4.453369371502683,True,True
+day: mean; night: range,mean=skew_normal; range=beta,24,0.5,beta,2.850382258961509,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.002034366939219,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,2.655268530447622,True,True
+"night: mean, range",mean=skew_normal; range=beta,12,0.5,beta,2.0094996744946148,True,True
+day: range; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,5.145828184468919,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.2856632153153615,True,True
+"day: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,6.039264209106749,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.109240318969237,True,True
+day: mean; night: range,mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.081053228173692,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.663846504249781,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.612553026078899,True,True
+day: mean; night: range,mean=student_t; range=beta,24,0.5,beta,2.8400373367683778,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,24,0.25,zero_inflated_beta,6.817064656613662,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.25,zero_inflated_beta,4.38729663419464,True,True
+"day: mean, range",mean=skew_normal; range=beta,12,0.0,beta,5.615490628290085,True,True
+day: mean; night: range,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.047381449093053,True,True
+day: mean; night: range,mean=skew_normal; range=beta,12,0.5,beta,2.1285652312312022,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.025934148362928,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.605043898293735,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.293067680685677,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.5786519742041625,True,True
+"day: mean, range",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.71971510001207,True,True
+"night: mean, range",mean=student_t; range=beta,12,0.25,beta,4.122680860910242,True,True
+"day: mean, range",mean=student_t; range=beta,12,0.0,beta,5.19918973625214,True,True
+day: mean; night: range,mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.8199504494525,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,12,0.25,beta,6.146944506119686,True,True
+day: mean; night: range,mean=student_t; range=beta,12,0.5,beta,2.1156940955164263,True,True
+"night: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.174877784949718,True,True
+"night: mean, range",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,2.1449368820597416,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.666773139187345,True,True
+day: mean; night: range,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0019817890596494,True,True
+"day: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.28863661239587,True,True
+"night: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.292188896111569,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,12,0.25,beta,5.762875370273093,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,4.59174626962545,True,True
+"night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.484759071391389,True,True
+"night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.495518969241226,True,True
+"day: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.411289816801331,True,True
+"night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.1140893357098194,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.116831565910788,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,24,0.5,beta_constrained,2.531799481134553,True,True
+day: mean; night: range,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.2314714723199955,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,24,0.5,beta,2.520597752484159,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,6.120417817883743,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.744131000041508,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,24,0.5,zero_inflated_beta,2.8689020091646307,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,24,0.5,interval_inflated_beta,4.1576283069132,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,24,0.5,beta,2.714667704389636,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,24,0.5,beta_constrained,2.367447847189726,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.629892713521402,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,24,0.5,interval_inflated_beta,3.710740046161544,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,6.230884358253334,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,5.98710365510937,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,6.157488943854244,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,12,0.0,beta,6.3106633861212975,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.389562943800822,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,12,0.25,beta,6.24430609627508,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,12,0.0,beta,6.199467436230315,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,12,0.25,beta,5.58344850431283,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.0,interval_inflated_beta,5.071704081382348,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.0,interval_inflated_beta,4.68839681879143,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.128045853730043,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.144717050913226,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,6.1275224638367245,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,5.324642840821493,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,4.654787803172425,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=beta,12,0.5,beta,5.364222307234154,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.0,beta_constrained,4.994173866559446,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.65309175181126,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,12,0.0,beta,5.064640128235464,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.0,beta_constrained,5.211936705248636,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,12,0.0,beta,4.321445241598384,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.418557383420493,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.0,zero_inflated_beta,6.06212403183242,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.0,zero_inflated_beta,5.692440136426044,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.4012292624830565,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta,12,0.5,beta,4.436503035949498,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta,12,0.5,beta,6.295223767218418,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,6.451732294870613,True,True
+daily: range; day: mean; night: mean,mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.642778497903942,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=interval_inflated_beta,12,0.5,interval_inflated_beta,6.817531114593823,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=beta_constrained,12,0.5,beta_constrained,3.777646802827252,True,True
+"day: mean, range; night: mean",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,6.630093232060018,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,4.239856529411245,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.25,beta_constrained,5.19295439942969,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,12,0.25,beta,5.117425758593101,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta_constrained,12,0.5,beta_constrained,4.755866412901442,True,True
+"day: mean, range; night: mean",mean=student_t; range=beta,12,0.5,beta,4.740217596631248,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.25,zero_inflated_beta,5.066885985613663,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta_constrained,12,0.25,beta_constrained,4.120041914493258,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.870249479287967,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,12,0.25,beta,4.000184544788447,True,True
+daily: range; day: mean; night: mean,mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.046263993818798,True,True
+"day: mean; night: mean, range",mean=student_t; range=interval_inflated_beta,12,0.25,interval_inflated_beta,5.365960531661404,True,True
+"day: mean, range; night: mean",mean=student_t; range=interval_inflated_beta,12,0.5,interval_inflated_beta,5.70857286735272,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.25,zero_inflated_beta,4.338695410250343,True,True
+"day: mean, range; night: mean",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,5.323683602953763,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta,12,0.5,beta,2.014180762444622,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=beta_constrained,12,0.5,beta_constrained,2.014016950454861,True,True
+"day: mean; night: mean, range",mean=skew_normal; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.116980979490636,True,True
+"day: mean; night: mean, range",mean=student_t; range=beta,12,0.5,beta,2.0185386610933405,True,True
+"day: mean; night: mean, range",mean=student_t; range=zero_inflated_beta,12,0.5,zero_inflated_beta,2.0287987007365564,True,True

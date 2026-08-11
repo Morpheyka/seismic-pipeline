@@ -8,7 +8,7 @@ in the mod package, ensuring consistent behavior and interface across all transf
 
 import logging
 from sklearn.base import BaseEstimator, TransformerMixin
-from ..seismo.logging_config import get_mod_logger
+from ..common.logging import get_mod_logger
 
 
 class TransformerMixinYt(TransformerMixin, BaseEstimator):

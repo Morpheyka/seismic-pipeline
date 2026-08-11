@@ -8,7 +8,9 @@ local/network drives and S3 storage, with focus on REM profile calculation.
 import os
 from datetime import timedelta
 
+from seismic_pipeline.config.paths import local_data_root as default_local_data_root
 from .date_utils import normalize_date_to_yyyymmdd, parse_event_date
+from .s3_cache_base import S3ClientCacheMixin
 import pickle
 import hashlib
 import numpy as np
@@ -25,7 +27,7 @@ import tempfile
 
 
 
-class HypnogramCacheManagerYt:
+class HypnogramCacheManagerYt(S3ClientCacheMixin):
     """
     Specialized cache manager for hypnogram files from multiple sources.
     
@@ -35,7 +37,7 @@ class HypnogramCacheManagerYt:
     
     def __init__(self, 
                  local_cache_dir: str = './hypnogram_cache',
-                 local_data_root: str = '/home/ponomattik/mnt/wd/rat',
+                 local_data_root: str | None = None,
                  s3_config: Optional[Dict] = None,
                  s3_rat_bucket: str = 'rat',
                  s3_temp_bucket: str = 'temp',
@@ -63,7 +65,9 @@ class HypnogramCacheManagerYt:
             Sampling rate of the data
         """
         self.local_cache_dir = Path(local_cache_dir)
-        self.local_data_root = Path(local_data_root)
+        self.local_data_root = Path(
+            local_data_root if local_data_root is not None else default_local_data_root()
+        )
         self.s3_config = s3_config
         self.s3_rat_bucket = s3_rat_bucket
         self.s3_temp_bucket = s3_temp_bucket
@@ -619,70 +623,18 @@ class HypnogramCacheManagerYt:
         if self._s3_reachable is False:
             return False
 
-        # #region agent log
-        if not hasattr(self, '_dbg_s3_check_count'): self._dbg_s3_check_count = 0
-        self._dbg_s3_check_count += 1
-        _dbg_should_log = self._dbg_s3_check_count <= 30
-        # #endregion
         client = self._get_s3_client()
         if client is None:
-            # #region agent log
-            if _dbg_should_log:
-                import time as _t, json as _j, os as _os
-                _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-                try:
-                    with open(_logpath, 'a') as _f:
-                        _f.write(_j.dumps({"hypothesisId":"H4","location":"cache_manager.py:_check_s3:no_client","message":"s3_client_is_none","data":{"rat_id":rat_id,"date":date,"call_num":self._dbg_s3_check_count},"timestamp":int(_t.time()*1000)}) + '\n')
-                except Exception:
-                    pass
-            # #endregion
             return False
-            
+
         try:
-            # #region agent log
-            import time as _t; _s3t0 = _t.time()
-            # #endregion
             date_parsed = self._parse_date(date)
             s3_key = f"{date_parsed}/{rat_id}/{rat_id}_hypno.pickle"
             client.head_object(Bucket=self.s3_temp_bucket, Key=s3_key)
-            # #region agent log
-            if _dbg_should_log:
-                _s3elapsed = _t.time() - _s3t0
-                import json as _j, os as _os
-                _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-                try:
-                    with open(_logpath, 'a') as _f:
-                        _f.write(_j.dumps({"hypothesisId":"H1","location":"cache_manager.py:_check_s3:found","message":"s3_check_found","data":{"rat_id":rat_id,"date":date,"elapsed_s":round(_s3elapsed,4),"call_num":self._dbg_s3_check_count},"timestamp":int(_t.time()*1000)}) + '\n')
-                except Exception:
-                    pass
-            # #endregion
             return True
         except client.exceptions.NoSuchKey:
-            # #region agent log
-            if _dbg_should_log:
-                _s3elapsed = _t.time() - _s3t0
-                import json as _j, os as _os
-                _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-                try:
-                    with open(_logpath, 'a') as _f:
-                        _f.write(_j.dumps({"hypothesisId":"H1","location":"cache_manager.py:_check_s3:not_found","message":"s3_check_not_found","data":{"rat_id":rat_id,"date":date,"elapsed_s":round(_s3elapsed,4),"call_num":self._dbg_s3_check_count},"timestamp":int(_t.time()*1000)}) + '\n')
-                except Exception:
-                    pass
-            # #endregion
             return False
-        except Exception as e:
-            # #region agent log
-            if _dbg_should_log:
-                _s3elapsed = _t.time() - _s3t0
-                import json as _j, os as _os
-                _logpath = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))), '.cursor', 'debug.log')
-                try:
-                    with open(_logpath, 'a') as _f:
-                        _f.write(_j.dumps({"hypothesisId":"H1_H4","location":"cache_manager.py:_check_s3:error","message":"s3_check_error","data":{"rat_id":rat_id,"date":date,"elapsed_s":round(_s3elapsed,4),"error":str(e)[:200],"call_num":self._dbg_s3_check_count},"timestamp":int(_t.time()*1000)}) + '\n')
-                except Exception:
-                    pass
-            # #endregion
-            # self.logger.error(f"Error checking S3 temp bucket for {rat_id}_{date}: {e}")  # Debug: uncomment if needed
+        except Exception:
             return False
 
     def cache_hypnogram(self, rat_id: str, date: str, source: str = 'local') -> bool:

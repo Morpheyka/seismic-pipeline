@@ -63,7 +63,7 @@ def save_step_data(X, y, step_name, output_dir, output_prefix, step_number):
                 X_df = pd.DataFrame(X, columns=[f'feature_{i}' for i in range(X.shape[1])])
             else:
                 X_df = pd.DataFrame(X)
-        except:
+        except (TypeError, ValueError):
             # Fallback - convert to string representation
             X_df = pd.DataFrame({'data': [str(X)]})
     
