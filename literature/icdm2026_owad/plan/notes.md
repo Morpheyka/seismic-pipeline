@@ -38,4 +38,4 @@
 - **Primary arm:** fingerprint `4f6e4c855d72864d` — `daily:mean`, Student-\(t\), \(N=24\), \(\mathrm{ov}=0\), day-mask ON, \(K=6\); артефакты `run_output_8day_density_safe/refit_best_mean_only/rank11_4f6e4c855d72864d/` (`observations.npz`, `trace.zarr` / `tau_probs`).
 - **Seeds:** `0,1,2`. MCMC: confirmatory (tune 6000 / draws 3000 / chains 4) по возможности; если budget жмёт — один и тот же lighter budget для real и shuffle, явно задокументировать.
 - **Claim:** regime-onset pattern зависит от **порядка дней в event-aligned окне**; ломается within-window permutation; не operational forecast.
-- **Run status (2026-08-12):** shuffle mean \(p(\tau=k)\) **не** ≈ uniform (остаточный пик на τ=7); критерий успеха viz A по shuffle **не выполнен** — в prose ослабить claim (см. `progress.md`).
+- **Run status (2026-08-13):** suite 4→3→1→2: синтетика подтверждает мощность null; по 20 seeds mid-window onset **ломается** (peak к краям prior; только 3/20 на τ=7); mean-PMF по 3 seeds был misleading. Prose восстановлен: паттерн чувствителен к порядку суток; календарная каузальность слабая.

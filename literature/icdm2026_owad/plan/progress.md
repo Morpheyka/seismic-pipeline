@@ -257,3 +257,19 @@
 
 - Re-exported `latex/images/fig_mean_only_by_lik.{pdf,png}` from `figures/data/mean_only_long.csv` with STIX mathtext + `pdf.fonttype=42`; rebuilt `paper_en.pdf` — Fig. 2 axis \(\mathbb{E}[\tau]\) readable (was broken Type3/dejavusans).
 
+## 2026-08-13 — Null-control suite (exps 4→3→1→2)
+
+- Script: `seismic_pipeline_standalone/scripts/run_null_control_suite.py`
+- Outputs: `run_output_8day_density_safe/null_control_suite/` + figs `figures/null_control_suite/`
+- **Exp4 synthetic:** aligned recovers τ=6 (MAD≈0.245); within-window shuffle flattens (MAD≈0.04–0.07) → **null has power**
+- **Exp3 i.i.d.:** peaks scatter (7/2/4); E[τ] leaves mid-window band
+- **Exp1 20 seeds ww-shuffle:** peak_counts {2:8, 3:3, 7:3, 8:6}; frac peak τ=7 = 0.15 — earlier 3-seed mean-PMF was misleading
+- **Exp2 column-shuffle:** preserves column multisets → day means unchanged → E[τ]≈5.74–5.78 peak τ=7 like real (weak null for shared-τ)
+
+## 2026-08-13 — prose rewrite (post suite)
+
+- **Claim restored/corrected:** mid-window onset **sensitive to within-window day order** (20-seed peak tallies + Exp4 power); calendar causality still weak.
+- **Do not say** “null failed to flatten / residual τ=7 ≈0.42” — that was mean-PMF over 3 seeds.
+- Updated: `body_en.tex`, `body_ru.tex`, abstracts (`paper_en`, camera, `paper_ru`, chapter mirrors), Discussion/Conclusion EN+RU chapters, Setup, Results null subsection.
+- Fig `fig_null_within_window`: left real PMF, right peak-τ histogram over 20 seeds.
+- Rebuilt `paper_en.pdf` / `paper_ru.pdf`; camera via `PAPER_CAMERA=1`.
