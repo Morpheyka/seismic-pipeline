@@ -85,7 +85,7 @@
 
 ### 6.1 Проблемы в фактически цитируемых записях
 
-- `Sanford2010`: ключ говорит 2010, в записи и в PDF год **2003** — ключ врёт (для cited OK по году в тексте, но путает авторов).
+- `Sanford2003`: ключ говорит 2010, в записи и в PDF год **2003** — ключ врёт (для cited OK по году в тексте, но путает авторов).
 - `Rodkin2011`: в EN-paper цитата рендерится как «Родкин [2011]» кириллицей; для английской submission лучше cite English translation (`Izvestiya, Physics of the Solid Earth`) как primary bibliographic form.
 - `GOST2017`: в тексте «ГОСТ Р 57546–2017 [2017]» — кириллический author-field; для EN нужен английский bibliographic form / note («Russian State Standard…»).
 - `Adams2007`: только arXiv; нет `archivePrefix` consistency / DOI; journal field = «arXiv preprint…» — допустимо, но стоит пометить как preprint явно или найти published version.
@@ -139,7 +139,7 @@
 2. Починить float’ы (Figs 3–5) и битый glyph на Fig. 2.
 3. Добавить 1 таблицу LOO top configurations; смягчить detection claim согласованно с failed shuffle.
 4. Убрать кириллицу из in-text citations (Rodkin English form; GOST English form).
-5. Починить `L-ACRD`→`L-CARD` (если подтвердится), `Methods`→`Method`, ключ `Sanford2010`→`Sanford2003`.
+5. Починить `L-ACRD`→`L-CARD` (если подтвердится), `Methods`→`Method`, ключ `Sanford2003`→`Sanford2003`.
 6. Сократить Intro↔Related Work дубли и OWAD-усилить 1 абзацем + 2–3 релевантных cite.
 7. Объяснить `20/33` и dependence of windows; ethics protocol id; code/data statement.
 

@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{27}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -8,7 +8,8 @@
 \bibitem[Adams and MacKay(2007)]{Adams2007}
 Ryan~Prescott Adams and David J.~C. MacKay.
 \newblock Bayesian online changepoint detection.
-\newblock \emph{arXiv preprint arXiv:0710.3742}, 2007.
+\newblock arXiv preprint, 2007.
+\newblock URL \url{https://arxiv.org/abs/0710.3742}.
 
 \bibitem[Aminikhanghahi and Cook(2017)]{Aminikhanghahi2017}
 Samaneh Aminikhanghahi and Diane~J. Cook.
@@ -30,6 +31,12 @@ Bradley~P. Carlin, Alan~E. Gelfand, and Adrian F.~M. Smith.
   Statistics)}, 41\penalty0 (2):\penalty0 389--405, 1992.
 \newblock \doi{10.2307/2347570}.
 
+\bibitem[Chandola et~al.(2009)Chandola, Banerjee, and Kumar]{Chandola2009}
+Varun Chandola, Arindam Banerjee, and Vipin Kumar.
+\newblock Anomaly detection: A survey.
+\newblock \emph{ACM Computing Surveys}, 41\penalty0 (3):\penalty0 1--58, 2009.
+\newblock \doi{10.1145/1541880.1541882}.
+
 \bibitem[Cicerone et~al.(2009)Cicerone, Ebel, and Britton]{Cicerone2009}
 R.~D. Cicerone, J.~E. Ebel, and J.~Britton.
 \newblock A systematic compilation of earthquake precursors.
@@ -43,11 +50,35 @@ Livio Conti, Piergiorgio Picozza, and Alessandro Sotgiu.
 \newblock \emph{Frontiers in Earth Science}, 9:\penalty0 676766, 2021.
 \newblock \doi{10.3389/feart.2021.676766}.
 
+\bibitem[Faber et~al.(2024)Faber, Corizzo, Sniezynski, and
+  Japkowicz]{Faber2024}
+Kamil Faber, Roberto Corizzo, Bartlomiej Sniezynski, and Nathalie Japkowicz.
+\newblock Lifelong continual learning for anomaly detection: New challenges,
+  perspectives, and insights.
+\newblock \emph{IEEE Access}, 12:\penalty0 41364--41380, 2024.
+\newblock \doi{10.1109/ACCESS.2024.3377690}.
+
 \bibitem[Fang et~al.(2010)Fang, Xia, Zhang, Liu, and Yao]{Fang2010}
 Guangzhan Fang, Yang Xia, Chunpeng Zhang, Tiejun Liu, and Dezhong Yao.
 \newblock Optimized single electroencephalogram channel sleep staging in rats.
 \newblock \emph{Laboratory Animals}, 44:\penalty0 312--322, 2010.
 \newblock \doi{10.1258/la.2010.009081}.
+
+\bibitem[{Federal Agency on Technical Regulating and
+  Metrology}(2017)]{GOST2017}
+{Federal Agency on Technical Regulating and Metrology}.
+\newblock {GOST} {R} 57546--2017: Earthquakes. seismic intensity scale.
+\newblock Technical report, Standartinform, Moscow, 2017.
+\newblock Russian State Standard (GOST R); original title: Zemletryaseniya.
+  Shkala seysmicheskoy intensivnosti.
+
+\bibitem[Gama et~al.(2014)Gama, Zliobaite, Bifet, Pechenizkiy, and
+  Bouchachia]{Gama2014}
+Joao Gama, Indre Zliobaite, Albert Bifet, Mykola Pechenizkiy, and Abdelhamid
+  Bouchachia.
+\newblock A survey on concept drift adaptation.
+\newblock \emph{ACM Computing Surveys}, 46\penalty0 (4):\penalty0 1--37, 2014.
+\newblock \doi{10.1145/2523813}.
 
 \bibitem[Geller(1997)]{Geller1997}
 Robert~J. Geller.
@@ -55,13 +86,6 @@ Robert~J. Geller.
 \newblock \emph{Geophysical Journal International}, 131\penalty0 (3):\penalty0
   425--450, 1997.
 \newblock \doi{10.1111/j.1365-246X.1997.tb06588.x}.
-
-\bibitem[{GOST R 57546--2017}(2017)]{GOST2017}
-{GOST R 57546--2017}.
-\newblock Earthquakes. seismic intensity scale.
-\newblock Technical report, Standartinform, Moscow, 2017.
-\newblock Russian original: Землетрясения. Шкала
-  сейсмической интенсивности.
 
 \bibitem[Grant et~al.(2011)Grant, Halliday, Balderer, Leuenberger, Newcomer,
   Cyr, and Freund]{Grant2011}
@@ -72,6 +96,16 @@ Rachel~A. Grant, Tim Halliday, Werner~P. Balderer, Fanny Leuenberger, Michelle
 \newblock \emph{International Journal of Environmental Research and Public
   Health}, 8\penalty0 (6):\penalty0 1936--1956, 2011.
 \newblock \doi{10.3390/ijerph8061936}.
+
+\bibitem[Han et~al.(2023)Han, Wang, Chen, Wang, Yu, Wang, Zhang, Wang, Jin,
+  Yang, Shi, and Yin]{Han2023}
+Dongqi Han, Zhiliang Wang, Wenqi Chen, Kai Wang, Rui Yu, Su~Wang, Han Zhang,
+  Zhihua Wang, Minghui Jin, Jiahai Yang, Xingang Shi, and Xia Yin.
+\newblock Anomaly detection in the open world: Normality shift detection,
+  explanation, and adaptation.
+\newblock In \emph{Proceedings of the Network and Distributed System Security
+  Symposium (NDSS)}. Internet Society, 2023.
+\newblock \doi{10.14722/ndss.2023.24830}.
 
 \bibitem[Hoffman and Gelman(2014)]{HoffmanGelman2014}
 Matthew~D. Hoffman and Andrew Gelman.
@@ -116,16 +150,13 @@ C.~Rampin, R.~Cespuglio, N.~Chastrette, and M.~Jouvet.
 
 \bibitem[Rodkin(2011)]{Rodkin2011}
 M.~V. Rodkin.
-\newblock Модель сейсмического режима как
-  совокупности эпизодов лавинообразной
-  релаксации, возникающих на множестве
-  метастабильных состояний.
-\newblock \emph{Физика Земли}, \penalty0 (10):\penalty0 18--26,
-  2011.
-\newblock English translation: Alternative to SOC concept-model of seismic
-  regime as a set of episodes of random avalanche-like releases occurring on a
-  set of metastable subsystems, Izvestiya, Physics of the Solid Earth, 47(11),
-  966--973, doi: 10.1134/S1069351311100107.
+\newblock Alternative to {SOC} concept---model of seismic regime as a set of
+  episodes of random avalanche-like releases occurring on a set of metastable
+  subsystems.
+\newblock \emph{Izvestiya, Physics of the Solid Earth}, 47\penalty0
+  (11):\penalty0 966--973, 2011.
+\newblock \doi{10.1134/S1069351311100107}.
+\newblock English translation of Fizika Zemli, 2011, no.~10, pp.~18--26.
 
 \bibitem[Saevskiy et~al.(2025)Saevskiy, Suntsova, Kosenko, Alam, and
   Kostin]{Saevskiy2025}
@@ -136,7 +167,7 @@ Anton Saevskiy, Natalia Suntsova, Peter Kosenko, Md~Noor Alam, and Andrey
 \newblock \emph{Sensors}, 25\penalty0 (3):\penalty0 921, 2025.
 \newblock \doi{10.3390/s25030921}.
 
-\bibitem[Sanford et~al.(2003)Sanford, Tang, Ross, and Morrison]{Sanford2010}
+\bibitem[Sanford et~al.(2003)Sanford, Tang, Ross, and Morrison]{Sanford2003}
 Larry~D. Sanford, Xiangdong Tang, Richard~J. Ross, and Adrian~R. Morrison.
 \newblock Influence of shock training and explicit fear-conditioned cues on
   sleep architecture in mice: Strain comparison.

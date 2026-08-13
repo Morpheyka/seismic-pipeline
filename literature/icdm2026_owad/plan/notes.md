@@ -18,14 +18,14 @@
 - Какой IEEE template/cls взять официально для ICDMW 2026
 - Какие 2–4 фигуры оставить в 8 страницах (приоритет: mean-only / mean-context)
 - Formalize bib key for classical neuroseismo site reports
-- Подтвердить автором: `Passyuk` (линия крыс) и `L-ACRD` vs `L-CARD`; аффилиации соавторов (KB GS RAS?)
-- Почему IIB event-wise счётчик `20/33` при `n=34`
+- Подтвердить автором: ~~`Passyuk` / `L-ACRD`~~ → **закрыто 2026-08-13:** *Rattus norvegicus*; `L-CARD`; ethics protocol №1 от 1.04.2022; center EN: Scientific Research Technological Center of Neurotechnologies, SFU. Classical 2–4 day cite — нет (статьи в работе).
+- ~~Почему IIB `20/33` при `n=34`~~ → **закрыто:** legacy confirmatory `drop_incomplete_events=True` выбросил `R3/2025-01-23/after_reversed` (2 missing days; проходит K=6). Пересчёт density-safe: **20/34**, \(\mathbb{E}[\tau]\approx 6.88\).
 
 ## Риски
 
 - Рецензенты OWAD ждут anomaly угол — держать changepoint framing
 - Не возвращать длинный bake-off неинформативных range-семейств в Results/Discussion
-- **Submission blockers (ревью 2026-08-12):** triple-blind anonymization; ICDM template; desk-reject policy на format
+- **Submission blockers (ревью 2026-08-12):** triple-blind anonymization; ICDM template — **закрыты** IEEE anon path. Остаточный venue-риск OWAD: **смягчён** (2026-08-13) cites Chandola/Gama/Han/Faber + mean title.
 - Полный список доебов: `plan/review_paper_en.md`
 
 ## Решения брейншторма (2026-08-12) — null / claim / viz

@@ -205,7 +205,7 @@
 
 - **Артефакт:** `plan/review_paper_en.md`
 - **Вердикт:** major revision / риск desk reject (нет anonymization + не ICDM IEEE template)
-- **Топ-дыры:** float’ы Figs 3–5; нет LOO-таблицы; failed shuffle vs сильный detection claim; кириллица Rodkin/GOST в EN cite; слабый OWAD fit; `L-ACRD`/`Passyuk`/`Sanford2010` hygiene
+- **Топ-дыры:** float’ы Figs 3–5; нет LOO-таблицы; failed shuffle vs сильный detection claim; кириллица Rodkin/GOST в EN cite; слабый OWAD fit; `L-ACRD`/`Passyuk`/`Sanford2003` hygiene
 - Skills: peer-review + writing-core + verification (pdftotext, cite∩bib, log, OWAD CFP)
 
 ## 2026-08-12 — Revision lock: within-window null + claim
@@ -273,3 +273,34 @@
 - Updated: `body_en.tex`, `body_ru.tex`, abstracts (`paper_en`, camera, `paper_ru`, chapter mirrors), Discussion/Conclusion EN+RU chapters, Setup, Results null subsection.
 - Fig `fig_null_within_window`: left real PMF, right peak-τ histogram over 20 seeds.
 - Rebuilt `paper_en.pdf` / `paper_ru.pdf`; camera via `PAPER_CAMERA=1`.
+
+## 2026-08-13 — OWAD fit + title (items 1–2)
+
+- **Stage:** S1 Evidence → S4 Drafting (targeted; single-agent degraded mode OK for non-full redraft).
+- **Title:** `Bayesian Changepoint Detection for Event-Aligned REM Means Near Seismic Events` (RU synced).
+- **OWAD prose:** new RW theme + Intro bridge; cites Chandola2009, Gama2014, Han2023, Faber2024 (CrossRef-verified). Explicit non-claim: not continual / normality-shift adaptation.
+- **Artifacts:** task packet `owad_fit_title.md`; evidence map S22–S25; blueprints Intro/RW; `paper_en.pdf` still **8** pages.
+- Spec review: title matches mean-first; OWAD cites present; no fabricated refs.
+- Quality review: venue fit stated as setting+case study, not overclaim of workshop methods.
+
+### Capability-use audit
+- Required skills: paper-orchestration, evidence-driven-writing, literature-review, verification
+- Skills actually used: those four (writing-core compression implicit)
+- Inputs consumed: review_paper_en §0/§1 title+OWAD; OWAD CFP; CrossRef DOIs; body_en/ru
+- Inputs not used: full multi-agent chapter dispatch (targeted revision, not full redraft)
+- Artifacts produced: bib keys, RW paragraph, title, chapter mirrors, evidence coverage
+- Remaining risk: classical site-report bib still missing; page budget tight if further RW growth
+
+## 2026-08-13 — Author facts (item 3) + IIB n=34 recompute
+
+- **Facts locked:** *Rattus norvegicus*; ADC `L-CARD`; ethics protocol No. 1 (1 Apr 2022); center EN name; no classical 2–4 day cite yet.
+- **IIB 20/33 root cause:** `run_top10_refit_plots.py` used `drop_incomplete_events=True` → dropped `R3 / 2025-01-23 / after_reversed` (2 missing days) which **survives** day-mask \(K=6\). Screening/paper cohort is \(n=34\).
+- **Fix:** `--density-safe` path in `run_top10_refit_plots.py`; refit `refit_iib_range_n34/` (chains=4). Event-wise **20/34**; \(\mathbb{E}[\tau]\approx 6.88\), MAP \(\tau=7\); regime medians/shares updated; Fig. diag-iib regenerated.
+- July R1–R4 windows already present in \(n=34\) (no missing animal).
+
+## 2026-08-13 — Melochi (item 4) + commit prep
+
+- Paired \(\Delta\mathbb{E}[\tau]\): mean paired \(+0.46\) (was ambiguous \(+0.42\)); pooled \(n=84\) wording.
+- Data: Methods→Method; Data/Code Availability section (anon-safe).
+- Bib: Rodkin EN primary; GOST English agency form; Adams `@misc` arXiv; `Sanford2010`→`Sanford2003`.
+- `paper_en.pdf` still 8 pages.

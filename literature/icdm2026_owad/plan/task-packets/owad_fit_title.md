@@ -1,0 +1,25 @@
+## Task Packet — OWAD venue fit + title (2026-08-13)
+
+- Scope: Resolve review items (1) OWAD Related Work / Intro fit and (2) title mismatch with mean-first analysis.
+- Stage: S1 Evidence → S4 Drafting (targeted revision; not full-paper redraft).
+- Files to read: `plan/review_paper_en.md`, `plan/project-overview.md`, `latex/body_en.tex`, `chapters/01_introduction.md`, `chapters/02_related_work.md`, `refs/evidence-map.md`, OWAD CFP topics.
+- Files allowed to edit:
+  - `latex/paper_en.tex`, `paper_en_camera.tex`, `paper_ru.tex` (title)
+  - `latex/body_en.tex`, `body_ru.tex` (Intro OWAD bridge; Related Work new theme + positioning)
+  - `chapters/01_introduction.md`, `01_introduction.ru.md`, `02_related_work.md`, `02_related_work.ru.md`
+  - `latex/references.bib` (verified OWAD/AD/drift keys only)
+  - `refs/evidence-map.md`, `plan/chapter-blueprints/01_introduction-blueprint.md`, `02_related_work-blueprint.md`
+  - `plan/project-overview.md`, `plan/progress.md`, this packet
+- Required skills: paper-orchestration (controller), evidence-driven-writing, literature-review (verified CrossRef), writing-core compression on 8p budget.
+- Evidence/data inputs: CrossRef DOIs for Chandola2009, Gama2014, Han2023 (NDSS OWAD), Faber2024; workshop CFP topic list.
+- Required artifacts: updated evidence map rows S22–S25; RW blueprint paragraph for open-world AD; revised title; rebuilt `paper_en.pdf` ≤8 pages.
+- Rejection checks:
+  - No fabricated citations.
+  - Do not claim this paper implements continual / lifelong AD or normality-shift adaptation.
+  - Do not reintroduce Multivariate as the primary scientific object if the narrative stays mean-first.
+  - Avoid lengthening Intro↔RW duplication; add OWAD theme, do not paste CFP.
+  - Non-prediction claim stated once in RW bridge, not thrice.
+- Validation commands: `PAPER_CAMERA=1 ./build.sh`; `pdfinfo paper_en.pdf` pages; `pdftotext` grep open-world / title / Multivariate.
+- Title lock (proposed → adopted unless user overrides):
+  - EN: `Bayesian Changepoint Detection for Event-Aligned REM Means Near Seismic Events`
+  - RU: `Байесовское обнаружение точки разладки в событие-относительных средних REM вблизи сейсмических событий`

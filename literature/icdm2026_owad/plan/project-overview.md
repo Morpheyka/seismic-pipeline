@@ -5,7 +5,7 @@
 - **Тип:** workshop paper (ICDM 2026)
 - **Воркшоп:** OWAD — Open World Anomaly Detection in Dynamic and Evolving Environments
 - **Область:** data mining / changepoint & anomaly-style detection в многомерных временных рядах; домен — нейрофизиология сна (REM) + сейсмический контекст
-- **Название:** Bayesian Changepoint Detection in Multivariate REM Time Series Near Seismic Events
+- **Название:** Bayesian Changepoint Detection for Event-Aligned REM Means Near Seismic Events
 - **Дата создания плана:** 2026-08-11
 - **Язык:** английский (submission); параллельные русские переводы глав в `chapters/*.ru.md` для автора
 - **Вывод:** IEEE LaTeX, ≤8 страниц + 2 extra
@@ -37,7 +37,7 @@
 |------|------------|
 | Мотивация (лёгкая) | биосигналы REM у сейсмических событий |
 | Задача данной статьи | статистически подтвердить аномалию по мозговому REM-сигналу; найти mean-признаки и гиперпараметры, наиболее правдоподобно её описывающие |
-| Задача для трека OWAD | changepoint / anomaly-style detection in multivariate time series |
+| Задача для трека OWAD | regime-onset / anomaly-style detection in short event-aligned REM means under irregular seismic context (not lifelong AD) |
 | Вклад | Bayesian \(\tau\) на mean; устойчивые распределения \(\mathbb{E}[\tau]\); ранжирование конфигураций; не bake-off неинформативных range-семейств; не оперативный прогноз |
 
 ## Что меняем относительно `conference_article_ru`

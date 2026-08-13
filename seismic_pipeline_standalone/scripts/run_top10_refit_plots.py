@@ -61,6 +61,25 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help="Optional single fingerprint to refit (for debugging).",
     )
+    parser.add_argument(
+        "--density-safe",
+        action="store_true",
+        help="Match density-safe screening: nan-pad incomplete days and day-mask K=6 "
+        "(drop_incomplete_events=False). Legacy default drops incomplete events.",
+    )
+    parser.add_argument(
+        "--min-valid-days",
+        type=int,
+        default=6,
+        help="Min valid days when --density-safe (default 6).",
+    )
+    parser.add_argument(
+        "--profile-cache-root",
+        type=Path,
+        default=None,
+        help="Optional existing density-safe profile cache root "
+        "(rem_n{N}_ov{ov}_stage2/samples_10days_nanpad.csv).",
+    )
     return parser.parse_args()
 
 
@@ -105,23 +124,52 @@ def _export_profile_cache(
     n_points: int,
     overlap: float,
     window_days: int,
+    density_safe: bool = False,
+    min_valid_days: int = 6,
+    profile_cache_root: Path | None = None,
 ) -> dict[str, Any]:
-    export_cfg = dict(export_base_cfg)
-    export_cfg.update(
-        {
-            "output_dir": str(cache_dir),
-            "window_days": int(window_days),
-            "n_points_per_day": int(n_points),
-            "overlap": float(overlap),
-        }
-    )
-    export_result = export_rem_profiles_10days_cached_only(**export_cfg)
-    prep = prepare_model_data(csv_path=export_result["paths"]["nanpad_output_csv"])
+    csv_path: str | None = None
+    if profile_cache_root is not None:
+        cand = (
+            Path(profile_cache_root)
+            / f"rem_n{int(n_points)}_ov{float(overlap):.2f}_stage2"
+            / "samples_10days_nanpad.csv"
+        )
+        if cand.is_file():
+            csv_path = str(cand)
+            print(f"[export] reuse profile cache {cand}", flush=True)
+
+    if csv_path is None:
+        export_cfg = dict(export_base_cfg)
+        export_cfg.update(
+            {
+                "output_dir": str(cache_dir),
+                "window_days": int(window_days),
+                "n_points_per_day": int(n_points),
+                "overlap": float(overlap),
+            }
+        )
+        export_result = export_rem_profiles_10days_cached_only(**export_cfg)
+        csv_path = export_result["paths"]["nanpad_output_csv"]
+
+    if density_safe:
+        prep = prepare_model_data(
+            csv_path=csv_path,
+            day_mask=True,
+            apply_artifacts=True,
+            min_valid_days=int(min_valid_days),
+            n_points_per_day=int(n_points),
+            window_days=int(window_days),
+        )
+    else:
+        prep = prepare_model_data(csv_path=csv_path)
+
     return {
         "data_norm": np.asarray(prep["data_norm"], dtype=float),
         "data_raw": np.asarray(prep["data_raw"], dtype=float),
         "good_indices": np.asarray(prep.get("good_indices", np.arange(prep["data_norm"].shape[0])), dtype=int),
-        "csv_path": prep.get("csv_path", export_result["paths"]["nanpad_output_csv"]),
+        "csv_path": prep.get("csv_path", csv_path),
+        "day_valid": prep.get("day_valid"),
     }
 
 
@@ -179,6 +227,10 @@ def _refit_and_plot_one(
     data_norm = data_bundle["data_norm"][active_idx]
     data_raw = data_bundle["data_raw"][active_idx]
 
+    day_valid = data_bundle.get("day_valid")
+    if day_valid is not None:
+        day_valid = np.asarray(day_valid)[active_idx]
+
     group_data = build_group_data(
         data_norm,
         n_chunks=int(cfg["n_chunks"]),
@@ -186,6 +238,7 @@ def _refit_and_plot_one(
         data_raw=data_raw,
         window_days=int(window_days),
         n_points_per_day=n_points,
+        day_valid=day_valid,
     )
     model = build_changepoint_model(
         group_data,
@@ -327,7 +380,8 @@ def main() -> None:
     export_base_cfg = default_export_base_cfg(output_dir=str(out_dir / "profile_cache"))
     export_base_cfg["events"] = [dict(x) for x in FULL_EXHAUSTIVE_EVENTS_8DAY]
     export_base_cfg["window_days"] = int(args.window_days)
-    export_base_cfg["drop_incomplete_events"] = True
+    # Density-safe: keep incomplete windows with NaN pads; legacy drops them.
+    export_base_cfg["drop_incomplete_events"] = not bool(args.density_safe)
 
     profile_cache: dict[tuple[int, float], dict[str, Any]] = {}
     metas: list[dict[str, Any]] = []
@@ -340,13 +394,24 @@ def main() -> None:
         key = _profile_key(n_points, overlap)
         if key not in profile_cache:
             cache_dir = out_dir / "profile_cache" / f"n{n_points}_ov{overlap:.2f}"
-            print(f"[export] profile n_points={n_points} overlap={overlap}", flush=True)
+            print(
+                f"[export] profile n_points={n_points} overlap={overlap} "
+                f"density_safe={bool(args.density_safe)}",
+                flush=True,
+            )
             profile_cache[key] = _export_profile_cache(
                 export_base_cfg=export_base_cfg,
                 cache_dir=cache_dir,
                 n_points=n_points,
                 overlap=overlap,
                 window_days=int(args.window_days),
+                density_safe=bool(args.density_safe),
+                min_valid_days=int(args.min_valid_days),
+                profile_cache_root=args.profile_cache_root,
+            )
+            print(
+                f"[export] n_model_events={profile_cache[key]['data_norm'].shape[0]}",
+                flush=True,
             )
 
         meta = _refit_and_plot_one(

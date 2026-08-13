@@ -25,10 +25,10 @@ Target: English, workshop density; ~5–6 paragraphs; OWAD-readable changepoint 
 
 ### Paragraph 4
 - Role: gap / estimand contrast + OWAD task statement
-- Main claim: Continuous hypnograms yield multivariate REM time series around events; classical site reports tracked profile range (~2–4 day effect window), whereas we estimate regime-onset changepoint \(\tau\) on an 8-day window.
-- Evidence IDs: S12, S12b, S13, S18
+- Main claim: Continuous hypnograms yield event-aligned REM mean summaries around events; classical site reports tracked profile range (~2–4 day effect window), whereas we estimate regime-onset changepoint \(\tau\) on an 8-day window. Open-world framing: irregular seismic context and scarce labels, not a continual AD system.
+- Evidence IDs: S12, S12b, S13, S18, S22–S25 (light touch in Intro; depth in RW)
 - Contrast or transition: to statistical bottlenecks
-- Forbidden content: long \(\tau\)-index inversion digression
+- Forbidden content: long \(\tau\)-index inversion digression; claiming lifelong AD
 
 ### Paragraph 5
 - Role: bottleneck cascade

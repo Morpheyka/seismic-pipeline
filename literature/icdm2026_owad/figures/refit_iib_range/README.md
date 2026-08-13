@@ -7,9 +7,9 @@
 | likelihoods | `range=interval_inflated_beta` |
 | active feature / lik | `range` / `interval_inflated_beta` |
 | n_points / overlap | `12` / `0.0` |
-| n_model_events | `33` |
+| n_model_events | `34` (density-safe day-mask K=6; source `refit_iib_range_n34`) |
 | MCMC | tune=6000, draws=3000, chains=4 |
-| tau_map | `7` (conc. 0.475) |
+| tau_map | `7` (conc. ≈0.558); \(\mathbb{E}[\tau]\approx 6.88\) |
 
 Parameter pairs: `{'mu': None, 'sigma': None, 'alpha': ('alpha_daily_range_1', 'alpha_daily_range_2'), 'beta': ('beta_daily_range_1', 'beta_daily_range_2'), 'pi': ('pi_daily_range_1', 'pi_daily_range_2'), 'nu': None}`
 

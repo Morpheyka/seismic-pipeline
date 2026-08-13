@@ -22,16 +22,11 @@
 \BIBdecl
 
 \bibitem{Rodkin2011}
-M.~V. Rodkin, ``\BIBforeignlanguage{russian}{Модель
-  сейсмического режима как совокупности
-  эпизодов лавинообразной релаксации,
-  возникающих на множестве метастабильных
-  состояний},'' \emph{\BIBforeignlanguage{russian}{Физика
-  Земли}}, no.~10, pp. 18--26, 2011, english translation: Alternative to
-  SOC concept-model of seismic regime as a set of episodes of random
-  avalanche-like releases occurring on a set of metastable subsystems,
-  Izvestiya, Physics of the Solid Earth, 47(11), 966--973, doi:
-  10.1134/S1069351311100107.
+M.~V. Rodkin, ``Alternative to {SOC} concept---model of seismic regime as a set
+  of episodes of random avalanche-like releases occurring on a set of
+  metastable subsystems,'' \emph{Izvestiya, Physics of the Solid Earth},
+  vol.~47, no.~11, pp. 966--973, 2011, english translation of Fizika Zemli,
+  2011, no.~10, pp.~18--26.
 
 \bibitem{Cicerone2009}
 R.~D. Cicerone, J.~E. Ebel, and J.~Britton, ``A systematic compilation of
@@ -79,7 +74,7 @@ B.~D. Palma, D.~Suchecki, and S.~Tufik, ``Differential effects of acute cold
   and footshock on the sleep of rats,'' \emph{Brain Research}, vol. 861, no.~1,
   pp. 97--104, 2000.
 
-\bibitem{Sanford2010}
+\bibitem{Sanford2003}
 L.~D. Sanford, X.~Tang, R.~J. Ross, and A.~R. Morrison, ``Influence of shock
   training and explicit fear-conditioned cues on sleep architecture in mice:
   Strain comparison,'' \emph{Behavior Genetics}, vol.~33, no.~1, pp. 43--58,
@@ -100,6 +95,27 @@ A.~Saevskiy, N.~Suntsova, P.~Kosenko, M.~N. Alam, and A.~Kostin, ``Open-source
   algorithm for automated vigilance state classification using single-channel
   electroencephalogram in rodents,'' \emph{Sensors}, vol.~25, no.~3, p. 921,
   2025.
+
+\bibitem{Chandola2009}
+V.~Chandola, A.~Banerjee, and V.~Kumar, ``Anomaly detection: A survey,''
+  \emph{ACM Computing Surveys}, vol.~41, no.~3, pp. 1--58, 2009.
+
+\bibitem{Gama2014}
+J.~Gama, I.~Zliobaite, A.~Bifet, M.~Pechenizkiy, and A.~Bouchachia, ``A survey
+  on concept drift adaptation,'' \emph{ACM Computing Surveys}, vol.~46, no.~4,
+  pp. 1--37, 2014.
+
+\bibitem{Han2023}
+D.~Han, Z.~Wang, W.~Chen, K.~Wang, R.~Yu, S.~Wang, H.~Zhang, Z.~Wang, M.~Jin,
+  J.~Yang, X.~Shi, and X.~Yin, ``Anomaly detection in the open world: Normality
+  shift detection, explanation, and adaptation,'' in \emph{Proceedings of the
+  Network and Distributed System Security Symposium (NDSS)}.\hskip 1em plus
+  0.5em minus 0.4em\relax Internet Society, 2023.
+
+\bibitem{Faber2024}
+K.~Faber, R.~Corizzo, B.~Sniezynski, and N.~Japkowicz, ``Lifelong continual
+  learning for anomaly detection: New challenges, perspectives, and insights,''
+  \emph{IEEE Access}, vol.~12, pp. 41\,364--41\,380, 2024.
 
 \bibitem{Hyndman2018}
 \BIBentryALTinterwordspacing
@@ -133,14 +149,17 @@ S.~Aminikhanghahi and D.~J. Cook, ``A survey of methods for time series change
   pp. 339--367, 2017.
 
 \bibitem{Adams2007}
+\BIBentryALTinterwordspacing
 R.~P. Adams and D.~J.~C. MacKay, ``Bayesian online changepoint detection,''
-  \emph{arXiv preprint arXiv:0710.3742}, 2007.
+  arXiv preprint, 2007. [Online]. Available:
+  \url{https://arxiv.org/abs/0710.3742}
+\BIBentrySTDinterwordspacing
 
 \bibitem{GOST2017}
-{GOST R 57546--2017}, ``\BIBforeignlanguage{russian}{Earthquakes. seismic
-  intensity scale},'' Standartinform, Moscow, Tech. Rep., 2017, russian
-  original: Землетрясения. Шкала сейсмической
-  интенсивности.
+{Federal Agency on Technical Regulating and Metrology}, ``{GOST} {R}
+  57546--2017: Earthquakes. seismic intensity scale,'' Standartinform, Moscow,
+  Tech. Rep., 2017, russian State Standard (GOST R); original title:
+  Zemletryaseniya. Shkala seysmicheskoy intensivnosti.
 
 \bibitem{HoffmanGelman2014}
 \BIBentryALTinterwordspacing
