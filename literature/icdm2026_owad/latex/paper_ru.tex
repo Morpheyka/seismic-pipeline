@@ -1,0 +1,60 @@
+% Русский черновик воркшопа ICDM 2026 OWAD
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage{geometry}
+\geometry{letterpaper, margin=0.75in, top=1in, bottom=1in}
+\setlength{\columnsep}{0.25in}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\setotherlanguage{english}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{natbib}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,fit}
+
+\graphicspath{{images/}}
+
+\title{Байесовское обнаружение точки разладки в многомерных REM-рядах\\
+в окрестности сейсмических событий}
+
+\author{%
+  М.~Б.~Пономарёв \and
+  А.~И.~Саевский \and
+  И.~Е.~Шепелев \and
+  П.~О.~Косенко \and
+  Д.~В.~Чебров \and
+  В.~Н.~Кирой \\
+  \small Научно-исследовательский технологический центр нейротехнологий,\\
+  \small Южный федеральный университет, Ростов-на-Дону, Россия
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Проверяется, показывает ли инструментальный REM-сигнал крыс, полученный из мозга, статистическую аномалию смены режима в окрестности сейсмических событий, и какие признаки и гиперпараметры профиля описывают эту аномалию наиболее согласованно. Восьмидневные событие-относительные окна гипнограмм (\(n=34\) после day-mask с \(K=6\)) сводят к суточным и полусуточным средним REM в байесовской модели одной точки разладки с маргинализацией дискретного onset \(\tau\). Правдоподобия Student-\(t\) и skew-normal для mean-признаков дают устойчивые распределения \(\mathbb{E}[\tau]\), сосредоточенные в нескольких сутках от события, без патологического скопления у края prior. PSIS-LOO ранжирует сохранённые геометрии профиля (\(N\), overlap) и mean-правдоподобия внутри одного observation builder. Within-window day-shuffle контроль на primary mean-плече не выравнивает среднее \(p(\tau=k)\) к равномерному --- остаточная масса у \(\tau=7\) сохраняется --- поэтому mid-window onset не объясняется однозначно порядком суток в событие-относительном окне. Range-семейства, заранее известные как разрушающие интерпретируемость onset, из основного анализа исключены. Итог --- статистическое свидетельство аномалии в нейронном сигнале сна, а не визуальное поведенческое доказательство и не оперативный прогноз землетрясений.
+
+\medskip
+\noindent\textbf{Ключевые слова:}
+парадоксальный сон, точка разладки, байесовский вывод, PSIS-LOO, нейросейсмология, обнаружение аномалий.
+\end{abstract}
+
+\input{body_ru.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

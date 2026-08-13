@@ -1,0 +1,77 @@
+% ICDM 2026 OWAD — named camera-ready / internal copy (IEEEtran).
+% Anonymous portal submission: paper_en.tex
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{placeins}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{5}
+\setcounter{bottomnumber}{4}
+\setcounter{totalnumber}{8}
+\setcounter{dbltopnumber}{4}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,fit}
+
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{images/}}
+
+\title{Bayesian Changepoint Detection in Multivariate REM Time Series Near Seismic Events}
+
+\author{%
+\IEEEauthorblockN{Matvey~B.~Ponomarev}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+\and
+\IEEEauthorblockN{Anton~I.~Saevskiy}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+\and
+\IEEEauthorblockN{Igor~E.~Shepelev}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+\and
+\IEEEauthorblockN{Petr~O.~Kosenko}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+\and
+\IEEEauthorblockN{Danila~V.~Chebrov}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+\and
+\IEEEauthorblockN{Valery~N.~Kiroy}
+\IEEEauthorblockA{Research and Technology Center for Neurotechnologies,\\
+Southern Federal University, Rostov-on-Don, Russia}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We test whether an instrumented, brain-derived REM signal in rats shows a statistical regime-shift anomaly near seismic events, and which features and profile hyperparameters describe that anomaly most coherently. Eight-day event-aligned hypnogram windows (\(n=34\) after day-mask with \(K=6\)) are summarized by daily and half-day REM means under a Bayesian single-changepoint model with marginalized discrete onset \(\tau\). Student-\(t\) and skew-normal likelihoods for mean features yield stable \(\mathbb{E}[\tau]\) distributions concentrated a few days from the event, without pathological prior-edge pile-up. PSIS-LOO ranks retained profile geometries (\(N\), overlap) and mean likelihoods inside one observation builder. A within-window day-shuffle control on the primary mean arm fails to flatten mean \(p(\tau=k)\) toward uniformity---residual mass remains near \(\tau=7\)---so the mid-window onset pattern is not uniquely attributed to event-aligned day order. Range likelihood families known a priori to destroy onset interpretability are excluded from the main analysis. The result is statistical evidence of an anomaly in a neural sleep signal---not visual behavioral proof and not operational earthquake prediction.
+\end{abstract}
+
+\begin{IEEEkeywords}
+REM sleep, changepoint detection, Bayesian inference, PSIS-LOO, neuroseismology, open-world anomaly detection.
+\end{IEEEkeywords}
+
+\input{body_en.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

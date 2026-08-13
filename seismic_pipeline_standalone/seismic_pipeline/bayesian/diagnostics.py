@@ -301,7 +301,8 @@ def _likelihood_pdf_from_posterior(
         return y1, y2
 
     if likelihood == "student_t":
-        nu = max(float(params_1["nu"]), 2.0 + eps)
+        nu_1 = max(float(params_1["nu"]), 2.0 + eps)
+        nu_2 = max(float(params_2.get("nu", params_1["nu"])), 2.0 + eps)
         mu_1 = float(params_1["mu"])
         mu_2 = float(params_2["mu"])
         sigma_1 = max(float(params_1["sigma"]), eps)
@@ -310,7 +311,7 @@ def _likelihood_pdf_from_posterior(
         # Student-t PDF via log-space for stability:
         # log f(x) = lgamma((nu+1)/2)-lgamma(nu/2)-0.5*log(nu*pi)-log(sigma)
         #           -((nu+1)/2)*log(1 + ((x-mu)^2)/(nu*sigma^2))
-        def _student_t_pdf(xv: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+        def _student_t_pdf(xv: np.ndarray, mu: float, sigma: float, nu: float) -> np.ndarray:
             log_c = (
                 float(math.lgamma((nu + 1.0) / 2.0))
                 - float(math.lgamma(nu / 2.0))
@@ -320,7 +321,21 @@ def _likelihood_pdf_from_posterior(
             z2 = ((xv - mu) / sigma) ** 2
             return np.exp(log_c - ((nu + 1.0) / 2.0) * np.log1p(z2 / nu))
 
-        return _student_t_pdf(x, mu_1, sigma_1), _student_t_pdf(x, mu_2, sigma_2)
+        return _student_t_pdf(x, mu_1, sigma_1, nu_1), _student_t_pdf(x, mu_2, sigma_2, nu_2)
+
+    if likelihood == "skew_normal":
+        from scipy.stats import skewnorm
+
+        mu_1 = float(params_1["mu"])
+        mu_2 = float(params_2["mu"])
+        sigma_1 = max(float(params_1["sigma"]), eps)
+        sigma_2 = max(float(params_2["sigma"]), eps)
+        alpha_1 = float(params_1.get("alpha", 0.0))
+        alpha_2 = float(params_2.get("alpha", 0.0))
+        return (
+            skewnorm.pdf(x, a=alpha_1, loc=mu_1, scale=sigma_1),
+            skewnorm.pdf(x, a=alpha_2, loc=mu_2, scale=sigma_2),
+        )
 
     if likelihood == "lognormal":
         mu_1 = float(params_1["mu"])
@@ -389,7 +404,7 @@ def _likelihood_pdf_from_posterior(
 
     raise ValueError(
         f"Unsupported likelihood '{likelihood}'. "
-        "Use one of: normal, student_t, lognormal, gamma, beta, beta_constrained, "
+        "Use one of: normal, student_t, skew_normal, lognormal, gamma, beta, beta_constrained, "
         "interval_inflated_beta."
     )
 
@@ -508,7 +523,12 @@ def feature_likelihood_profiles(
                 params_2["threshold"] = threshold
 
             nu_name = f"nu_{group_name}_{feat_name}"
-            if nu_name in trace_vars:
+            nu1_name = f"nu_{group_name}_{feat_name}_1"
+            nu2_name = f"nu_{group_name}_{feat_name}_2"
+            if nu1_name in trace_vars and nu2_name in trace_vars:
+                params_1["nu"] = float(np.mean(_values_flat(trace, nu1_name)))
+                params_2["nu"] = float(np.mean(_values_flat(trace, nu2_name)))
+            elif nu_name in trace_vars:
                 nu_mean = float(np.mean(_values_flat(trace, nu_name)))
                 params_1["nu"] = nu_mean
                 params_2["nu"] = nu_mean

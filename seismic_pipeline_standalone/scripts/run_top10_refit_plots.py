@@ -134,11 +134,15 @@ def _build_trace_vars(trace, group_data: dict) -> list[str]:
         trace_vars.append("tau_mean")
     for group_name, features in group_data.items():
         for feat_name in features.keys():
-            for param_name in ("mu", "sigma", "alpha", "beta"):
+            for param_name in ("mu", "sigma", "alpha", "beta", "pi", "nu"):
                 p1 = f"{param_name}_{group_name}_{feat_name}_1"
                 p2 = f"{param_name}_{group_name}_{feat_name}_2"
                 if p1 in available and p2 in available:
                     trace_vars.extend([p1, p2])
+            # Shared Student-t degrees of freedom (legacy / default).
+            nu_shared = f"nu_{group_name}_{feat_name}"
+            if nu_shared in available:
+                trace_vars.append(nu_shared)
     return trace_vars
 
 
@@ -237,6 +241,36 @@ def _refit_and_plot_one(
     if not summary.empty:
         summary.to_csv(model_dir / "posterior_summary.csv")
 
+    # Persist ArviZ DataTree for offline diagnostic replotting.
+    try:
+        trace_nc = model_dir / "trace.nc"
+        trace.to_netcdf(str(trace_nc))
+        print(f"[refit] wrote {trace_nc}", flush=True)
+    except Exception as exc:
+        print(f"[refit] warning: failed to save trace.nc: {exc}", flush=True)
+        try:
+            trace_zarr = model_dir / "trace.zarr"
+            if trace_zarr.exists():
+                import shutil
+
+                shutil.rmtree(trace_zarr)
+            trace.to_zarr(str(trace_zarr))
+            print(f"[refit] wrote {trace_zarr}", flush=True)
+        except Exception as exc2:
+            print(f"[refit] warning: failed to save trace.zarr: {exc2}", flush=True)
+
+    # Persist observed feature arrays for likelihood overlays.
+    try:
+        obs_payload: dict[str, Any] = {}
+        for group_name, features in group_data.items():
+            for feat_name, observed_df in features.items():
+                key = f"{group_name}__{feat_name}"
+                obs_payload[key] = np.asarray(observed_df.to_numpy(dtype=float))
+        np.savez_compressed(model_dir / "observations.npz", **obs_payload)
+        print(f"[refit] wrote {model_dir / 'observations.npz'}", flush=True)
+    except Exception as exc:
+        print(f"[refit] warning: failed to save observations.npz: {exc}", flush=True)
+
     title = f"rank {rank} {fingerprint} | {row.get('features', '')}"
     plot_trace_and_tau(
         trace,
@@ -251,15 +285,18 @@ def _refit_and_plot_one(
         save_path=model_dir / "posteriors.png",
         tau_bar_save_path=model_dir / "tau_posterior.png",
     )
-    feature_likelihood_profiles(
-        trace,
-        group_data=group_data,
-        parameter_selection=cfg["parameter_selection"],
-        grid_size=300,
-        plot=True,
-        save_dir=model_dir,
-        plot_stem_prefix=stem,
-    )
+    try:
+        feature_likelihood_profiles(
+            trace,
+            group_data=group_data,
+            parameter_selection=cfg["parameter_selection"],
+            grid_size=300,
+            plot=True,
+            save_dir=model_dir,
+            plot_stem_prefix=stem,
+        )
+    except Exception as exc:
+        print(f"[refit] warning: likelihood profile plots failed: {exc}", flush=True)
     print(f"[refit] saved plots to {model_dir}", flush=True)
     return meta
 

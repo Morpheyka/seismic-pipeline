@@ -44,7 +44,11 @@ def setup_style() -> None:
         {
             "font.family": "sans-serif",
             "font.sans-serif": ["Noto Sans", "DejaVu Sans", "Lato", "Arial"],
-            "mathtext.fontset": "dejavusans",
+            # dejavusans lacks usable blackboard-bold E in PDF (broken axis glyphs);
+            # STIX + TrueType embedding keeps \mathbb{E}[\tau] readable under XeLaTeX.
+            "mathtext.fontset": "stix",
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
             "font.size": 9,
             "axes.titlesize": 9,
             "axes.labelsize": 9,

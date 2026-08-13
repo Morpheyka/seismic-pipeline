@@ -323,15 +323,33 @@ def build_changepoint_model(
                             ll_2 = pm.logp(pm.Normal.dist(mu=mu_2, sigma=sigma_2), obs_fill)
                             _add_ll(ll_1, ll_2)
                     elif likelihood == "student_t":
-                        nu = _build_prior(
-                            f"nu_{group_name}_{feat_name}",
-                            spec.get("nu_prior", {"dist": "exponential_plus", "lam": 0.05, "offset": 2.0}),
-                            positive_only=True,
+                        nu_prior = spec.get(
+                            "nu_prior",
+                            {"dist": "exponential_plus", "lam": 0.05, "offset": 2.0},
                         )
+                        nu_per_regime = bool(spec.get("nu_per_regime", False))
+                        if nu_per_regime:
+                            nu_1 = _build_prior(
+                                f"nu_{group_name}_{feat_name}_1",
+                                nu_prior,
+                                positive_only=True,
+                            )
+                            nu_2 = _build_prior(
+                                f"nu_{group_name}_{feat_name}_2",
+                                nu_prior,
+                                positive_only=True,
+                            )
+                        else:
+                            nu_1 = nu_2 = _build_prior(
+                                f"nu_{group_name}_{feat_name}",
+                                nu_prior,
+                                positive_only=True,
+                            )
                         obs_fill = _fill_nonfinite_for_dist(observed, 0.0)
                         if tau_mode == "discrete" and not has_nan:
                             mu = pm.math.switch(tau > feat_idx + 1, mu_1, mu_2)
                             sigma = pm.math.switch(tau > feat_idx + 1, sigma_1, sigma_2)
+                            nu = pm.math.switch(tau > feat_idx + 1, nu_1, nu_2)
                             pm.StudentT(
                                 f"obs_{group_name}_{feat_name}",
                                 nu=nu,
@@ -340,8 +358,8 @@ def build_changepoint_model(
                                 observed=obs_fill,
                             )
                         else:
-                            ll_1 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_1, sigma=sigma_1), obs_fill)
-                            ll_2 = pm.logp(pm.StudentT.dist(nu=nu, mu=mu_2, sigma=sigma_2), obs_fill)
+                            ll_1 = pm.logp(pm.StudentT.dist(nu=nu_1, mu=mu_1, sigma=sigma_1), obs_fill)
+                            ll_2 = pm.logp(pm.StudentT.dist(nu=nu_2, mu=mu_2, sigma=sigma_2), obs_fill)
                             _add_ll(ll_1, ll_2)
                     elif likelihood == "skew_normal":
                         alpha_1 = _build_prior(

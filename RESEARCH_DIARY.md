@@ -1,3 +1,23 @@
+# Research / Change Diary
+
+Append-only log of substantial changes and experiments: what, why, result.
+
+## 2026-08-12 — OWAD prose: weaken day-order claim after failed within-window null
+
+- **Change:** Removed proxy/date-shuffle language; inserted within-window day-shuffle control + `fig:null-within-window` with honest failed-uniformity reading across Abstract/Setup/Results/Discussion/Conclusion (EN+RU latex + chapter mirrors).
+- **Why:** Shuffle mean \(p(\tau=k)\) still peaks near \(\tau=7\) (~0.42); MAD→uniform ≈0.082 vs real ≈0.086 — null did not flatten.
+- **Result:** Claim weakened to “pattern not uniquely explained by event-aligned day order”; LOO table + IEEE wrapper preserved; `paper_en.pdf` rebuild 8 pages.
+- **Artifacts:** `latex/body_en.tex`, `latex/body_ru.tex`, `latex/paper_en.tex`, chapters `00`,`05`–`08` (+`.ru.md`), `latex/images/fig_null_within_window.*`
+- **Next:** full `rebuild-verify` pass if IEEE float migration still in flux.
+
+## 2026-08-12 — IIB/ν-split diagnostics в OWAD Results+Discussion
+
+- **Change:** Сводка IIB regime + shared vs existing ν-split; 4 фигуры в `latex/images`; текст EN+RU в Results/Discussion (chapters + body_*.tex).
+- **Why:** Вставить confirmatory-диагностики в статью по уже готовым артефактам (без нового MCMC); полосы 90%.
+- **Result:** IIB before/after на \(y=\mathrm{range}/2\); ν₂≈13 < ν₁≈30; PDF EN 8p / RU 9p собраны OK.
+- **Artifacts:** `tables/iib_range_regime_summary.md`, `tables/student_t_nu_split_vs_shared.md`, `fig:diag-iib`, `fig:diag-mean-nu`, `plan/progress.md`
+- **Next:** опционально новый ν-прогон / 50% band / полный ν-grid.
+
 ## 2026-08-11 — Release prep: conference-article-2026.08
 
 - **Change:** Split IIB article script vs BC+normal; frozen CSV в `artifacts/conference_article/`; REPRODUCE.md, CITATION.cff, LICENSE, requirements-lock; обновлены plot scripts и ack в tex.
@@ -5,10 +25,6 @@
 - **Result:** 1548 configs CSV committed; plot scripts читают artifacts path.
 - **Artifacts:** `artifacts/conference_article/`, `REPRODUCE.md`, tag `conference-article-2026.08`
 - **Next:** merge PRs в main, GitHub Release.
-
-# Research / Change Diary
-
-Append-only log of substantial changes and experiments: what, why, result.
 
 ## 2026-08-10 — Plate-схема: TikZ из препринта 072026 (не tau_model.png)
 

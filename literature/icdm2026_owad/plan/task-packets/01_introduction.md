@@ -1,0 +1,25 @@
+## Task Packet — 01 Introduction
+
+- Scope: English workshop Introduction for ICDM 2026 OWAD; adapt RU draft with changepoint/regime-shift framing; hype only as motivation; keep non-prediction claims.
+- Stage: S1 Evidence → S4 Drafting
+- Files to read:
+  - `plan/project-overview.md`, `plan/outline.md`, `plan/notes.md`
+  - `refs/evidence-map.md`
+  - `plan/chapter-blueprints/01_introduction-blueprint.md`
+  - `literature/conference_article_ru/chapters/01_introduction.md`
+- Files allowed to edit:
+  - `chapters/01_introduction.md`
+  - `plan/progress.md`, `plan/notes.md`
+  - `plan/review/evidence-coverage.md`
+- Required skills: evidence-driven-writing, writing-chapters, writing-core
+- Evidence/data inputs: evidence map S01–S18 + carlin1992hierarchical (S19)
+- Required artifacts: evidence map, paragraph blueprint, evidence-coverage, Intro prose
+- Rejection checks:
+  - no operational earthquake-prediction claim
+  - no “we measure stress directly”
+  - no bullet contribution list in body
+  - no process notes / user instructions in manuscript
+  - no invented citations
+  - OWAD-readable: multivariate time-series changepoint / regime shift stated as the technical problem
+- Validation: word/char count vs min_chars=2800; three-pass writing-core check; citation keys ⊆ `refs/references.bib`
+- Handoff format: status, file path, argument chain summary, unresolved gaps, self-review
