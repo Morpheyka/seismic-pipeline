@@ -45,7 +45,9 @@ def setup_style(base: int = 11) -> None:
         {
             "font.family": "sans-serif",
             "font.sans-serif": ["DejaVu Sans", "Noto Sans", "Arial"],
-            "mathtext.fontset": "dejavusans",
+            "mathtext.fontset": "stix",
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
             "font.size": base,
             "axes.titlesize": base + 1,
             "axes.labelsize": base,
@@ -68,8 +70,8 @@ def setup_style(base: int = 11) -> None:
 
 def save_fig(fig: plt.Figure, out_dir: Path, stem: str) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / f"{stem}.png", dpi=450)
-    fig.savefig(out_dir / f"{stem}.svg")
+    for ext in (".png", ".svg", ".pdf"):
+        fig.savefig(out_dir / f"{stem}{ext}", dpi=450)
     plt.close(fig)
     print(f"wrote {out_dir / stem}.png")
 
@@ -699,6 +701,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--out-dir", type=Path, required=True)
     p.add_argument("--n-fan-curves", type=int, default=400)
     p.add_argument("--iib-threshold", type=float, default=0.9)
+    p.add_argument(
+        "--title",
+        type=str,
+        default="",
+        help="Human-readable figure title (no fingerprints).",
+    )
     return p.parse_args()
 
 
@@ -721,7 +729,7 @@ def main() -> None:
     cfg_spec = ((meta.get("config") or {}).get("parameter_selection") or {}).get(feature) or {}
     if isinstance(cfg_spec, dict) and "threshold" in cfg_spec:
         threshold = float(cfg_spec["threshold"])
-    title = f"{meta.get('fingerprint')} | {meta.get('features')} | {meta.get('likelihoods')}"
+    title = args.title.strip() or str(meta.get("features") or "confirmatory refit")
     print(f"[lik] feature={feature} likelihood={likelihood}")
     print(f"[params] {pairs}")
     print(f"[obs] key={obs_key} shape={observed_2d.shape} support_upper={support_upper}")

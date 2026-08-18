@@ -158,7 +158,7 @@ R.~P. Adams and D.~J.~C. MacKay, ``Bayesian online changepoint detection,''
 \bibitem{GOST2017}
 {Federal Agency on Technical Regulating and Metrology}, ``{GOST} {R}
   57546--2017: Earthquakes. seismic intensity scale,'' Standartinform, Moscow,
-  Tech. Rep., 2017, russian State Standard (GOST R); original title:
+  Tech. Rep., 2017, {R}ussian State Standard (GOST R); original title:
   Zemletryaseniya. Shkala seysmicheskoy intensivnosti.
 
 \bibitem{HoffmanGelman2014}
@@ -167,6 +167,14 @@ M.~D. Hoffman and A.~Gelman, ``The no-{U}-turn sampler: Adaptively setting path
   lengths in {H}amiltonian {M}onte {C}arlo,'' \emph{Journal of Machine Learning
   Research}, vol.~15, no.~47, pp. 1593--1623, 2014. [Online]. Available:
   \url{https://www.jmlr.org/papers/v15/hoffman14a.html}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Vehtari2024}
+\BIBentryALTinterwordspacing
+A.~Vehtari, D.~Simpson, A.~Gelman, Y.~Yao, and J.~Gabry, ``Pareto smoothed
+  importance sampling,'' \emph{Journal of Machine Learning Research}, vol.~25,
+  no.~72, pp. 1--58, 2024. [Online]. Available:
+  \url{https://www.jmlr.org/papers/v25/19-556.html}
 \BIBentrySTDinterwordspacing
 
 \end{thebibliography}

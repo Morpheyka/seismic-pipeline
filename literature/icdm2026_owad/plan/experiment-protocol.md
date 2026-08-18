@@ -40,7 +40,7 @@
 | MCMC | Prefer confirmatory: tune 6000 / draws 3000 / chains 4; if too slow, same lighter budget for **both** real comparator and shuffle (document) |
 | Outputs | `run_output_*/within_window_shuffle/` + `null_control_suite/` — seed-wise peak \(\tau\), E[\(\tau\)], synthetic MAD |
 | Paper figure | Left: real mean \(p(\tau=k)\); right: histogram of peak \(\tau\) over 20 shuffle seeds; `\label{fig:null-within-window}` |
-| Claim | Mid-window onset **sensitive to event-aligned day order** (consensus breaks across seeds); calendar-causal attribution remains weak; not an operational forecast |
+| Claim | Mid-window onset **sensitive to event-aligned day order** (consensus breaks across seeds); anomaly confirmed in event-aligned windows; not an operational forecast |
 | Deprecated summary | Do **not** claim “shuffle failed to flatten” from mean-PMF over 3 seeds — that aggregation was misleading |
 
 **Deprecated for prose:** proxy/date-shuffle narrative and any claim that calendar-date shuffle failed to separate dates.

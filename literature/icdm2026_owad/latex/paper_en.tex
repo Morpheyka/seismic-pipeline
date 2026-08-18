@@ -32,20 +32,25 @@
 \usepackage[hidelinks]{hyperref}
 
 \graphicspath{{images/}}
+\hyphenation{electro-en-ceph-a-lo-gram}
+
+% Triple-blind: anonymize site/affiliation wording inside body_en.tex
+\newif\ifOWADAnonymous
+\OWADAnonymoustrue
 
 \title{Bayesian Changepoint Detection for Event-Aligned REM Means Near Seismic Events}
 
 % Anonymous submission: no names, affiliations, thanks, or date.
 \author{%
 \IEEEauthorblockN{Anonymous Authors}
-\IEEEauthorblockA{Affiliation withheld for double-blind review}
+\IEEEauthorblockA{Affiliation withheld for triple-blind review}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We test whether an instrumented, brain-derived REM signal in rats shows a statistical regime-shift anomaly near seismic events, and which features and profile hyperparameters describe that anomaly most coherently. Eight-day event-aligned hypnogram windows (\(n=34\) after day-mask with \(K=6\)) are summarized by daily and half-day REM means under a Bayesian single-changepoint model with marginalized discrete onset \(\tau\). Student-\(t\) and skew-normal likelihoods for mean features yield stable \(\mathbb{E}[\tau]\) distributions concentrated a few days from the event, without pathological prior-edge pile-up. PSIS-LOO ranks retained profile geometries (\(N\), overlap) and mean likelihoods inside one observation builder. A within-window day-shuffle control on the primary mean arm breaks that mid-window onset consensus across seeds (peak \(\tau\) leaves \(\{6,7\}\) for prior-edge modes), matching a synthetic single-changepoint power check; causal calendar attribution remains weak. Range likelihood families known a priori to destroy onset interpretability are excluded from the main analysis. The result is statistical evidence of an anomaly in a neural sleep signal---not visual behavioral proof and not operational earthquake prediction.
+We test whether an instrumented, brain-derived REM signal in rats shows a statistical regime-shift anomaly near seismic events, and which features and profile hyperparameters describe that anomaly most coherently. Eight-day event-aligned hypnogram windows (\(n=34\) after day-mask with \(K=6\)) are summarized by daily and half-day REM means under a Bayesian single-changepoint model with marginalized discrete onset \(\tau\). Student-\(t\) and skew-normal likelihoods for mean features yield stable \(\mathbb{E}[\tau]\) distributions concentrated a few days from the event. PSIS-LOO ranks retained profile geometries (\(N\), overlap) and mean likelihoods inside one observation builder. A within-window day-shuffle control on the primary mean arm breaks that mid-window onset consensus across seeds (peak \(\tau\) leaves \(\{6,7\}\) for single-regime edges \(\tau=2\) or \(\tau=8\)), matching a synthetic single-changepoint power check, so the onset is tied to event-aligned day order rather than to a generic eight-day REM stretch. Secondary range checks use IIB@\(0.9\) because ordinary Beta is ill-behaved when min–max–normalized daily range concentrates near one. The result is statistical evidence of an anomaly in a neural sleep signal near seismic events---not visual behavioral proof and not operational earthquake prediction.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -55,7 +60,7 @@ REM sleep, changepoint detection, Bayesian inference, PSIS-LOO, neuroseismology,
 \input{body_en.tex}
 
 \section*{Data and Code Availability}
-Derived screening tables, confirmatory summaries, and analysis scripts supporting the reported results will be released in a public repository upon acceptance. Raw continuous animal recordings remain under institutional access restrictions.
+An anonymized archive of derived screening tables, confirmatory summaries, and plotting scripts is included with this submission and will be mirrored publicly upon acceptance. Raw continuous animal recordings remain under institutional access restrictions.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

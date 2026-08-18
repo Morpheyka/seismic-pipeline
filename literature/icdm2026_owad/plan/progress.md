@@ -304,3 +304,124 @@
 - Data: Methods→Method; Data/Code Availability section (anon-safe).
 - Bib: Rodkin EN primary; GOST English agency form; Adams `@misc` arXiv; `Sanford2010`→`Sanford2003`.
 - `paper_en.pdf` still 8 pages.
+
+## 2026-08-14 — Anonymization (triple-blind Data leaks)
+
+- Flag `\ifOWADAnonymous` in `paper_en.tex` / `paper_en_camera.tex`; Data in `body_en.tex` branched.
+- Anon: no KB GS RAS / SFU / Neurotechnologies center / protocol No. 1 / coords / exact 2025-07 dates / Kamchatka placename; ethics & staging → “authors’ institution”.
+- Camera: full wording restored; Chebrov affiliation → KB GS RAS (was wrongly SFU).
+- Scan: `paper_en.pdf` clean of those strings; `\cite{Saevskiy2025}` remains (bib has no SFU affiliation line).
+- Residual risk: unique rat+seismic+REM setup may still be recognizable to specialists; citing Saevskiy2025 is standard and not self-named.
+
+## 2026-08-14 — Range framing: IIB, not a-priori exclusion
+
+- Dropped “range families excluded a priori / not LOO winners” rhetoric.
+- New Method story: ordinary Beta diverges at the upper boundary when min–max daily range concentrates near 1 → secondary range uses IIB@0.9; primary narrative stays mean Student-\(t\)/skew-normal.
+- Synced abstracts, Intro/RW, Results, Discussion, Conclusion (EN/RU) + chapter mirrors; Design points to Method likelihood choices.
+
+## 2026-08-14 — Edge mass = single-regime reading
+
+- Define once in Method: mass at \(\tau=2\) or \(\tau=8\) ≈ model sees no useful two-regime split → one shared-parameter distribution; mid-window mass = readable onset.
+- Cut repeated “pathological prior-edge pile-up” from abstract/Discussion/Conclusion; Results report mid-window / no collapse to \(\tau=2\); null control links edge peaks to that reading.
+
+## 2026-08-14 — Final review `paper_en.pdf` (S5)
+
+- **Stage:** S5 Review (не redraft глав).
+- **Артефакты:** `plan/review_paper_en_final.md`, packet `plan/task-packets/2026-08-14-final-review.md`.
+- **Вердикт:** minor revision перед сабмитом. Desk-reject 12.08 (анонимность / не IEEE / 8+2) закрыт. Остаются: gallery-title Fig. 3, fingerprints Fig. 4/6, Type 3 на Fig. 5, нет CPD baseline, \(\hat k>1\) в Table I без комментария.
+- **Сабмит-файл:** `latex/paper_en.pdf` (8 стр., Anonymous). Не слать `paper_en_camera.pdf` (9 стр., имена).
+- Пользователь подтвердил: нет (ожидаем, править фигуры или нет).
+
+### Capability-use audit
+
+- Required skills: using-research-writing, paper-orchestration, peer-review, writing-core, latex-output, figures-python, figures-diagram, verification
+- Skills actually used: those eight (statistical-analysis — только чеклист Pareto/LOO, без нового анализа; brainstorming не нужен — scope уже locked)
+- Inputs consumed: `paper_en.pdf` (все 8 стр. raster), `paper_en.tex` / `body_en.tex` / `paper_en_camera.tex`, `latex/images/*`, `paper_en.log`, `references.bib`, OWAD CFP, `plan/review_paper_en.md`
+- Inputs not used: `style_check.sh` (нет в skills tree; EN-рукопись, не MD-глава); `research_quality_gate.ps1` (нет скрипта); полный multi-agent chapter rewrite (задача = review)
+- Artifacts produced: `plan/review_paper_en_final.md`, этот audit, task packet
+- Verification run: `pdfinfo` (8 стр., letter); `pdftotext` anonymization grep; cite keys ⊆ bib (0 missing); `pdffonts` Type 3 на Fig. 5; visual `pdftoppm` pp.1–8; OWAD CFP 8+2 / IEEE 2-col / anonymized
+- Remaining risk: уникальная схема + cite Saevskiy2025 может деанонимизировать специалистам; XeLaTeX+Liberation vs официальный pdflatex+Times; camera PDF eXpress ещё не гоняли
+
+## 2026-08-17 — Pre-submit fixes (figures, LOO, offline baseline)
+
+- **Stage:** S5 Review → правки по плану `owad_pre-submit_fixes`.
+- Fig. 3 перерисован из `mean_only_profile_agg.csv` без gallery-title.
+- Fig. 4/6: человеческие titles, STIX, `pdf.fonttype=42`.
+- Fig. 5: real PMF + 20-seed peaks; Type 3 нет.
+- Prose: triple-blind; \(\hat k_{\max}>1\) ordinal; screening \(6.03\) vs confirmatory \(5.74\); Pareto-ID promise снят; Vehtari2024.
+- Offline Gaussian two-mean scan: \(n=33\), median \(\tau_{\mathrm{ML}}=5.0\), \(10/33\) in \(\{6,7\}\), \(6/33\) = Bayesian MAP \(7\).
+- Interpretation subsection удалена; Discussion сжат.
+- **Verify:** `paper_en.pdf` = 8 стр. letter; no Type 3; anon grep clean; Vehtari2024 in `.bbl`. Camera = 9 стр. (не в портал).
+
+### Capability-use audit
+
+- Required skills: paper-orchestration, writing-core, figures-python, latex-output, verification
+- Skills actually used: those four
+- Inputs consumed: `mean_only_profile_agg.csv`, confirmatory `observations.npz` / traces, `exp1_many_seeds.json`, `within_window_shuffle_results.json`
+- Inputs not used: new MCMC; BOCPD/PELT implementations
+- Artifacts: `plot_fig3_profile.py`, `offline_cpd_baseline.py` + JSON; regenerated latex images; updated `body_en.tex` / `body_ru.tex`
+- Verification: `pdfinfo` Pages=8; `pdffonts` no Type 3; `pdftotext` no identity / no fingerprints; cite Vehtari2024 present
+- Remaining risk: confirmatory mean arm still \(n=33\) vs screening \(n=34\) (stated in text); no classical 2–4 day cite; XeLaTeX vs IEEE Times
+
+## 2026-08-17 — Final review vs ICDM CFP + OWAD portal
+
+- **Stage:** S5 Review (не redraft). Критерии: [ICDM 2026 Research Track](https://icdm2026.neu.edu.cn/11666/list.htm) + OWAD CFP; print-check Asian/European glyphs.
+- **Артефакты:** `plan/review_paper_en_icdm_submit.md`, packet `plan/task-packets/2026-08-17-final-review-icdm.md`.
+- **Вердикт:** для OWAD формат готов к сабмиту (`paper_en.pdf`, 8 стр., Anonymous). Research Track: дедлайн 6 июня уже прошёл; 8≤10 формально ок, вклад main track не тянет.
+- Desk-reject length/IEEE/anonymity закрыт. Print: Type 3 нет; кириллицы/CJK нет; Benítez/Šinkovec в слое; \(\mathbb{E}[\tau]\) на растере читается.
+- Сабмит только `paper_en.pdf`. Не слать camera (9 стр., имена).
+- Пользователь подтвердил: нет (ожидаем: слать как есть / час на Fig. 2 title + anonymous repo).
+
+### Capability-use audit
+
+- Required skills: using-research-writing, paper-orchestration, peer-review, writing-core, latex-output, figures-python, figures-diagram, verification
+- Skills actually used: those eight (statistical-analysis — чеклист LOO/Pareto/offline JSON, без нового анализа; brainstorming не нужен — scope locked; style_check.sh — для MD-глав, не для PDF; Pineau checklist PDF fetch timeout)
+- Inputs consumed: `paper_en.pdf` (все 8 стр. raster + crops), `paper_en.tex` / `body_en.tex` / `paper_en_camera.tex`, `paper_en.bbl` / `references.bib` / `paper_en.log`, `latex/images/*`, ICDM CFP, OWAD CFP, `offline_cpd_baseline.json`, ревью 12.08 и 14.08
+- Inputs not used: full multi-agent rewrite (задача = review); `research_quality_gate.ps1` (нет скрипта); IEEE templates.html (HTTP 418)
+- Artifacts produced: `plan/review_paper_en_icdm_submit.md`, этот audit, task packet
+- Verification run: `pdfinfo` Pages=8 letter; `pdffonts` Type 3=0; `pdftotext` anon grep clean; cite∩bib missing []; log 10pt + 0 Overfull; visual pdftoppm pp.1–8; JSON baseline matches prose
+- Remaining risk: уникальная схема + [14] Saevskiy/Kosenko; XeLaTeX+Liberation vs Times на PDF eXpress; OWAD-рецензент может отвергнуть как out-of-scope offline CPD; Research Track уже закрыт
+
+## 2026-08-18 — Presubmit fixes (legend Fig. 1 + polish)
+
+- **Stage:** S5 Review → targeted edits (packet `2026-08-18-presubmit-fixes.md`).
+- Fig. 1: легенда (6 узлов) `yshift=-3mm` в `tau_model_en.tikz` / `tau_model.tikz`; узел \(\nu_f\) снят; \(t=1{\ldots}8\). Зазор plate→legend ≈ 3.6 мм на растере 160 dpi.
+- Fig. 2: нейтральный title (`plot_fig2_mean_hist.py`); Type 3 нет.
+- Setup: `nan-padding` → NaN-masked without imputation (EN+RU body + chapters).
+- Data/Code: anonymized archive with submission; `supplement/README.md`.
+- Hyphenation `electro-en-ceph-a-lo-gram` в преамбуле; GOST `{R}ussian`.
+- **Verify:** `paper_en.pdf` = 8 стр. letter; camera = 9; Type 3 нет; pile-up/nan-padding/identity grep clean; Overfull 0.
+
+### Capability-use audit
+
+- Required skills: paper-orchestration, writing-core, figures-python, figures-diagram, latex-output, verification
+- Skills actually used: those six
+- Inputs consumed: `mean_only_long.csv` (n=84), tikz plates, `paper_en.tex` / camera / `body_*.tex`
+- Inputs not used: BOCPD/PELT; classical 2–4 day cite (нет ключа)
+- Artifacts: tikz legend shift; Fig. 2 pdf/png/svg; supplement README; rebuilt PDFs
+- Verification: `pdfinfo` Pages=8; `pdffonts` Type 3=0; pdftotext no pile-up / no identity; pixel gap Fig. 1 legend ~23 px @160 dpi
+- Remaining risk: unique setup + Saevskiy[14]; XeLaTeX vs Times; OWAD fit still weak
+
+## 2026-08-18 — Claim wording: anomaly near event, not calendar-causal predictor
+
+- Conclusion/Abstract: подтверждаем regime-shift аномалию вблизи сейсмических событий; убран ярлык `calendar-causal predictor`.
+- Discussion: shuffle поддерживает аномалию в event-aligned окнах; не отождествляет землетрясение с физиологической причиной; оперативный прогноз по-прежнему снят.
+- Зеркала EN+RU body, camera, chapters, protocol claim.
+- Next: rebuild `paper_en.pdf`, проверить 8 стр.
+- **Verify:** `paper_en.pdf` Pages=8 letter; `calendar-causal` нет в tex/PDF.
+
+## 2026-08-18 — Убран рис. 3 (`fig:mean-profile`)
+
+- Автор: график неинформативен. Снят `figure*` из `body_en.tex` / `body_ru.tex`.
+- Утверждение про \(N\)/overlap перенесено на Table I (`tab:loo-topk`); в RU-черновик добавлен `\input{table_loo_topk.tex}`.
+- Файлы `fig_mean_by_profile.*` на диске оставлены, в PDF не входят.
+- **Verify:** `paper_en.pdf` Pages=**7** letter (refs с p.7); camera=8; `fig:mean-profile` нет в aux; undefined refs нет; Type 3 нет (CID/Type1C). Номера: Fig. 2 гистограммы; Fig. 3 confirmatory \(\nu\)-split; Fig. 4 shuffle; Fig. 5 IIB.
+
+## 2026-08-18 — Убраны повторы «classical»
+
+- **Stage:** S4 targeted cut (packet `2026-08-18-cut-classical-repeats.md`).
+- Intro: один контраст (range / 12 бинов / 2–4 суток vs onset \(\tau\)), без слова classical.
+- Method: \((N,\mathrm{ov})=(12,0)\) как определение сетки.
+- **Verify:** `paper_en.pdf` Pages=7 letter; в PDF нет `classical`; «two to four days» только в Intro.
+
+
